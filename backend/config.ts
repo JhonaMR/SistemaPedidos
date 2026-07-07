@@ -17,4 +17,4 @@ export const DB_PATHS = {
   campanasReferencias: path.join(DB_DIR, 'campanas_referencias.json'),
 };
 
-export const FOTOS_REFERENCIAS_DIR = path.join(process.cwd(), 'fotos_referencias');
+export const FOTOS_REFERENCIAS_DIR = path.join(process.cwd(), 'public', 'fotos_referencias');

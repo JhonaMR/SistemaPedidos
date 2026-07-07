@@ -1,14 +1,5 @@
 [
   {
-    "id": "usr_sop",
-    "nombre": "Usuario Soporte",
-    "usuario": "SOP",
-    "clave": "9999",
-    "rol": "soporte",
-    "esPrimeraVez": false,
-    "activo": true
-  },
-  {
     "id": "1",
     "nombre": "Jhon Montoya",
     "usuario": "JAM",
@@ -17,5 +8,14 @@
     "esPrimeraVez": false,
     "activo": true,
     "idVendedor": "01"
+  },
+  {
+    "id": "usr_sop",
+    "nombre": "Usuario Soporte",
+    "usuario": "SOP",
+    "clave": "9999",
+    "rol": "soporte",
+    "esPrimeraVez": false,
+    "activo": true
   }
 ]
