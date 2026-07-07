@@ -1,0 +1,8 @@
+{
+  "name": "Toma de pedidos ARARE",
+  "description": "Sistema integral de toma de pedidos de prendas de vestir para vendedores. Permite registrar clientes, configurar prendas personalizadas por talla y color, gestionar el catálogo con precios COP, visualizar histórico por campañas clientes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

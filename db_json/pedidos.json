@@ -1,0 +1,41 @@
+[
+  {
+    "clienteId": "cli_002",
+    "clienteNombre": "INVERSIONES AM ACACIAS S.A.S.",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Jhon Montoya",
+    "items": [
+      {
+        "id": "cart_1783362439425_bm5s",
+        "prendaRef": "12869",
+        "nombrePrenda": "BLS MAN BOLE",
+        "categoria": "Dama",
+        "talla": "S-10, M-10, L-10",
+        "tallasDetalle": {
+          "S": 10,
+          "M": 10,
+          "L": 10
+        },
+        "cantidad": 30,
+        "precioUnitario": 31900,
+        "total": 957000
+      }
+    ],
+    "subtotal": 957000,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 957000,
+    "estado": "Pendiente",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-06",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783362444757",
+    "numeroPedido": "JAM-001",
+    "fecha": "2026-07-06",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 0,
+    "idLocal": 1
+  }
+]

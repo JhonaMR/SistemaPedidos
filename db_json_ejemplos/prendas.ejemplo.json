@@ -1,0 +1,103 @@
+[
+  {
+    "ref": "CAM-001",
+    "nombre": "Camisa Formal Oxford Manga Larga",
+    "categoria": "Colegial",
+    "precioBase": 45000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "stock": 50,
+    "imagenUrl": ""
+  },
+  {
+    "ref": "POL-002",
+    "nombre": "Camiseta Polo Pima Premium",
+    "categoria": "Niño",
+    "precioBase": 35000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "stock": 80,
+    "imagenUrl": ""
+  },
+  {
+    "ref": "PAN-003",
+    "nombre": "Jeans Denim Regular Fit",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 55000,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 45,
+    "imagenUrl": ""
+  },
+  {
+    "ref": "CHA-004",
+    "nombre": "Chaqueta Impermeable Cortavientos",
+    "categoria": "Colegial",
+    "precioBase": 78000,
+    "tallasDisponibles": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "stock": 25,
+    "imagenUrl": ""
+  },
+  {
+    "ref": "VES-005",
+    "nombre": "Vestido Casual Lino Primavera",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 65000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 30,
+    "imagenUrl": ""
+  },
+  {
+    "ref": "CAM-006",
+    "nombre": "Camisa Leñadora Franela",
+    "categoria": "Niña",
+    "precioBase": 42000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "stock": 40,
+    "imagenUrl": ""
+  },
+  {
+    "ref": "UNI-007",
+    "nombre": "Chaqueta Médica Drill Súper Flex",
+    "categoria": "Dama",
+    "precioBase": 49000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "stock": 60,
+    "imagenUrl": ""
+  }
+]

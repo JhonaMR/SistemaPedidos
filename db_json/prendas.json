@@ -1,0 +1,6701 @@
+[
+  {
+    "ref": "211",
+    "nombre": "BLUSA NIÑA",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 5500,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/211.jpg"
+  },
+  {
+    "ref": "605",
+    "nombre": "CAMISETA MOÑO PIEDRAS",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/605.jpg"
+  },
+  {
+    "ref": "624",
+    "nombre": "BLUSA MGA CASQUITO AMARRES LATERALES",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/624.jpg"
+  },
+  {
+    "ref": "662",
+    "nombre": "BL FONDEO FLORES  APERTURA ESP",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/662.jpg"
+  },
+  {
+    "ref": "663",
+    "nombre": "BLUSA OVER ESTAMPADA 2 RAYAS",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 18900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/663.jpg"
+  },
+  {
+    "ref": "664",
+    "nombre": "BLUSA RAYA APLI HELLO KYTY",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/664.jpg"
+  },
+  {
+    "ref": "665",
+    "nombre": "CAMISETA OVERS RAYAS CUELL COMBINA",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/665.jpg"
+  },
+  {
+    "ref": "666",
+    "nombre": "BLS COMBINADA CON SESGO",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/666.jpg"
+  },
+  {
+    "ref": "667",
+    "nombre": "BL  TIRAS ESTA RAYA ONDA FLOR",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/667.jpg"
+  },
+  {
+    "ref": "668",
+    "nombre": "BLUSON ESTAM FLOR",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/668.jpg"
+  },
+  {
+    "ref": "670",
+    "nombre": "CONJUNTO NIÑA RAYAS",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/670.jpg"
+  },
+  {
+    "ref": "671",
+    "nombre": "CONJUNTO NIÑA 2 CORAZONES 2 FLORE",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/671.jpg"
+  },
+  {
+    "ref": "673",
+    "nombre": "CONJUNTO EN FONDEO FLORES",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/673.jpg"
+  },
+  {
+    "ref": "675",
+    "nombre": "CONJUNTO  DE NIÑA EVERYDAY",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/675.jpg"
+  },
+  {
+    "ref": "676",
+    "nombre": "CONJUNTO DE NIÑA FLORES CORAZON",
+    "categoria": [
+      "Niña"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/676.jpg"
+  },
+  {
+    "ref": "3032",
+    "nombre": "CONJUNTO DEPORTIVO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/3032.jpg"
+  },
+  {
+    "ref": "3050",
+    "nombre": "CAMISILLA DEPORTIVA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/3050.jpg"
+  },
+  {
+    "ref": "5003",
+    "nombre": "PIJAMA RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/5003.jpg"
+  },
+  {
+    "ref": "6147",
+    "nombre": "CAMISERA MANG CORT EST PALMERAS CAFES",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6147.jpg"
+  },
+  {
+    "ref": "6148",
+    "nombre": "CAMISERA NIÑO CORTE INFERIOR APLIQUE",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6148.jpg"
+  },
+  {
+    "ref": "6149",
+    "nombre": "CAMISERA PLAYERAAAPLIQUE CALIFORNIA",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6149.jpg"
+  },
+  {
+    "ref": "6151",
+    "nombre": "CAMISERA  DOBLE PERILLA",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6151.jpg"
+  },
+  {
+    "ref": "6152",
+    "nombre": "CAMISERA DE NIÑO EN DEGRADE BACK",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6152.jpg"
+  },
+  {
+    "ref": "6156",
+    "nombre": "CAMISETA  DE NIÑO GALAXY",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6156.jpg"
+  },
+  {
+    "ref": "6157",
+    "nombre": "CAMISETA CORTE ESTAMPADO GRAFFITY",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6157.jpg"
+  },
+  {
+    "ref": "6158",
+    "nombre": "CAMISETA DE NIÑO BREKER",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6158.jpg"
+  },
+  {
+    "ref": "6159",
+    "nombre": "CAMISETA  STREET RAGER",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6159.jpg"
+  },
+  {
+    "ref": "6160",
+    "nombre": "CAMISETA BRK CON BOLSILLO",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6160.jpg"
+  },
+  {
+    "ref": "6161",
+    "nombre": "CAMISETA SPACE  WAYS",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6161.jpg"
+  },
+  {
+    "ref": "6162",
+    "nombre": "CAMISETA  DE NIÑO  STOP CREATING",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6162.jpg"
+  },
+  {
+    "ref": "6163",
+    "nombre": "CAMISETA CORTE EN FRENTE",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6163.jpg"
+  },
+  {
+    "ref": "6165",
+    "nombre": "CONJUNTO BORDADO CHAMAKITOS",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 64900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6165.jpg"
+  },
+  {
+    "ref": "6166",
+    "nombre": "CONJUNTO DE NIÑO APLIQUE  VACATION",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 53900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6166.jpg"
+  },
+  {
+    "ref": "6167",
+    "nombre": "CVONJUNTO DE NIÑO RAYAS PLACA CHAMAKITO",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 64900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6167.jpg"
+  },
+  {
+    "ref": "6169",
+    "nombre": "CONJUNTO DE NIÑO  INESPIRGTION",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 52900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6169.jpg"
+  },
+  {
+    "ref": "6171",
+    "nombre": "CONJUNTO SKATER",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 52900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6171.jpg"
+  },
+  {
+    "ref": "6173",
+    "nombre": "CONJUNTO DE NIÑO ARIZONA RAYA",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 58900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6173.jpg"
+  },
+  {
+    "ref": "6174",
+    "nombre": "CONJUNTO RAYAS  GO UP",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6174.jpg"
+  },
+  {
+    "ref": "6175",
+    "nombre": "CONJUNTO",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 57900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6175.jpg"
+  },
+  {
+    "ref": "6176",
+    "nombre": "CONJUNTO NINE",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 51900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6176.jpg"
+  },
+  {
+    "ref": "6177",
+    "nombre": "CONJUNTO URBAN CYTY",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 57900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6177.jpg"
+  },
+  {
+    "ref": "6178",
+    "nombre": "CONJUNTO DEGRADE  ESTAMPADO PATINETAS",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 48900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6178.jpg"
+  },
+  {
+    "ref": "6179",
+    "nombre": "CONJUNTO NIÑO  GOOD -WOW",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 41900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6179.jpg"
+  },
+  {
+    "ref": "6180",
+    "nombre": "CONJUNTO COMBINADO  RACING",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 51900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6180.jpg"
+  },
+  {
+    "ref": "6181",
+    "nombre": "CONJUNTO DE NIÑO  FOOTBALL",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6181.jpg"
+  },
+  {
+    "ref": "6182",
+    "nombre": "CONJUNTO DE TRES PARADISE",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 80900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6182.jpg"
+  },
+  {
+    "ref": "6183",
+    "nombre": "CONJUNTO NIÑO LEVEL UP",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6183.jpg"
+  },
+  {
+    "ref": "6184",
+    "nombre": "CONJUNTO DE NIÑO OVERLON",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 47900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6184.jpg"
+  },
+  {
+    "ref": "6185",
+    "nombre": "CONJUNTO DE NIÑO SURFERS",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6185.jpg"
+  },
+  {
+    "ref": "6186",
+    "nombre": "CONJUNTO NIÑO  STRUGGLING",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6186.jpg"
+  },
+  {
+    "ref": "6187",
+    "nombre": "CONJUNTO DE NIÑO WIN",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6187.jpg"
+  },
+  {
+    "ref": "6188",
+    "nombre": "CAMISETA  NIÑO BLESSING",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6188.jpg"
+  },
+  {
+    "ref": "6189",
+    "nombre": "CAMISETA OVERSAY  NIÑO COLOMBIA",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6189.jpg"
+  },
+  {
+    "ref": "6190",
+    "nombre": "CAMISETA OVERSAY FUTBOL",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6190.jpg"
+  },
+  {
+    "ref": "6191",
+    "nombre": "CAMISETA DE NIÑO COMANDOS",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6191.jpg"
+  },
+  {
+    "ref": "6192",
+    "nombre": "CAMISETA OBVERSY DOGTOWN",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6192.jpg"
+  },
+  {
+    "ref": "6193",
+    "nombre": "CONJUNTO DE TRES CAMUFLADO",
+    "categoria": [
+      "Niño"
+    ],
+    "precioBase": 89900,
+    "tallasDisponibles": [
+      "2-4",
+      "6-8",
+      "10-12",
+      "14-16"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/6193.jpg"
+  },
+  {
+    "ref": "11329",
+    "nombre": "BLUSA DAMA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5500,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/11329.jpg"
+  },
+  {
+    "ref": "11880",
+    "nombre": "BLUSA PLIZADA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/11880.jpg"
+  },
+  {
+    "ref": "12088",
+    "nombre": "BLUSA DAMA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 7000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12088.jpg"
+  },
+  {
+    "ref": "12395",
+    "nombre": "CAMISETA ASIMETRICO BOLEROS POPELINA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12395.jpg"
+  },
+  {
+    "ref": "12402",
+    "nombre": "BLUSON HOMBRO CAIDO PRENDEDOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12402.jpg"
+  },
+  {
+    "ref": "12412",
+    "nombre": "BLUSA CUELLO CRUZADA OJALILLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12412.jpg"
+  },
+  {
+    "ref": "12416",
+    "nombre": "CAMISERA ENVIVADA BOTONES NEGROS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 44900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12416.jpg"
+  },
+  {
+    "ref": "12442",
+    "nombre": "CONJUNTO LINO ENVIVADO MANGA SISA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 57900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12442.jpg"
+  },
+  {
+    "ref": "12460",
+    "nombre": "CROP TOP OJA/RIB",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12460.jpg"
+  },
+  {
+    "ref": "12473",
+    "nombre": "TOP CON AMARRE Y BRILLOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12473.jpg"
+  },
+  {
+    "ref": "12503",
+    "nombre": "BLUSA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12503.jpg"
+  },
+  {
+    "ref": "12565",
+    "nombre": "CHALECO CON TACHES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12565.jpg"
+  },
+  {
+    "ref": "12574",
+    "nombre": "TOP ESCOTE CON BRILLOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12574.jpg"
+  },
+  {
+    "ref": "12576",
+    "nombre": "BASICA LOVELY",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12576.jpg"
+  },
+  {
+    "ref": "12579",
+    "nombre": "CAMISERA EFECTO BORDADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12579.jpg"
+  },
+  {
+    "ref": "12600",
+    "nombre": "DUO BUSO CON MALLA Y AMARRE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12600.jpg"
+  },
+  {
+    "ref": "12609",
+    "nombre": "CROP TOP CON APLIQUE DE FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12609.jpg"
+  },
+  {
+    "ref": "12623",
+    "nombre": "BUSTIER DE MALLA CON PIEDRAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12623.jpg"
+  },
+  {
+    "ref": "12640",
+    "nombre": "CAMISILLA APLIQUE PIEDRAS FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12640.jpg"
+  },
+  {
+    "ref": "12652",
+    "nombre": "CAMISERA AMARRE FTE HEBILLA ESTAMPADO FLORES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12652.jpg"
+  },
+  {
+    "ref": "12671",
+    "nombre": "CHALECO FLORES TONO A TONO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12671.jpg"
+  },
+  {
+    "ref": "12686",
+    "nombre": "BUSO RECOGIDO MAYATEX",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12686.jpg"
+  },
+  {
+    "ref": "12694",
+    "nombre": "BLUSA CON AMARRE ESPALDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12694.jpg"
+  },
+  {
+    "ref": "12704",
+    "nombre": "CHALECO CUELLO HALTER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12704.jpg"
+  },
+  {
+    "ref": "12709",
+    "nombre": "BLUSA HOLGADA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12709.jpg"
+  },
+  {
+    "ref": "12712",
+    "nombre": "BLUSA RECOGIDA MANGAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12712.jpg"
+  },
+  {
+    "ref": "12744",
+    "nombre": "BODY RECOGIDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12744.jpg"
+  },
+  {
+    "ref": "12754",
+    "nombre": "BLUSA PERILLA BOTONES Y BOLERO INFERIOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 16900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12754.jpg"
+  },
+  {
+    "ref": "12777",
+    "nombre": "TOP SURSIDO TELA ROSI",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 14900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12777.jpg"
+  },
+  {
+    "ref": "12782",
+    "nombre": "CAMISILLA A RAYAS CON LETRERO EN ALTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12782.jpg"
+  },
+  {
+    "ref": "12809",
+    "nombre": "DUO BL MAN SIS Y TUNEL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 58900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12809.jpg"
+  },
+  {
+    "ref": "12862",
+    "nombre": "BLUSON FLORES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12862.jpg"
+  },
+  {
+    "ref": "12864",
+    "nombre": "CAMISILLA SISA ENTRADA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12864.jpg"
+  },
+  {
+    "ref": "12865",
+    "nombre": "TOP CARGADERA GRUESA BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 16900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12865.jpg"
+  },
+  {
+    "ref": "12866",
+    "nombre": "CAMISILLA ACANALADA ESTRELLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12866.jpg"
+  },
+  {
+    "ref": "12868",
+    "nombre": "DUO CON CROPTO Y AMARRE ESP",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 69900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12868.jpg"
+  },
+  {
+    "ref": "12869",
+    "nombre": "BLS MAN BOLE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12869.jpg"
+  },
+  {
+    "ref": "12875",
+    "nombre": "BLUSA CRUZADA CON HERRAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12875.jpg"
+  },
+  {
+    "ref": "12877",
+    "nombre": "CAMISILLA PUNTILLA CUELLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12877.jpg"
+  },
+  {
+    "ref": "12878",
+    "nombre": "DUO CON TOP",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 64900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12878.jpg"
+  },
+  {
+    "ref": "12879",
+    "nombre": "BL CUE PERI",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 38900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12879.jpg"
+  },
+  {
+    "ref": "12881",
+    "nombre": "BODY BAS MANG",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12881.jpg"
+  },
+  {
+    "ref": "12892",
+    "nombre": "BL ESTAM CON AMARRE FRENT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12892.jpg"
+  },
+  {
+    "ref": "12894",
+    "nombre": "CAMISERA LINOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12894.jpg"
+  },
+  {
+    "ref": "12895",
+    "nombre": "CORPIÑO A RAYAS BOLERO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 30900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12895.jpg"
+  },
+  {
+    "ref": "12897",
+    "nombre": "STRAPLE AMERR FRENT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12897.jpg"
+  },
+  {
+    "ref": "12907",
+    "nombre": "BODY CUADRADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 28900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12907.jpg"
+  },
+  {
+    "ref": "12908",
+    "nombre": "BODY BASIC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 28900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12908.jpg"
+  },
+  {
+    "ref": "12909",
+    "nombre": "CAMISETA MGA CORTA A RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12909.jpg"
+  },
+  {
+    "ref": "12912",
+    "nombre": "BASI RIB N 23",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 18900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12912.jpg"
+  },
+  {
+    "ref": "12914",
+    "nombre": "BL CUELL TEJIDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12914.jpg"
+  },
+  {
+    "ref": "12915",
+    "nombre": "BL SIS APLIQ P",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 28900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12915.jpg"
+  },
+  {
+    "ref": "12916",
+    "nombre": "CROPTO SESGO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12916.jpg"
+  },
+  {
+    "ref": "12917",
+    "nombre": "CROP TOP TELA MANTEYA DOS BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12917.jpg"
+  },
+  {
+    "ref": "12918",
+    "nombre": "TOP ESTAMPAT PL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12918.jpg"
+  },
+  {
+    "ref": "12919",
+    "nombre": "CAM FOND ALT FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12919.jpg"
+  },
+  {
+    "ref": "12920",
+    "nombre": "LENCERO BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12920.jpg"
+  },
+  {
+    "ref": "12921",
+    "nombre": "CAMSILLA FRANJA LATERAL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12921.jpg"
+  },
+  {
+    "ref": "12922",
+    "nombre": "BLUSA DAMA FRANJA Y MOÑO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12922.jpg"
+  },
+  {
+    "ref": "12923",
+    "nombre": "CAMISETA MGAS BLONDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12923.jpg"
+  },
+  {
+    "ref": "12924",
+    "nombre": "CAMISILLA GUIPIUR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12924.jpg"
+  },
+  {
+    "ref": "12926",
+    "nombre": "CAMISETA DOBLE FLOR ALTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12926.jpg"
+  },
+  {
+    "ref": "12931",
+    "nombre": "BLUSA DOBLE BOLERO AMARRE ESPALDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12931.jpg"
+  },
+  {
+    "ref": "12933",
+    "nombre": "BODY TIRAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12933.jpg"
+  },
+  {
+    "ref": "12934",
+    "nombre": "BLUSA DESTELLANTE ENCAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12934.jpg"
+  },
+  {
+    "ref": "12935",
+    "nombre": "BODY CUELL ALT LAGRI SP",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12935.jpg"
+  },
+  {
+    "ref": "12936",
+    "nombre": "BLUSA CUELLO HR FONDEO FLORES ALTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 14900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12936.jpg"
+  },
+  {
+    "ref": "12937",
+    "nombre": "CAMISETA SMILE ALTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 14900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12937.jpg"
+  },
+  {
+    "ref": "12939",
+    "nombre": "CAMISETA MGA DOBLE TEXTURA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12939.jpg"
+  },
+  {
+    "ref": "12940",
+    "nombre": "CAMISILLA 05 CUELLO COMBINADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12940.jpg"
+  },
+  {
+    "ref": "12941",
+    "nombre": "CAMISETA MGA CORTA AMORE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12941.jpg"
+  },
+  {
+    "ref": "12942",
+    "nombre": "BLUSON CORTES CENTROS MGA CASQUITO APLIQUE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12942.jpg"
+  },
+  {
+    "ref": "12943",
+    "nombre": "TOP LENCERIA DAMA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12943.jpg"
+  },
+  {
+    "ref": "12945",
+    "nombre": "ESTRAPLE AMARRE LATERAL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12945.jpg"
+  },
+  {
+    "ref": "12946",
+    "nombre": "CAMISETA CORTE FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12946.jpg"
+  },
+  {
+    "ref": "12950",
+    "nombre": "CROPT EST CIER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12950.jpg"
+  },
+  {
+    "ref": "12951",
+    "nombre": "CAMISE LATERA EN ENCAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12951.jpg"
+  },
+  {
+    "ref": "12952",
+    "nombre": "CAMISERTA PICO ENCAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12952.jpg"
+  },
+  {
+    "ref": "12953",
+    "nombre": "BLUSA MGA MUÑECA PUNTOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12953.jpg"
+  },
+  {
+    "ref": "12955",
+    "nombre": "BUSO ASIMETRICO TRANSPARENCIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12955.jpg"
+  },
+  {
+    "ref": "12956",
+    "nombre": "CAMISILLA ENCAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12956.jpg"
+  },
+  {
+    "ref": "12957",
+    "nombre": "BLUSA CUELLO BANDEJA ASIMETRICO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12957.jpg"
+  },
+  {
+    "ref": "12958",
+    "nombre": "CMISETA MGA REDOBLADA EST BAMBI",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12958.jpg"
+  },
+  {
+    "ref": "12959",
+    "nombre": "CAMISETA BOLSILLO ENCAGE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12959.jpg"
+  },
+  {
+    "ref": "12960",
+    "nombre": "CAMISETA ENCAJE FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12960.jpg"
+  },
+  {
+    "ref": "12961",
+    "nombre": "CAMSILLA ENCEGE CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12961.jpg"
+  },
+  {
+    "ref": "12962",
+    "nombre": "BLUSA ASIMETRICA HERRAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 44900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12962.jpg"
+  },
+  {
+    "ref": "12963",
+    "nombre": "BLUSA BOLER MANG ESTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12963.jpg"
+  },
+  {
+    "ref": "12964",
+    "nombre": "CAMISA - ALMILLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 46900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12964.jpg"
+  },
+  {
+    "ref": "12965",
+    "nombre": "CORPIÑO AMARRE ESPALDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12965.jpg"
+  },
+  {
+    "ref": "12966",
+    "nombre": "BLUSA AMARRES MILAN VERAMIENTNIC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 43900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12966.jpg"
+  },
+  {
+    "ref": "12967",
+    "nombre": "TOP FLORES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12967.jpg"
+  },
+  {
+    "ref": "12968",
+    "nombre": "CAMISERA MGA BOMBA ESTAMPADO CENEFA FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 44900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12968.jpg"
+  },
+  {
+    "ref": "12969",
+    "nombre": "BLUSA STRAPLE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12969.jpg"
+  },
+  {
+    "ref": "12970",
+    "nombre": "BLS CON GRIP EN FRNT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12970.jpg"
+  },
+  {
+    "ref": "12971",
+    "nombre": "BL DE AMARRE ESP",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 36900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12971.jpg"
+  },
+  {
+    "ref": "12972",
+    "nombre": "CAMISE BOL FLOR GRIPIUR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12972.jpg"
+  },
+  {
+    "ref": "12973",
+    "nombre": "DUO CHALECO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 42900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12973.jpg"
+  },
+  {
+    "ref": "12974",
+    "nombre": "BODY CONCHAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12974.jpg"
+  },
+  {
+    "ref": "12975",
+    "nombre": "BODY CUELL BANDEJ Y MANG APART",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12975.jpg"
+  },
+  {
+    "ref": "12976",
+    "nombre": "BUS SUB EN PUNT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12976.jpg"
+  },
+  {
+    "ref": "12978",
+    "nombre": "BLUSA PERLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12978.jpg"
+  },
+  {
+    "ref": "12979",
+    "nombre": "STRAPLE FLORES CIERR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12979.jpg"
+  },
+  {
+    "ref": "12980",
+    "nombre": "BL BOL CUELLO ESTAM RAYA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12980.jpg"
+  },
+  {
+    "ref": "12981",
+    "nombre": "BLUSA RESORTDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 36900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12981.jpg"
+  },
+  {
+    "ref": "12983",
+    "nombre": "CAMISETA MGA CASQUITO APLIQUE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12983.jpg"
+  },
+  {
+    "ref": "12984",
+    "nombre": "BODY COP FRNA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12984.jpg"
+  },
+  {
+    "ref": "12986",
+    "nombre": "BODY DECORATIVO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12986.jpg"
+  },
+  {
+    "ref": "12987",
+    "nombre": "BODY FLORES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12987.jpg"
+  },
+  {
+    "ref": "12990",
+    "nombre": "BLUSA PLUSS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12990.jpg"
+  },
+  {
+    "ref": "12991",
+    "nombre": "BL PLUS CORTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12991.jpg"
+  },
+  {
+    "ref": "12993",
+    "nombre": "CHALECO NOCHE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12993.jpg"
+  },
+  {
+    "ref": "12996",
+    "nombre": "CAMISERA BOL ESTAM",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12996.jpg"
+  },
+  {
+    "ref": "12999",
+    "nombre": "BODY SUB  LAGRIMA FRENR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/12999.jpg"
+  },
+  {
+    "ref": "13000",
+    "nombre": "BODY RAYA OCHENTERA APLIQUE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13000.jpg"
+  },
+  {
+    "ref": "13001",
+    "nombre": "BLUSA RAYAS CORBATA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13001.jpg"
+  },
+  {
+    "ref": "13002",
+    "nombre": "CAMISETA CORTE LATERAL BOTONES DECORATIVOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 41900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13002.jpg"
+  },
+  {
+    "ref": "13003",
+    "nombre": "BLUSA VIENA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13003.jpg"
+  },
+  {
+    "ref": "13004",
+    "nombre": "CAMISILLA FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13004.jpg"
+  },
+  {
+    "ref": "13005",
+    "nombre": "CAMISETA JAMAICA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13005.jpg"
+  },
+  {
+    "ref": "13006",
+    "nombre": "BLUSA FLOR HERRAGE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13006.jpg"
+  },
+  {
+    "ref": "13007",
+    "nombre": "BLUSA ROSA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13007.jpg"
+  },
+  {
+    "ref": "13008",
+    "nombre": "CAMISETA 1987",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13008.jpg"
+  },
+  {
+    "ref": "13009",
+    "nombre": "BLU SUBL RAYA CUELLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13009.jpg"
+  },
+  {
+    "ref": "13010",
+    "nombre": "BLU ENCAJE EN CONTRASTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13010.jpg"
+  },
+  {
+    "ref": "13011",
+    "nombre": "BLUSA EN GRIPIU",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13011.jpg"
+  },
+  {
+    "ref": "13012",
+    "nombre": "BLUS CUELL NERU PLUSS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13012.jpg"
+  },
+  {
+    "ref": "13013",
+    "nombre": "BL AMARR ANGELIT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13013.jpg"
+  },
+  {
+    "ref": "13014",
+    "nombre": "BL AMARR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13014.jpg"
+  },
+  {
+    "ref": "13015",
+    "nombre": "CAMISETA PLUSS COMBINADA CROCHET",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13015.jpg"
+  },
+  {
+    "ref": "13016",
+    "nombre": "CAMISILLA PLUSS PEDRERIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13016.jpg"
+  },
+  {
+    "ref": "13017",
+    "nombre": "CAMISETA RAYAS MGA BOMBA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 42900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13017.jpg"
+  },
+  {
+    "ref": "13019",
+    "nombre": "CAMISERA A RAYAS FONDEO FLORES Y GUIOIUR MGAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 55900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13019.jpg"
+  },
+  {
+    "ref": "13023",
+    "nombre": "CAMISETA PLUS CORTE ESPALDA FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13023.jpg"
+  },
+  {
+    "ref": "13027",
+    "nombre": "BODY ISLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13027.jpg"
+  },
+  {
+    "ref": "13028",
+    "nombre": "BODY RIO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13028.jpg"
+  },
+  {
+    "ref": "13029",
+    "nombre": "DUO BODY COR MAN CASQ",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13029.jpg"
+  },
+  {
+    "ref": "13032",
+    "nombre": "BUSO DE CIERRE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13032.jpg"
+  },
+  {
+    "ref": "13033",
+    "nombre": "CAMISETA MARGARITA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13033.jpg"
+  },
+  {
+    "ref": "13034",
+    "nombre": "CAMISETA TEKILA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13034.jpg"
+  },
+  {
+    "ref": "13035",
+    "nombre": "CAMISETA  ESPALDA Y PUÑOS BLONDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 38900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13035.jpg"
+  },
+  {
+    "ref": "13036",
+    "nombre": "CAMISETA ESPALDA CON APLIQUES YB APLIQUE PUNTO CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13036.jpg"
+  },
+  {
+    "ref": "13038",
+    "nombre": "BL RAYA EST FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13038.jpg"
+  },
+  {
+    "ref": "13039",
+    "nombre": "BLU PEPLUT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 30900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13039.jpg"
+  },
+  {
+    "ref": "13040",
+    "nombre": "BL STRAP CON HERRAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13040.jpg"
+  },
+  {
+    "ref": "13041",
+    "nombre": "STRAP FLOR MAX",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13041.jpg"
+  },
+  {
+    "ref": "13042",
+    "nombre": "BL MANG BOLE ARABEZC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13042.jpg"
+  },
+  {
+    "ref": "13043",
+    "nombre": "BL EST BOLA Y CORBATIN",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13043.jpg"
+  },
+  {
+    "ref": "13044",
+    "nombre": "CORSER LUZA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13044.jpg"
+  },
+  {
+    "ref": "13045",
+    "nombre": "BLUSA LENCERA DAMA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13045.jpg"
+  },
+  {
+    "ref": "13046",
+    "nombre": "LENCERA ESTRA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13046.jpg"
+  },
+  {
+    "ref": "13047",
+    "nombre": "BLUSA COPAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13047.jpg"
+  },
+  {
+    "ref": "13048",
+    "nombre": "BL ALFORZ FRENT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13048.jpg"
+  },
+  {
+    "ref": "13050",
+    "nombre": "BL APERT FRENTE Y GRIPIUR EN SESG",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13050.jpg"
+  },
+  {
+    "ref": "13052",
+    "nombre": "BLUSA ENCAJE SISA ENTRADA PLACA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13052.jpg"
+  },
+  {
+    "ref": "13054",
+    "nombre": "CROP TOP PUFHER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13054.jpg"
+  },
+  {
+    "ref": "13055",
+    "nombre": "CHALECO LANA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13055.jpg"
+  },
+  {
+    "ref": "13057",
+    "nombre": "BLUSA COPA GUIPIUR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13057.jpg"
+  },
+  {
+    "ref": "13058",
+    "nombre": "BL RAYA SI BOTO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13058.jpg"
+  },
+  {
+    "ref": "13059",
+    "nombre": "CAMISA BOLSILLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13059.jpg"
+  },
+  {
+    "ref": "13063",
+    "nombre": "BLUSON PLUSS BOLERO FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13063.jpg"
+  },
+  {
+    "ref": "13064",
+    "nombre": "BLUSA PLUSS LENCERA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13064.jpg"
+  },
+  {
+    "ref": "13065",
+    "nombre": "BLUSA COPAS FRANJA PLUSS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13065.jpg"
+  },
+  {
+    "ref": "13066",
+    "nombre": "CAMISERA LINO FLOR PAPEL FULL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 45900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13066.jpg"
+  },
+  {
+    "ref": "13067",
+    "nombre": "BLUSA MALLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13067.jpg"
+  },
+  {
+    "ref": "13068",
+    "nombre": "CAMISETA MANGA CORATA FONDEADA FLORES TEXTO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13068.jpg"
+  },
+  {
+    "ref": "13069",
+    "nombre": "CAMISILLA SISA ENTRADA PUNTOS ALTA TEXTO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13069.jpg"
+  },
+  {
+    "ref": "13070",
+    "nombre": "BLUSA CORTE FTE BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 14900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13070.jpg"
+  },
+  {
+    "ref": "13071",
+    "nombre": "CROP TOP MINIPRINST MOÑOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 14900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13071.jpg"
+  },
+  {
+    "ref": "13072",
+    "nombre": "BLUSA CORTE FTE BOLAS COORDINADAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13072.jpg"
+  },
+  {
+    "ref": "13073",
+    "nombre": "BLUSA LAGRIMA FTAE CUELLO HALTER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 15900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13073.jpg"
+  },
+  {
+    "ref": "13074",
+    "nombre": "CAMISILLA COMBINADOA BURDA BOLAS TEXTO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13074.jpg"
+  },
+  {
+    "ref": "13075",
+    "nombre": "CAMISERA ANIMAL PRINT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13075.jpg"
+  },
+  {
+    "ref": "13076",
+    "nombre": "TOP EN AMELIA Y MAYATEX",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13076.jpg"
+  },
+  {
+    "ref": "13077",
+    "nombre": "DUO CHALECO TELA SOPHIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 42900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13077.jpg"
+  },
+  {
+    "ref": "13078",
+    "nombre": "BL BAND ESTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13078.jpg"
+  },
+  {
+    "ref": "13079",
+    "nombre": "CAMISILLA PRENDEDOR BABY",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13079.jpg"
+  },
+  {
+    "ref": "13081",
+    "nombre": "CAMISETA MGA CORTA TEXTO ALTA CON MIRELLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13081.jpg"
+  },
+  {
+    "ref": "13082",
+    "nombre": "ESTRAPLE RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13082.jpg"
+  },
+  {
+    "ref": "13083",
+    "nombre": "TOP ALWAIS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13083.jpg"
+  },
+  {
+    "ref": "13084",
+    "nombre": "TOP BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13084.jpg"
+  },
+  {
+    "ref": "13085",
+    "nombre": "CAMISETA COSTADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13085.jpg"
+  },
+  {
+    "ref": "13086",
+    "nombre": "CAMISETA RECOGIDO MANGAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13086.jpg"
+  },
+  {
+    "ref": "13087",
+    "nombre": "BLUSA HELLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13087.jpg"
+  },
+  {
+    "ref": "13088",
+    "nombre": "CAMISETA OVERSAY",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13088.jpg"
+  },
+  {
+    "ref": "13089",
+    "nombre": "BLUSA V",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13089.jpg"
+  },
+  {
+    "ref": "13090",
+    "nombre": "BLUSA BELIVE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13090.jpg"
+  },
+  {
+    "ref": "13091",
+    "nombre": "TOP 1981",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 18900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13091.jpg"
+  },
+  {
+    "ref": "13092",
+    "nombre": "BL FOND FLORE Y TEXTO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13092.jpg"
+  },
+  {
+    "ref": "13093",
+    "nombre": "BL CUELL ESTA BOLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13093.jpg"
+  },
+  {
+    "ref": "13094",
+    "nombre": "BL SIS ESTAM FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13094.jpg"
+  },
+  {
+    "ref": "13095",
+    "nombre": "BL CORT LAT BOTONE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13095.jpg"
+  },
+  {
+    "ref": "13096",
+    "nombre": "BL EST PUNTOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13096.jpg"
+  },
+  {
+    "ref": "13097",
+    "nombre": "BL ALFO FRENTE Y NGELIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13097.jpg"
+  },
+  {
+    "ref": "13098",
+    "nombre": "STRA ESTAP",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13098.jpg"
+  },
+  {
+    "ref": "13099",
+    "nombre": "BLS ESTA CON GRIPIR MANG",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13099.jpg"
+  },
+  {
+    "ref": "13100",
+    "nombre": "BL STAM GOOD",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13100.jpg"
+  },
+  {
+    "ref": "13101",
+    "nombre": "BLUSA PLUSS CORPIÑO BOLERO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13101.jpg"
+  },
+  {
+    "ref": "13102",
+    "nombre": "BLUSA PLUSS ARGOLLA HOMBRO ASIMETRICA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13102.jpg"
+  },
+  {
+    "ref": "13103",
+    "nombre": "CAMISERA TAPA PERLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 43900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13103.jpg"
+  },
+  {
+    "ref": "13104",
+    "nombre": "CAMISERA BOLSILLOS INCRUSTADOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13104.jpg"
+  },
+  {
+    "ref": "13105",
+    "nombre": "CAMISERA  SUBLIMADO RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 38900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13105.jpg"
+  },
+  {
+    "ref": "13106",
+    "nombre": "CAMISERA CORTES APLIQUE PIEDRAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 45900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13106.jpg"
+  },
+  {
+    "ref": "13107",
+    "nombre": "CAMISERA NUDO FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13107.jpg"
+  },
+  {
+    "ref": "13108",
+    "nombre": "CAMISERA CREPE BORADADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13108.jpg"
+  },
+  {
+    "ref": "13109",
+    "nombre": "BLUSA PLUSS MANGA SISA RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13109.jpg"
+  },
+  {
+    "ref": "13110",
+    "nombre": "CAMISILLA BURDA CUELLO Y SISA EN RIB CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13110.jpg"
+  },
+  {
+    "ref": "13112",
+    "nombre": "BLU RAYA PLUSS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13112.jpg"
+  },
+  {
+    "ref": "13113",
+    "nombre": "BL ESTM BOTO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13113.jpg"
+  },
+  {
+    "ref": "13114",
+    "nombre": "BLUS RAYA SUB",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13114.jpg"
+  },
+  {
+    "ref": "13115",
+    "nombre": "BL PLUSS MANG BOLE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13115.jpg"
+  },
+  {
+    "ref": "13116",
+    "nombre": "CAMISETA FONDEO CORAZONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13116.jpg"
+  },
+  {
+    "ref": "13117",
+    "nombre": "BLUSON RAYAS FLORES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13117.jpg"
+  },
+  {
+    "ref": "13118",
+    "nombre": "CAMISILLA RAYA EST PUNTO CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13118.jpg"
+  },
+  {
+    "ref": "13119",
+    "nombre": "CROP TOP PUNTOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13119.jpg"
+  },
+  {
+    "ref": "13120",
+    "nombre": "ESTRAPLE BOLERO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13120.jpg"
+  },
+  {
+    "ref": "13121",
+    "nombre": "CAMISILLA RAYA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13121.jpg"
+  },
+  {
+    "ref": "13122",
+    "nombre": "CAMISILLA RAYA DOBLE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 18900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13122.jpg"
+  },
+  {
+    "ref": "13123",
+    "nombre": "CAMISILLA TEXTO TONO ATONO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13123.jpg"
+  },
+  {
+    "ref": "13124",
+    "nombre": "BLUSA RIB DOS COLORES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13124.jpg"
+  },
+  {
+    "ref": "13125",
+    "nombre": "TOP ROMANTIC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13125.jpg"
+  },
+  {
+    "ref": "13126",
+    "nombre": "BL D TI ESTASM Y BOT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13126.jpg"
+  },
+  {
+    "ref": "13127",
+    "nombre": "BL ESTAN ESC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13127.jpg"
+  },
+  {
+    "ref": "13128",
+    "nombre": "BL CENTO BOTON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13128.jpg"
+  },
+  {
+    "ref": "13129",
+    "nombre": "TOP THE BESTIS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13129.jpg"
+  },
+  {
+    "ref": "13131",
+    "nombre": "BL  EST  EN CENEFA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13131.jpg"
+  },
+  {
+    "ref": "13132",
+    "nombre": "BL APLIE HELLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13132.jpg"
+  },
+  {
+    "ref": "13133",
+    "nombre": "CAMISETA RECOGIDA APLIQUE CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13133.jpg"
+  },
+  {
+    "ref": "13134",
+    "nombre": "BLUSA BLONDA TOP INCORPORADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13134.jpg"
+  },
+  {
+    "ref": "13135",
+    "nombre": "BODY 3/4 CUELLO SEMICUADRADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13135.jpg"
+  },
+  {
+    "ref": "13136",
+    "nombre": "BODY SESGOS AL CONTRASTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13136.jpg"
+  },
+  {
+    "ref": "13137",
+    "nombre": "POLO BOLSILLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13137.jpg"
+  },
+  {
+    "ref": "13138",
+    "nombre": "TOP NUDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 18900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13138.jpg"
+  },
+  {
+    "ref": "13139",
+    "nombre": "BLUSA CORTE DIAGONAL FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13139.jpg"
+  },
+  {
+    "ref": "13141",
+    "nombre": "BLUSA BONA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13141.jpg"
+  },
+  {
+    "ref": "13142",
+    "nombre": "BLUSA NEVER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13142.jpg"
+  },
+  {
+    "ref": "13143",
+    "nombre": "CAMISETA RAYAS COMBINADA LOS ANGELES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13143.jpg"
+  },
+  {
+    "ref": "13144",
+    "nombre": "BODY SESGOS COMBINADOS ESTAMPADO FTE Y ESPALDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 28900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13144.jpg"
+  },
+  {
+    "ref": "13145",
+    "nombre": "CAMISERA RAYAS BOLSILLO APLIQUE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13145.jpg"
+  },
+  {
+    "ref": "13146",
+    "nombre": "TOP DORADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13146.jpg"
+  },
+  {
+    "ref": "13147",
+    "nombre": "BODY SUMMER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13147.jpg"
+  },
+  {
+    "ref": "13148",
+    "nombre": "CAMISETA CORAZONES PERLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13148.jpg"
+  },
+  {
+    "ref": "13149",
+    "nombre": "CAMISETA MOTORCYCLES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13149.jpg"
+  },
+  {
+    "ref": "13150",
+    "nombre": "CAMISETA A RAYAS TEXTO PAPEL EN ALTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13150.jpg"
+  },
+  {
+    "ref": "13151",
+    "nombre": "TOP TEJIDO MORESK",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13151.jpg"
+  },
+  {
+    "ref": "13153",
+    "nombre": "BLUSA YARA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 40900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13153.jpg"
+  },
+  {
+    "ref": "13154",
+    "nombre": "BLUSA CUELLO BANDEJA SOBEPUESTO RECOGIDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13154.jpg"
+  },
+  {
+    "ref": "13155",
+    "nombre": "BLUSA BORDADO PERRITO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13155.jpg"
+  },
+  {
+    "ref": "13157",
+    "nombre": "TOP GLAM",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13157.jpg"
+  },
+  {
+    "ref": "13158",
+    "nombre": "TOP BOTON CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13158.jpg"
+  },
+  {
+    "ref": "13159",
+    "nombre": "TOP OJALETES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13159.jpg"
+  },
+  {
+    "ref": "13160",
+    "nombre": "TOP FLORES CROCHET",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13160.jpg"
+  },
+  {
+    "ref": "13161",
+    "nombre": "BLUSA LUCKY LIFE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13161.jpg"
+  },
+  {
+    "ref": "13162",
+    "nombre": "POLO RALLAS TEJIDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13162.jpg"
+  },
+  {
+    "ref": "13163",
+    "nombre": "CROP TOP VARILLA PUNTOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13163.jpg"
+  },
+  {
+    "ref": "13164",
+    "nombre": "CROP TOP LARGO BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13164.jpg"
+  },
+  {
+    "ref": "13165",
+    "nombre": "CAMISILLA DAMA APLIQUE PIEDRAS PERLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13165.jpg"
+  },
+  {
+    "ref": "13167",
+    "nombre": "CAMISETA MARGARITA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13167.jpg"
+  },
+  {
+    "ref": "13168",
+    "nombre": "CAMISETA SANTEZA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13168.jpg"
+  },
+  {
+    "ref": "13169",
+    "nombre": "BLUSA CORAZON BORDADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13169.jpg"
+  },
+  {
+    "ref": "13170",
+    "nombre": "BODY CUELLO ASIMETRICO HEBILLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13170.jpg"
+  },
+  {
+    "ref": "13172",
+    "nombre": "BODY TOP INCLUIDO MAYATEX BOLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13172.jpg"
+  },
+  {
+    "ref": "13173",
+    "nombre": "BODY CUELLO DRAPEADO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13173.jpg"
+  },
+  {
+    "ref": "13174",
+    "nombre": "BODY CORTE BUSTO AMARRE FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13174.jpg"
+  },
+  {
+    "ref": "13175",
+    "nombre": "BODY MAYATEX FRANJA ANAGAELITA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13175.jpg"
+  },
+  {
+    "ref": "13176",
+    "nombre": "BODY SISA ENTRADA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 36900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13176.jpg"
+  },
+  {
+    "ref": "13177",
+    "nombre": "BODY HEBILLA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13177.jpg"
+  },
+  {
+    "ref": "13179",
+    "nombre": "BODY PARIS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13179.jpg"
+  },
+  {
+    "ref": "13180",
+    "nombre": "BODY MAYATEX ASIMETRICO MANGA LARGA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13180.jpg"
+  },
+  {
+    "ref": "13182",
+    "nombre": "BODY ESTRAPLE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13182.jpg"
+  },
+  {
+    "ref": "13183",
+    "nombre": "BLUSA NEW JERSEY",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13183.jpg"
+  },
+  {
+    "ref": "13184",
+    "nombre": "TUBULAR MGA CORTA PERLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13184.jpg"
+  },
+  {
+    "ref": "13185",
+    "nombre": "TOP TUBULAR IRREGULAR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13185.jpg"
+  },
+  {
+    "ref": "13186",
+    "nombre": "TUBULAR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13186.jpg"
+  },
+  {
+    "ref": "13187",
+    "nombre": "CAMISERA TELA ELASTICA BOTONES GRANDES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13187.jpg"
+  },
+  {
+    "ref": "13188",
+    "nombre": "BLUSA MAYATEX RECOGIDO FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13188.jpg"
+  },
+  {
+    "ref": "13190",
+    "nombre": "CAMISETA MANGA COORTA HERRAJE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13190.jpg"
+  },
+  {
+    "ref": "13191",
+    "nombre": "CORPIÑO PUNTOS ESPALDA RESORTADA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13191.jpg"
+  },
+  {
+    "ref": "13192",
+    "nombre": "CONJUNTO BLUSA Y PANTALON A RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 68900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13192.jpg"
+  },
+  {
+    "ref": "13193",
+    "nombre": "BLUSON CUELLO SPORT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 40900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13193.jpg"
+  },
+  {
+    "ref": "13194",
+    "nombre": "TOP BLONDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13194.jpg"
+  },
+  {
+    "ref": "13195",
+    "nombre": "CAMISETA DESTELLANTE CON SESGOS ANCHOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13195.jpg"
+  },
+  {
+    "ref": "13196",
+    "nombre": "BLUSA FLOR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13196.jpg"
+  },
+  {
+    "ref": "13197",
+    "nombre": "BLUSA FORTUNE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13197.jpg"
+  },
+  {
+    "ref": "13198",
+    "nombre": "CAMISETA RALLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13198.jpg"
+  },
+  {
+    "ref": "13199",
+    "nombre": "BLUSA 91",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13199.jpg"
+  },
+  {
+    "ref": "13200",
+    "nombre": "BLUSA CHERISH",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13200.jpg"
+  },
+  {
+    "ref": "13201",
+    "nombre": "BLUSA ROLLAGE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 44900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13201.jpg"
+  },
+  {
+    "ref": "13202",
+    "nombre": "TOP HERRAJE CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13202.jpg"
+  },
+  {
+    "ref": "13203",
+    "nombre": "BLUSA VINTAGE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13203.jpg"
+  },
+  {
+    "ref": "13204",
+    "nombre": "CAMISETA RAYAS COORDINADAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13204.jpg"
+  },
+  {
+    "ref": "13205",
+    "nombre": "TOP MUSSETY",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13205.jpg"
+  },
+  {
+    "ref": "13206",
+    "nombre": "BLUSA GLOBA GUIPIUR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13206.jpg"
+  },
+  {
+    "ref": "13207",
+    "nombre": "BLUSON PERILLA CUELLO POLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13207.jpg"
+  },
+  {
+    "ref": "13208",
+    "nombre": "CAMISETA MANGA CORTA CON BOTONES EN FTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13208.jpg"
+  },
+  {
+    "ref": "13209",
+    "nombre": "BLUSA CORAZON PLUS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13209.jpg"
+  },
+  {
+    "ref": "13210",
+    "nombre": "BLUSA HAWAI PLUS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13210.jpg"
+  },
+  {
+    "ref": "13211",
+    "nombre": "BLUSA MORESCA PLUS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 44900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13211.jpg"
+  },
+  {
+    "ref": "13212",
+    "nombre": "BLUSA GRIPIUR PLUS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 38900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13212.jpg"
+  },
+  {
+    "ref": "13213",
+    "nombre": "VESTIDO  AMARRE EN FRENTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13213.jpg"
+  },
+  {
+    "ref": "13214",
+    "nombre": "VESTIDO CORTE BUST  ROME",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13214.jpg"
+  },
+  {
+    "ref": "13215",
+    "nombre": "VESTIDO RALLAS VIC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13215.jpg"
+  },
+  {
+    "ref": "13216",
+    "nombre": "VESTIDO RIO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13216.jpg"
+  },
+  {
+    "ref": "13217",
+    "nombre": "VESTIDO POLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 48900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13217.jpg"
+  },
+  {
+    "ref": "13218",
+    "nombre": "VESTIDO CUELL V APLIQUE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 35900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13218.jpg"
+  },
+  {
+    "ref": "13219",
+    "nombre": "VESTIDO 2 BOLEROS Y APLIQUE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 45900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13219.jpg"
+  },
+  {
+    "ref": "13220",
+    "nombre": "CONJUNTO CAMISETA CUELLO POLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 79900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13220.jpg"
+  },
+  {
+    "ref": "13221",
+    "nombre": "CONJUNTO CAMISERA MANGA SISA SHORT RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 59900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13221.jpg"
+  },
+  {
+    "ref": "13222",
+    "nombre": "CONJUNTO CHALECO AMARRE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 56900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13222.jpg"
+  },
+  {
+    "ref": "13223",
+    "nombre": "CONJUNTO MGA SISA SHORT PUFF TONO ATONO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 49900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13223.jpg"
+  },
+  {
+    "ref": "13224",
+    "nombre": "BL SIS CON CIRCON SESG LAGRI ESP",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13224.jpg"
+  },
+  {
+    "ref": "13225",
+    "nombre": "CAMISETA SMILE ALTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13225.jpg"
+  },
+  {
+    "ref": "13226",
+    "nombre": "BLUSA DAMA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13226.jpg"
+  },
+  {
+    "ref": "13227",
+    "nombre": "CAMISETA 1987",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13227.jpg"
+  },
+  {
+    "ref": "13228",
+    "nombre": "CAMISETA MGA CORTA A RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13228.jpg"
+  },
+  {
+    "ref": "13229",
+    "nombre": "CAMSIETA MGA CORTA CON ELSTICO CUELLO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13229.jpg"
+  },
+  {
+    "ref": "13230",
+    "nombre": "TUBULAR OSITO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13230.jpg"
+  },
+  {
+    "ref": "13231",
+    "nombre": "CORPIÑO PLUSS BOLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 31900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13231.jpg"
+  },
+  {
+    "ref": "13232",
+    "nombre": "CAMISETA A RAYAS APLIQUE SMILE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13232.jpg"
+  },
+  {
+    "ref": "13233",
+    "nombre": "CAMISETA PLUSS APLIQUE P.CORAZON Y ESPALDA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13233.jpg"
+  },
+  {
+    "ref": "13234",
+    "nombre": "CAMISETA DESTELLANTE CON RIB",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13234.jpg"
+  },
+  {
+    "ref": "13235",
+    "nombre": "BLUSA DAMA PLUSS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13235.jpg"
+  },
+  {
+    "ref": "13236",
+    "nombre": "CAMISETA A RAYAS APLIQUE OK",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 44900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13236.jpg"
+  },
+  {
+    "ref": "13237",
+    "nombre": "CAMISETA 3 BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 37900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13237.jpg"
+  },
+  {
+    "ref": "13238",
+    "nombre": "BLUSA CORTES FTES MGA 3/4",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13238.jpg"
+  },
+  {
+    "ref": "13239",
+    "nombre": "BLUSON CUELLO EN V",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13239.jpg"
+  },
+  {
+    "ref": "13240",
+    "nombre": "BLUSON CUELLO TEJIDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 48900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13240.jpg"
+  },
+  {
+    "ref": "13241",
+    "nombre": "CHALECO BOTONES DORADOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 36900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13241.jpg"
+  },
+  {
+    "ref": "13242",
+    "nombre": "CAMISETA MGA READOBLADA CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13242.jpg"
+  },
+  {
+    "ref": "13243",
+    "nombre": "CAMISETA MGA CORTA A RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 5000,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13243.jpg"
+  },
+  {
+    "ref": "13244",
+    "nombre": "BL EST PUNTOS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13244.jpg"
+  },
+  {
+    "ref": "13245",
+    "nombre": "CAMISETA RECOGIDO MANGAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13245.jpg"
+  },
+  {
+    "ref": "13246",
+    "nombre": "CAMISETA PLUSS COMBINADA CROCHET",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 32900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13246.jpg"
+  },
+  {
+    "ref": "13247",
+    "nombre": "CAMISE BOL FLOR GRIPIUR",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 39900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13247.jpg"
+  },
+  {
+    "ref": "13248",
+    "nombre": "CAMISETA DAMA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 10900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13248.jpg"
+  },
+  {
+    "ref": "13249",
+    "nombre": "BODY ANIMAL PRINT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13249.jpg"
+  },
+  {
+    "ref": "13250",
+    "nombre": "BLUSA 1981",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13250.jpg"
+  },
+  {
+    "ref": "13252",
+    "nombre": "BLUSA 1994",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13252.jpg"
+  },
+  {
+    "ref": "13253",
+    "nombre": "CAMISETA CORTA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13253.jpg"
+  },
+  {
+    "ref": "13254",
+    "nombre": "BLU ESTA BOT FRENT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 34900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13254.jpg"
+  },
+  {
+    "ref": "13255",
+    "nombre": "BLUSA BANDERA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13255.jpg"
+  },
+  {
+    "ref": "13256",
+    "nombre": "CAMISETA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13256.jpg"
+  },
+  {
+    "ref": "13257",
+    "nombre": "BLUSA PLUSS COLOMBIA MGA SISA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 28900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13257.jpg"
+  },
+  {
+    "ref": "13258",
+    "nombre": "CAMISETA RIB MGA CORTA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 30900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13258.jpg"
+  },
+  {
+    "ref": "13259",
+    "nombre": "CAMISETA MANGA CORTA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13259.jpg"
+  },
+  {
+    "ref": "13260",
+    "nombre": "BLUSA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13260.jpg"
+  },
+  {
+    "ref": "13262",
+    "nombre": "CAMISA AMARRE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 12900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13262.jpg"
+  },
+  {
+    "ref": "13263",
+    "nombre": "CAMISETA CORTE LATERAL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13263.jpg"
+  },
+  {
+    "ref": "13264",
+    "nombre": "CHALECO BOTON GRANDE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13264.jpg"
+  },
+  {
+    "ref": "13265",
+    "nombre": "CAMISETA DE BOLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13265.jpg"
+  },
+  {
+    "ref": "13266",
+    "nombre": "BLUSA CUELLO BANDEJA 98",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13266.jpg"
+  },
+  {
+    "ref": "13267",
+    "nombre": "TOP CONTRASTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13267.jpg"
+  },
+  {
+    "ref": "13268",
+    "nombre": "TOP BOTON CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13268.jpg"
+  },
+  {
+    "ref": "13269",
+    "nombre": "BLUSA MOONLIGTH",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13269.jpg"
+  },
+  {
+    "ref": "13270",
+    "nombre": "CAMISETA NO RAIN",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13270.jpg"
+  },
+  {
+    "ref": "13271",
+    "nombre": "CAMISETA OVERSAY MGA CORTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13271.jpg"
+  },
+  {
+    "ref": "13272",
+    "nombre": "CAMISETA PRENSES AL LADO IZQUIERDO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13272.jpg"
+  },
+  {
+    "ref": "13273",
+    "nombre": "CAMISETA POLO COMBINADO RIB APLIQUE PUNTO CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13273.jpg"
+  },
+  {
+    "ref": "13274",
+    "nombre": "CAMISETA POLO CUELLO AL CONTRASTE AZUL",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13274.jpg"
+  },
+  {
+    "ref": "13275",
+    "nombre": "CAMISILLA RAYAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 23900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13275.jpg"
+  },
+  {
+    "ref": "13276",
+    "nombre": "MGA SISA APLIQUE BLANCO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 19900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13276.jpg"
+  },
+  {
+    "ref": "13277",
+    "nombre": "BLUSA CUELLO Y PERILLA SISAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13277.jpg"
+  },
+  {
+    "ref": "13278",
+    "nombre": "BLUSA DE RAYA  ESTAMPADO TEXTURA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13278.jpg"
+  },
+  {
+    "ref": "13279",
+    "nombre": "CAMISETA FONDEO DE BOLAS",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13279.jpg"
+  },
+  {
+    "ref": "13280",
+    "nombre": "BLUSA CON METIDO Y BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13280.jpg"
+  },
+  {
+    "ref": "13281",
+    "nombre": "BLUSA SISA CORTE ASIMETRIOC BOSTON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13281.jpg"
+  },
+  {
+    "ref": "13282",
+    "nombre": "BLUSON CRUZADO BOTONES",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 22900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13282.jpg"
+  },
+  {
+    "ref": "13283",
+    "nombre": "BLUSA  YES CORAZON",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13283.jpg"
+  },
+  {
+    "ref": "13284",
+    "nombre": "BLUSA ESTAMPADA  DEAR SPRINT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13284.jpg"
+  },
+  {
+    "ref": "13285",
+    "nombre": "CAMISETA CUELLO ESTAMPADO EN RAYA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 27900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13285.jpg"
+  },
+  {
+    "ref": "13286",
+    "nombre": "CAMISETA CONSIDER",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 26900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13286.jpg"
+  },
+  {
+    "ref": "13287",
+    "nombre": "BLUSON CORTE HOMBRO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13287.jpg"
+  },
+  {
+    "ref": "13288",
+    "nombre": "TOP TRIANGULO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 17900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13288.jpg"
+  },
+  {
+    "ref": "13289",
+    "nombre": "TOP CALIFORNIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13289.jpg"
+  },
+  {
+    "ref": "13290",
+    "nombre": "CAMISETA EN ANIMAL PRINT",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 25900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13290.jpg"
+  },
+  {
+    "ref": "13291",
+    "nombre": "BLUSA STRAPLE ESTAMPADA EN FONDEO",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13291.jpg"
+  },
+  {
+    "ref": "13292",
+    "nombre": "BLUSA SESGO EN COPA ICONIC",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13292.jpg"
+  },
+  {
+    "ref": "13293",
+    "nombre": "BLUS COPA  SESGO EN CONTRASTE",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 20900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13293.jpg"
+  },
+  {
+    "ref": "13294",
+    "nombre": "CAMISETA MANGA CORTA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 21900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13294.jpg"
+  },
+  {
+    "ref": "13295",
+    "nombre": "CAMISETA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13295.jpg"
+  },
+  {
+    "ref": "13296",
+    "nombre": "CAMISETA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 24900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13296.jpg"
+  },
+  {
+    "ref": "13298",
+    "nombre": "CAMISETA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 28900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13298.jpg"
+  },
+  {
+    "ref": "13299",
+    "nombre": "CAMISETA MGA RANGLAN COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13299.jpg"
+  },
+  {
+    "ref": "13300",
+    "nombre": "CAMISETA COLOMBIA 10",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13300.jpg"
+  },
+  {
+    "ref": "13302",
+    "nombre": "CAMISETA  FONDEO  MARIPOSA COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 29900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13302.jpg"
+  },
+  {
+    "ref": "13303",
+    "nombre": "POLO COLOMBIA",
+    "categoria": [
+      "Dama"
+    ],
+    "precioBase": 33900,
+    "tallasDisponibles": [
+      "S",
+      "M",
+      "L"
+    ],
+    "stock": 100,
+    "imagenUrl": "/fotos_referencias/13303.jpg"
+  }
+]

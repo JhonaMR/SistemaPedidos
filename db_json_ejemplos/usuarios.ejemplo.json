@@ -1,0 +1,20 @@
+[
+  {
+    "id": "usr_sop",
+    "nombre": "Usuario Soporte",
+    "usuario": "SOP",
+    "clave": "9999",
+    "rol": "soporte",
+    "esPrimeraVez": false,
+    "activo": true
+  },
+  {
+    "id": "usr_gen",
+    "nombre": "Usuario General",
+    "usuario": "GEN",
+    "clave": "1234",
+    "rol": "general",
+    "esPrimeraVez": true,
+    "activo": true
+  }
+]

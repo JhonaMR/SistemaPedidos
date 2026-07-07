@@ -1,0 +1,41 @@
+[
+  {
+    "id": "ped_1",
+    "numeroPedido": "PED-0001",
+    "clienteId": "c1",
+    "clienteNombre": "Alejandro Restrepo Gómez",
+    "clienteTelefono": "+57 312 765 4321",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "item_1",
+        "prendaRef": "CAM-001",
+        "nombrePrenda": "Camisa Formal Oxford Manga Larga",
+        "categoria": "Colegial",
+        "talla": "M",
+        "cantidad": 2,
+        "precioUnitario": 45000,
+        "total": 90000
+      },
+      {
+        "id": "item_2",
+        "prendaRef": "POL-002",
+        "nombrePrenda": "Camiseta Polo Pima Premium",
+        "categoria": "Niño",
+        "talla": "M",
+        "cantidad": 3,
+        "precioUnitario": 35000,
+        "total": 105000
+      }
+    ],
+    "subtotal": 195000,
+    "porcentajeDescuento": 5,
+    "montoDescuento": 9750,
+    "total": 185250,
+    "estado": "Procesado",
+    "notas": "Entregar planchadas en bolsas de satín individual.",
+    "fecha": "2026-06-28",
+    "fechaEntregaEstimada": "2026-07-02",
+    "fechaLimiteDespacho": "2026-07-05"
+  }
+]

@@ -1,0 +1,24 @@
+[
+  {
+    "id": "c1",
+    "nombre": "Alejandro Restrepo Gómez",
+    "documentoIdentidad": "CC 10234567",
+    "telefono": "+57 312 765 4321",
+    "correo": "alejandro@gmail.com",
+    "direccion": "Avenida El Poblado #10-34",
+    "ciudad": "Medellín",
+    "notas": "Talla M en camisas regulares, prefiere colores oscuros (azul marino y negro).",
+    "fechaRegistro": "2026-06-15"
+  },
+  {
+    "id": "c2",
+    "nombre": "Carolina Vélez Alzate",
+    "documentoIdentidad": "NIT 900.123.456-1",
+    "telefono": "+57 300 123 4567",
+    "correo": "carolina.velez@distribucionesvelez.com",
+    "direccion": "Carrera 43A #5A-20",
+    "ciudad": "Medellín",
+    "notas": "Mayorista de uniformes corporativos. Tallas surtidas.",
+    "fechaRegistro": "2026-06-18"
+  }
+]
