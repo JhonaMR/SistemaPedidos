@@ -22,7 +22,7 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { Cliente, Pedido, UsuarioApp, Prenda } from './types';
+import { Cliente, Pedido, UsuarioApp, Prenda, Campana } from './types';
 import { db, PedidoOffline } from './services/db';
 import {
   fetchServerData,
@@ -42,6 +42,22 @@ import OrderHistory from './components/OrderHistory';
 import ClientSection from './components/ClientSection';
 import Login from './components/Login';
 import ReferenciasCatalog from './components/ReferenciasCatalog';
+
+export function parseCampana(nombreCompleto: string): Campana {
+  const match = nombreCompleto.match(/\d{4}/);
+  const anio = match ? parseInt(match[0], 10) : 2026;
+  const cleanName = nombreCompleto.replace(new RegExp(`\\s*${anio}\\s*`, 'g'), '').trim();
+  const norm = cleanName.toLowerCase();
+  
+  let numero = 1;
+  if (norm.includes('inicio')) numero = 1;
+  else if (norm.includes('madre')) numero = 2;
+  else if (norm.includes('vacacio') || norm.includes('vacac')) numero = 3;
+  else if (norm.includes('temporad')) numero = 4;
+  else numero = 5;
+
+  return { nombre: cleanName, anio, numero };
+}
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'nuevo-pedido' | 'pedidos' | 'clientes' | 'configuracion' | 'referencias'>('dashboard');
@@ -78,7 +94,11 @@ export default function App() {
     if (savedAvail) {
       try {
         const parsed = JSON.parse(savedAvail);
-        if (parsed && parsed.length > 0) return parsed[0];
+        if (parsed && parsed.length > 0) {
+          const first = parsed[0];
+          if (typeof first === 'string') return first;
+          return `${first.nombre} ${first.anio}`;
+        }
       } catch (e) {}
     }
     return '';
@@ -87,9 +107,30 @@ export default function App() {
   const [selectedCampanaConfig, setSelectedCampanaConfig] = useState<string | null>(null);
   const [campanaRefSearch, setCampanaRefSearch] = useState('');
   const [selectedCampanaYear, setSelectedCampanaYear] = useState<string>('Todas');
+  const [showNewCampanaModal, setShowNewCampanaModal] = useState(false);
+  const [newCampanaName, setNewCampanaName] = useState('');
+  const [newCampanaYear, setNewCampanaYear] = useState('');
+  const [newCampanaNumber, setNewCampanaNumber] = useState('');
+  const [selectedHeaderYear, setSelectedHeaderYear] = useState<number>(() => {
+    const savedActive = localStorage.getItem('prenda_campana');
+    if (savedActive) {
+      const match = savedActive.match(/\d{4}/);
+      if (match) return parseInt(match[0], 10);
+    }
+    return new Date().getFullYear();
+  });
+
+  useEffect(() => {
+    if (activeCampana) {
+      const match = activeCampana.match(/\d{4}/);
+      if (match) {
+        setSelectedHeaderYear(parseInt(match[0], 10));
+      }
+    }
+  }, [activeCampana]);
 
   // Campaign references configuration state
-  const [campanasDisponibles, setCampanasDisponibles] = useState<string[]>(() => {
+  const [campanasDisponibles, setCampanasDisponibles] = useState<Campana[]>(() => {
     const saved = localStorage.getItem('prenda_campanas_disponibles');
     return saved ? JSON.parse(saved) : [];
   });
@@ -196,7 +237,33 @@ export default function App() {
         setPedidos(dbPedidos);
         setCatalogGarments(dbPrendas);
         setUsuarios(dbUsuarios);
-        setCampanasDisponibles(dbCampanas.map(c => c.nombre));
+
+        // Migración local en caliente si falta anio o numero
+        const migratedCampanas = dbCampanas.map(c => {
+          let name = c.nombre;
+          let anio = c.anio;
+          let numero = c.numero;
+          if (anio === undefined || numero === undefined) {
+            const parsed = parseCampana(name);
+            name = parsed.nombre;
+            anio = parsed.anio;
+            numero = parsed.numero;
+          }
+          return { nombre: name, anio, numero };
+        });
+
+        const needsSave = dbCampanas.some(c => c.anio === undefined || c.numero === undefined);
+        if (needsSave) {
+          await db.transaction('rw', db.campanas, async () => {
+            await db.campanas.clear();
+            await db.campanas.bulkAdd(migratedCampanas.map(c => ({ id: `${c.nombre} ${c.anio}`, nombre: c.nombre, anio: c.anio, numero: c.numero })));
+          });
+          if (navigator.onLine) {
+            apiSaveCampanas(migratedCampanas);
+          }
+        }
+
+        setCampanasDisponibles(migratedCampanas);
 
         // Mapear campañas y referencias
         const mappedRefs: Record<string, string[]> = {};
@@ -225,6 +292,76 @@ export default function App() {
     }
   };
 
+  const handleCreateCampana = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!newCampanaName.trim() || !newCampanaYear.trim() || !newCampanaNumber.trim()) {
+      alert("Por favor rellene todos los campos.");
+      return;
+    }
+
+    const cleanName = newCampanaName.trim();
+    const yearVal = parseInt(newCampanaYear, 10);
+    const numVal = parseInt(newCampanaNumber, 10);
+
+    if (isNaN(yearVal) || isNaN(numVal)) {
+      alert("Año y Número de orden deben ser valores numéricos.");
+      return;
+    }
+
+    const fullName = `${cleanName} ${yearVal}`;
+
+    // Verify if name already exists in campaign list
+    const exists = campanasDisponibles.some(
+      c => `${c.nombre.toLowerCase()} ${c.anio}` === fullName.toLowerCase()
+    );
+
+    if (exists) {
+      alert(`La campaña "${fullName}" ya existe.`);
+      return;
+    }
+
+    const newCampanaObj: Campana = {
+      nombre: cleanName,
+      anio: yearVal,
+      numero: numVal
+    };
+
+    const updatedCampanas = [...campanasDisponibles, newCampanaObj];
+    
+    // Set campaign references entry as empty for this new campaign
+    const updatedRefs = {
+      ...campanasReferencias,
+      [fullName]: []
+    };
+
+    // Update React states
+    setCampanasDisponibles(updatedCampanas);
+    setCampanasReferencias(updatedRefs);
+    
+    // Save to localStorage for quick cache access
+    localStorage.setItem('prenda_campanas_disponibles', JSON.stringify(updatedCampanas));
+    localStorage.setItem('prenda_campanas_referencias', JSON.stringify(updatedRefs));
+
+    // Save and sync with server/IndexedDB
+    await syncWithServer(
+      clientes, 
+      pedidos, 
+      null, 
+      deletedPedidos, 
+      pedidoBackups, 
+      usuarios, 
+      updatedCampanas, 
+      updatedRefs
+    );
+
+    // Reset fields and close modal
+    setNewCampanaName('');
+    setNewCampanaYear('');
+    setNewCampanaNumber('');
+    setShowNewCampanaModal(false);
+    alert(`Campaña "${fullName}" creada con éxito.`);
+  };
+
   const inicializarIndexedDBDesdeServidor = async () => {
     try {
       const data = await fetchServerData();
@@ -248,7 +385,22 @@ export default function App() {
           await db.usuarios.bulkAdd(data.usuarios);
         }
         if (data.campanas && data.campanas.length > 0) {
-          await db.campanas.bulkAdd(data.campanas.map(c => ({ id: c, nombre: c })));
+          const mappedCampanas = data.campanas.map(c => {
+            if (typeof c === 'string') {
+              return parseCampana(c);
+            }
+            return {
+              nombre: c.nombre,
+              anio: c.anio || 2026,
+              numero: c.numero || 1
+            };
+          });
+          await db.campanas.bulkAdd(mappedCampanas.map(c => ({
+            id: `${c.nombre} ${c.anio}`,
+            nombre: c.nombre,
+            anio: c.anio,
+            numero: c.numero
+          })));
         }
         if (data.campanasReferencias && Object.keys(data.campanasReferencias).length > 0) {
           const refsArray = Object.keys(data.campanasReferencias).map(key => ({
@@ -275,7 +427,13 @@ export default function App() {
       setPedidos(dbPedidos);
       setCatalogGarments(dbPrendas);
       setUsuarios(dbUsuarios);
-      setCampanasDisponibles(dbCampanas.map(c => c.nombre));
+
+      const migratedCampanas = dbCampanas.map(c => ({
+        nombre: c.nombre,
+        anio: c.anio,
+        numero: c.numero
+      }));
+      setCampanasDisponibles(migratedCampanas);
 
       const mappedRefs: Record<string, string[]> = {};
       dbCampanasRefs.forEach(cr => {
@@ -369,7 +527,7 @@ export default function App() {
     updatedDeletedPedidos?: Pedido[],
     updatedBackups?: Pedido[],
     updatedUsuarios?: UsuarioApp[],
-    updatedCampanas?: string[],
+    updatedCampanas?: Campana[],
     updatedCampanasRefs?: Record<string, string[]>
   ) => {
     // 1. Guardar en IndexedDB usando Dexie
@@ -399,7 +557,7 @@ export default function App() {
         }
         if (updatedCampanas) {
           await db.campanas.clear();
-          await db.campanas.bulkAdd(updatedCampanas.map(c => ({ id: c, nombre: c })));
+          await db.campanas.bulkAdd(updatedCampanas.map(c => ({ id: `${c.nombre} ${c.anio}`, nombre: c.nombre, anio: c.anio, numero: c.numero })));
         }
         if (updatedCampanasRefs) {
           const refsArray = Object.keys(updatedCampanasRefs).map(key => ({
@@ -1033,7 +1191,8 @@ export default function App() {
   }
   const filteredCampanasReferencias: Record<string, string[]> = {};
   campanasDisponibles.forEach(c => {
-    filteredCampanasReferencias[c] = campanasReferencias[c] || [];
+    const fullName = `${c.nombre} ${c.anio}`;
+    filteredCampanasReferencias[fullName] = campanasReferencias[fullName] || [];
   });
 
   return (
@@ -1055,15 +1214,16 @@ export default function App() {
             </div>
 
             <div className="space-y-2">
-              {campanasDisponibles.map((campana) => {
-                const isSelected = activeCampana === campana;
+              {[...campanasDisponibles].sort((a, b) => a.numero - b.numero).map((campana) => {
+                const fullName = `${campana.nombre} ${campana.anio}`;
+                const isSelected = activeCampana === fullName;
                 return (
                   <button
-                    key={campana}
+                    key={fullName}
                     type="button"
                     onClick={() => {
-                      setActiveCampana(campana);
-                      localStorage.setItem('prenda_campana', campana);
+                      setActiveCampana(fullName);
+                      localStorage.setItem('prenda_campana', fullName);
                     }}
                     className={`w-full p-3.5 text-left rounded-xl text-xs font-bold transition-all border flex items-center justify-between ${
                       isSelected
@@ -1071,7 +1231,7 @@ export default function App() {
                         : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
-                    <span>{campana}</span>
+                    <span>{fullName}</span>
                     {isSelected && (
                       <span className="w-2 h-2 rounded-full bg-indigo-600" />
                     )}
@@ -1259,8 +1419,39 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {/* Campaign Selector aligned with Base de datos */}
+            {/* Campaign Selectors: Year & Campaign */}
             <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Año:</span>
+              <select
+                id="header-year-selector"
+                value={selectedHeaderYear}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setSelectedHeaderYear(val);
+                  
+                  // Auto-select first campaign of this year
+                  const campaignsForYear = campanasDisponibles
+                    .filter(c => c.anio === val)
+                    .sort((a, b) => a.numero - b.numero);
+                  
+                  if (campaignsForYear.length > 0) {
+                    const newActive = `${campaignsForYear[0].nombre} ${campaignsForYear[0].anio}`;
+                    setActiveCampana(newActive);
+                    localStorage.setItem('prenda_campana', newActive);
+                  } else {
+                    setActiveCampana('');
+                    localStorage.setItem('prenda_campana', '');
+                  }
+                }}
+                className="p-1.5 px-2 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+              >
+                <option value={2026}>2026</option>
+                <option value={2027}>2027</option>
+                <option value={2028}>2028</option>
+                <option value={2029}>2029</option>
+              </select>
+
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 ml-1">Campaña:</span>
               <select
                 id="header-campana-selector"
                 value={activeCampana}
@@ -1271,11 +1462,17 @@ export default function App() {
                 }}
                 className="p-1.5 px-3 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
               >
-                {campanasDisponibles.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
+                {campanasDisponibles.filter(c => c.anio === selectedHeaderYear).length === 0 && (
+                  <option value="">-- Sin campañas --</option>
+                )}
+                {[...campanasDisponibles]
+                  .filter(c => c.anio === selectedHeaderYear)
+                  .sort((a, b) => a.numero - b.numero)
+                  .map((c) => (
+                    <option key={`${c.nombre} ${c.anio}`} value={`${c.nombre} ${c.anio}`}>
+                      {c.nombre} {c.anio}
+                    </option>
+                  ))}
               </select>
             </div>
 
@@ -1560,8 +1757,8 @@ export default function App() {
                               className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                             >
                               <option value="">-- No asociar a ninguna campaña --</option>
-                              {campanasDisponibles.map(c => (
-                                <option key={c} value={c}>{c}</option>
+                              {[...campanasDisponibles].sort((a, b) => a.numero - b.numero).map(c => (
+                                <option key={`${c.nombre} ${c.anio}`} value={`${c.nombre} ${c.anio}`}>{c.nombre} {c.anio}</option>
                               ))}
                             </select>
                           </div>
@@ -1600,8 +1797,8 @@ export default function App() {
                               className="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                             >
                               <option value="">-- Selecciona Campaña --</option>
-                              {campanasDisponibles.map(c => (
-                                <option key={c} value={c}>{c}</option>
+                              {[...campanasDisponibles].sort((a, b) => a.numero - b.numero).map(c => (
+                                <option key={`${c.nombre} ${c.anio}`} value={`${c.nombre} ${c.anio}`}>{c.nombre} {c.anio}</option>
                               ))}
                             </select>
                           </div>
@@ -1826,58 +2023,77 @@ export default function App() {
                       Gestione la lista de campañas comerciales y configure qué referencias del catálogo están activas y autorizadas para cada campaña.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0 bg-slate-50/50 border border-slate-200 rounded-lg p-1 px-2.5">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Filtrar Año:</span>
-                    <select
-                      id="select-campana-year-filter"
-                      value={selectedCampanaYear}
-                      onChange={(e) => setSelectedCampanaYear(e.target.value)}
-                      className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
+                  <div className="flex items-center gap-3 shrink-0 self-start sm:self-auto">
+                    <div className="flex items-center gap-2 bg-slate-50/50 border border-slate-200 rounded-lg p-1 px-2.5">
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">Filtrar Año:</span>
+                      <select
+                        id="select-campana-year-filter"
+                        value={selectedCampanaYear}
+                        onChange={(e) => setSelectedCampanaYear(e.target.value)}
+                        className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
+                      >
+                        <option value="Todas">Todas</option>
+                        {Array.from(new Set(campanasDisponibles.map(c => String(c.anio)))).sort().map(yr => (
+                          <option key={yr} value={yr}>{yr}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewCampanaName('');
+                        setNewCampanaYear(String(new Date().getFullYear()));
+                        // Auto calculate next number
+                        const maxNum = campanasDisponibles.reduce((max, c) => Math.max(max, c.numero || 0), 0);
+                        setNewCampanaNumber(String(maxNum + 1));
+                        setShowNewCampanaModal(true);
+                      }}
+                      className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-3xs"
                     >
-                      <option value="Todas">Todas</option>
-                      {Array.from(new Set(campanasDisponibles.map(c => {
-                        const m = c.match(/\d{4}/);
-                        return m ? m[0] : 'Otros';
-                      }))).sort().map(yr => (
-                        <option key={yr} value={yr}>{yr}</option>
-                      ))}
-                    </select>
+                      <span>Crear Campaña</span>
+                    </button>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {campanasDisponibles.filter(campana => {
                     if (selectedCampanaYear === 'Todas') return true;
-                    const m = campana.match(/\d{4}/);
-                    const yr = m ? m[0] : 'Otros';
-                    return yr === selectedCampanaYear;
-                  }).map((campana) => {
-                    const loadedRefsCount = campanasReferencias[campana]?.length || 0;
-                    const isActive = activeCampana === campana;
+                    return String(campana.anio) === selectedCampanaYear;
+                  }).sort((a, b) => a.numero - b.numero).map((campana) => {
+                    const fullName = `${campana.nombre} ${campana.anio}`;
+                    const loadedRefsCount = campanasReferencias[fullName]?.length || 0;
+                    const isActive = activeCampana === fullName;
 
                     return (
                       <div
-                        key={campana}
+                        key={fullName}
                         className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-all ${
                           isActive 
-                            ? 'bg-indigo-50/50 border-indigo-200' 
+                            ? 'bg-indigo-50/50 border-indigo-200 shadow-xs' 
                             : 'bg-slate-50/50 border-slate-200'
                         }`}
                       >
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-xs font-bold text-slate-800 line-clamp-1">{campana}</span>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between gap-1.5">
+                            <span className="text-xs font-bold text-slate-800 line-clamp-1">{campana.nombre}</span>
                             {isActive && (
                               <span className="text-[8px] bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-bold uppercase shrink-0">Activa</span>
                             )}
                           </div>
-                          <p className="text-[10px] text-slate-400 mt-1 font-semibold">{loadedRefsCount} referencias habilitadas</p>
+                          
+                          <div className="grid grid-cols-2 gap-1.5 text-[10px] bg-white p-2 rounded-lg border border-slate-100 font-medium">
+                            <div className="text-slate-400">Año: <span className="font-semibold text-slate-700">{campana.anio}</span></div>
+                            <div className="text-slate-400 text-right">Orden: <span className="font-mono font-bold text-indigo-600">#{campana.numero}</span></div>
+                          </div>
+
+                          <p className="text-[10px] text-slate-400 font-semibold">{loadedRefsCount} referencias habilitadas</p>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => {
-                            setSelectedCampanaConfig(campana);
+                            setSelectedCampanaConfig(fullName);
                             setCampanaRefSearch('');
                           }}
                           className="w-full py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[10px] uppercase tracking-wider rounded-lg shadow-xs transition-all text-center"
@@ -1974,6 +2190,104 @@ export default function App() {
               Cerrar
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Crear Nueva Campaña Modal */}
+      {showNewCampanaModal && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4"
+          onClick={() => setShowNewCampanaModal(false)}
+        >
+          <form 
+            onSubmit={handleCreateCampana}
+            className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in duration-150 text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="text-base font-extrabold text-slate-900 leading-snug flex items-center gap-2">
+                  <Package className="h-5 w-5 text-indigo-600" />
+                  <span>Crear Nueva Campaña</span>
+                </h3>
+                <p className="text-[11px] text-slate-500 mt-0.5">Registre una nueva campaña comercial.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowNewCampanaModal(false)}
+                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3.5">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Nombre de la Campaña *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej. Vacaciones, Madres, Inicio de año"
+                  value={newCampanaName}
+                  onChange={(e) => setNewCampanaName(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Año *</label>
+                  <input
+                    type="number"
+                    required
+                    min={2026}
+                    max={2035}
+                    placeholder="Ej. 2026"
+                    value={newCampanaYear}
+                    onChange={(e) => {
+                      const yr = e.target.value;
+                      setNewCampanaYear(yr);
+                      if (yr.trim() !== '') {
+                        // When year changes, auto calculate next order number
+                        const maxNum = campanasDisponibles.reduce((max, c) => Math.max(max, c.numero || 0), 0);
+                        setNewCampanaNumber(String(maxNum + 1));
+                      }
+                    }}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Número de Orden *</label>
+                  <input
+                    type="number"
+                    required
+                    min={1}
+                    placeholder="Ej. 5"
+                    value={newCampanaNumber}
+                    onChange={(e) => setNewCampanaNumber(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setShowNewCampanaModal(false)}
+                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-colors text-center"
+              >
+                Crear Campaña
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

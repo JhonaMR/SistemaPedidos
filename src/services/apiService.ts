@@ -1,4 +1,4 @@
-import { Cliente, Pedido, Prenda, UsuarioApp } from '../types';
+import { Cliente, Pedido, Prenda, UsuarioApp, Campana } from '../types';
 
 // URL base de la API dinámica. Si está definida en las variables de entorno, la usa.
 // Si no, usa ruta relativa por defecto (ideal para localhost).
@@ -15,7 +15,7 @@ export interface ServerData {
   };
   prendas: Prenda[];
   usuarios: UsuarioApp[];
-  campanas: string[];
+  campanas: Campana[];
   campanasReferencias: Record<string, string[]>;
 }
 
@@ -90,7 +90,7 @@ export async function apiSaveUsuarios(usuarios: UsuarioApp[]): Promise<boolean> 
   return response.ok;
 }
 
-export async function apiSaveCampanas(campanas: string[]): Promise<boolean> {
+export async function apiSaveCampanas(campanas: Campana[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/campanas`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

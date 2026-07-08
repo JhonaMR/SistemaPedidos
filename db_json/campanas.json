@@ -1,6 +1,22 @@
 [
-  "Inicio de año 2026",
-  "Madres 2026",
-  "Temporada 2026",
-  "Vacaciones 2026"
+  {
+    "nombre": "Inicio de año",
+    "anio": 2026,
+    "numero": 1
+  },
+  {
+    "nombre": "Madres",
+    "anio": 2026,
+    "numero": 2
+  },
+  {
+    "nombre": "Temporada",
+    "anio": 2026,
+    "numero": 4
+  },
+  {
+    "nombre": "Vacaciones",
+    "anio": 2026,
+    "numero": 3
+  }
 ]

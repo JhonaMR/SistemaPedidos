@@ -34,10 +34,31 @@ export async function getAllData() {
   const defaultUsuarios = '[{"id":"usr_sop","nombre":"Usuario Soporte","usuario":"SOP","clave":"9999","rol":"soporte","esPrimeraVez":false,"activo":true},{"id":"usr_gen","nombre":"Usuario General","usuario":"GEN","clave":"1234","rol":"general","esPrimeraVez":true,"activo":true}]';
   const usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
 
-  const defaultCampanas = '["Campaña Colegios 2026", "Campaña Primavera 2026", "Campaña Otoño/Invierno 2026", "Campaña Dotaciones Básicas"]';
-  const defaultCampanasRefs = '{"Campaña Colegios 2026":["p1","p2","p3","p4","p5","p6","p7"],"Campaña Primavera 2026":["p1","p2","p3","p4","p5","p6","p7"],"Campaña Otoño/Invierno 2026":["p1","p2","p3","p4","p5","p6","p7"],"Campaña Dotaciones Básicas":["p1","p2","p3","p4","p5","p6","p7"]}';
-  const campanas = await safeReadFile(DB_PATHS.campanas, defaultCampanas);
+  const defaultCampanas = '[{"nombre":"Inicio de año","anio":2026,"numero":1},{"nombre":"Madres","anio":2026,"numero":2},{"nombre":"Vacaciones","anio":2026,"numero":3},{"nombre":"Temporada","anio":2026,"numero":4}]';
+  const defaultCampanasRefs = '{"Inicio de año 2026":["p1","p2","p3","p4","p5","p6","p7"],"Madres 2026":["p1","p2","p3","p4","p5","p6","p7"],"Vacaciones 2026":["p1","p2","p3","p4","p5","p6","p7"],"Temporada 2026":["p1","p2","p3","p4","p5","p6","p7"]}';
+  let campanas = await safeReadFile(DB_PATHS.campanas, defaultCampanas);
   const campanasReferencias = await safeReadFile(DB_PATHS.campanasReferencias, defaultCampanasRefs);
+
+  // Migrate if it's an array of strings (old database schema)
+  if (Array.isArray(campanas) && campanas.length > 0 && typeof campanas[0] === 'string') {
+    campanas = campanas.map((c: string) => {
+      const match = c.match(/\d{4}/);
+      const anio = match ? parseInt(match[0], 10) : 2026;
+      const cleanName = c.replace(new RegExp(`\\s*${anio}\\s*`, 'g'), '').trim();
+      const norm = cleanName.toLowerCase();
+      
+      let numero = 1;
+      if (norm.includes('inicio')) numero = 1;
+      else if (norm.includes('madre')) numero = 2;
+      else if (norm.includes('vacacio') || norm.includes('vacac')) numero = 3;
+      else if (norm.includes('temporad')) numero = 4;
+      else numero = 5;
+
+      return { nombre: cleanName, anio, numero };
+    });
+    // Write back the migrated version to keep it persistent
+    await safeWriteFile(DB_PATHS.campanas, campanas);
+  }
 
   return { clientes, pedidos, deletedPedidos, backups, vendedor, prendas, usuarios, campanas, campanasReferencias };
 }
@@ -70,7 +91,7 @@ export async function saveUsuarios(usuarios: any[]) {
   return safeWriteFile(DB_PATHS.usuarios, usuarios);
 }
 
-export async function saveCampanas(campanas: string[]) {
+export async function saveCampanas(campanas: any[]) {
   return safeWriteFile(DB_PATHS.campanas, campanas);
 }
 

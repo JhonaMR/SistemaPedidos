@@ -12,7 +12,7 @@ class TomaPedidoDB extends Dexie {
   clientes!: Table<Cliente>;
   prendas!: Table<Prenda>;
   usuarios!: Table<UsuarioApp>;
-  campanas!: Table<{ id: string; nombre: string }>;
+  campanas!: Table<{ id: string; nombre: string; anio: number; numero: number }>;
   campanasReferencias!: Table<{ campana: string; referencias: string[] }>;
 
   constructor() {

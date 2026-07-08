@@ -81,3 +81,10 @@ export interface UsuarioApp {
   idVendedor?: string; // e.g. "01", "02" para consecutivos
 }
 
+export interface Campana {
+  nombre: string;
+  anio: number;
+  numero: number;
+}
+
+
