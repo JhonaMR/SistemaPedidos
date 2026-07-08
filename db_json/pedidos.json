@@ -37,5 +37,44 @@
     "campana": "Vacaciones 2026",
     "sincronizado": 1,
     "idLocal": 1
+  },
+  {
+    "clienteId": "cli_029",
+    "clienteNombre": "ARIZUL DEL CARIBE S.A.S",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783544272302_l8ao",
+        "prendaRef": "12395",
+        "nombrePrenda": "CAMISETA ASIMETRICO BOLEROS POPELINA",
+        "categoria": "Dama",
+        "talla": "S-1, M-1, L-1",
+        "tallasDetalle": {
+          "S": 1,
+          "M": 1,
+          "L": 1
+        },
+        "cantidad": 3,
+        "precioUnitario": 24900,
+        "total": 74700
+      }
+    ],
+    "subtotal": 74700,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 74700,
+    "estado": "Pendiente",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-08",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783544275248",
+    "numeroPedido": "SOP-001",
+    "fecha": "2026-07-08",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 0,
+    "idLocal": 2
   }
 ]

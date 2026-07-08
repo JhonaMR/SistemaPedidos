@@ -1,17 +1,17 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { Cliente, Prenda, ItemPedido, Pedido } from '../types';
-import { 
-  ShoppingBag, 
-  Trash2, 
-  Plus, 
-  Minus, 
-  Sparkles, 
-  User, 
-  CheckCircle, 
-  Info, 
-  Calendar, 
-  CreditCard, 
-  Percent, 
+import {
+  ShoppingBag,
+  Trash2,
+  Plus,
+  Minus,
+  Sparkles,
+  User,
+  CheckCircle,
+  Info,
+  Calendar,
+  CreditCard,
+  Percent,
   DollarSign,
   X,
   Image as ImageIcon
@@ -32,18 +32,18 @@ interface OrderFormProps {
   onCancel?: () => void;
 }
 
-export default function OrderForm({ 
-  clientes, 
+export default function OrderForm({
+  clientes,
   pedidos,
   activeCampana,
   campanasReferencias,
-  onAddPedido, 
-  onQuickAddCliente, 
+  onAddPedido,
+  onQuickAddCliente,
   vendedor,
   catalogGarments = [],
   editingPedido = null,
-  onUpdatePedido = () => {},
-  onCancel = () => {}
+  onUpdatePedido = () => { },
+  onCancel = () => { }
 }: OrderFormProps) {
   // Filter catalogGarments by campaign references
   const listToUse = catalogGarments || [];
@@ -196,8 +196,8 @@ export default function OrderForm({
 
     // Check if there is an item with the same garment AND same novelty AND same price in the cart
     const existingIndex = cart.findIndex(
-      item => 
-        item.prendaRef === selectedPrenda.ref && 
+      item =>
+        item.prendaRef === selectedPrenda.ref &&
         (item.novedad || '') === (novedad || '').trim() &&
         item.precioUnitario === customUnitPrice
     );
@@ -208,7 +208,7 @@ export default function OrderForm({
       // Merge with existing cart item
       const existingItem = cart[existingIndex];
       const mergedTallasDetalle = { ...(existingItem.tallasDetalle || {}) } as Record<string, number>;
-      
+
       Object.entries(newTallasDetalle).forEach(([t, qty]) => {
         mergedTallasDetalle[t] = (mergedTallasDetalle[t] || 0) + qty;
       });
@@ -338,16 +338,16 @@ export default function OrderForm({
   // Autocomplete filtering
   const filteredAutocompleteClients = clientSearchQuery.trim().length >= 3
     ? clientes.filter(c =>
-        c.nombre.toLowerCase().includes(clientSearchQuery.toLowerCase()) ||
-        (c.codigoCliente || '').toLowerCase().includes(clientSearchQuery.toLowerCase())
-      )
+      c.nombre.toLowerCase().includes(clientSearchQuery.toLowerCase()) ||
+      (c.codigoCliente || '').toLowerCase().includes(clientSearchQuery.toLowerCase())
+    )
     : [];
 
   const selectedClient = clientes.find(c => c.id === selectedClientId);
 
   return (
     <div id="order-creation-form" className="space-y-6">
-      
+
       {/* Step 1: Client Selection banner */}
       <div id="client-selection-panel" className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
@@ -362,20 +362,29 @@ export default function OrderForm({
               onClick={() => setIsQuickAdding(true)}
               className="px-3 py-1.5 bg-[#FAF7F0] border border-[#C4BFA6] hover:bg-[#F3EFE4] text-xs font-bold uppercase rounded-lg text-[#6A5E4E] transition-all shrink-0"
             >
-              + Registro Rápido
+              + Nuevo cliente
             </button>
           )}
           {selectedClientId && (
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedClientId('');
-                setClientSearchQuery('');
-              }}
-              className="px-3 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
-            >
-              Cambiar Cliente
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onCancel}
+                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedClientId('');
+                  setClientSearchQuery('');
+                }}
+                className="px-3 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
+              >
+                Cambiar Cliente
+              </button>
+            </div>
           )}
         </div>
 
@@ -400,20 +409,20 @@ export default function OrderForm({
                       onFocus={() => setShowClientSuggestions(true)}
                       className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-[#4A5D4E] focus:outline-none"
                     />
-                    
+
                     {/* Floating suggestions dropdown */}
                     {showClientSuggestions && clientSearchQuery.trim().length >= 3 && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto divide-y divide-slate-100">
                         {filteredAutocompleteClients.length > 0 ? (
                           filteredAutocompleteClients.map((c) => (
                             <div
-                               key={c.id}
-                               onClick={() => {
-                                 setSelectedClientId(c.id);
-                                 setClientSearchQuery(c.nombre);
-                                 setShowClientSuggestions(false);
-                               }}
-                               className="p-2.5 hover:bg-slate-50 cursor-pointer text-xs flex justify-between items-center"
+                              key={c.id}
+                              onClick={() => {
+                                setSelectedClientId(c.id);
+                                setClientSearchQuery(c.nombre);
+                                setShowClientSuggestions(false);
+                              }}
+                              className="p-2.5 hover:bg-slate-50 cursor-pointer text-xs flex justify-between items-center"
                             >
                               <div>
                                 <span className="font-bold text-slate-800">{c.nombre}</span>
@@ -448,8 +457,8 @@ export default function OrderForm({
                     });
                     siguienteCorrelativo = Math.max(...correlativos) + 1;
                   }
-                  const consecutiveText = editingPedido 
-                    ? editingPedido.numeroPedido 
+                  const consecutiveText = editingPedido
+                    ? editingPedido.numeroPedido
                     : `${prefijoVendedor}-${String(siguienteCorrelativo).padStart(3, '0')}`;
 
                   return (
@@ -506,7 +515,7 @@ export default function OrderForm({
                                 />
                                 <span className="text-[10px] font-bold text-amber-950">%</span>
                               </div>
-                              
+
                               <button
                                 type="button"
                                 onClick={() => {
@@ -522,7 +531,7 @@ export default function OrderForm({
                             </div>
                           )}
                         </div>
- 
+
                         {/* Consecutive Badge */}
                         <div className="bg-indigo-600 text-white text-xs font-bold font-mono px-2.5 py-1.5 rounded-lg shadow-xs tracking-wide flex items-center justify-center transition-all hover:scale-[1.01]">
                           {consecutiveText}
@@ -574,16 +583,16 @@ export default function OrderForm({
         ) : (
           <form onSubmit={handleQuickAddClientSubmit} className="bg-[#FAF9F5] border border-[#E9E4D4] p-4 rounded-lg space-y-3">
             <div className="flex justify-between items-center pb-1 border-b border-[#ECE7D6]">
-              <h4 className="text-xs font-bold text-[#6A5E4E] uppercase">Registro de Cliente Express</h4>
-              <button 
-                type="button" 
-                onClick={() => setIsQuickAdding(false)} 
+              <h4 className="text-xs font-bold text-[#6A5E4E] uppercase">Registro de Cliente.</h4>
+              <button
+                type="button"
+                onClick={() => setIsQuickAdding(false)}
                 className="text-xs text-[#9E9585] hover:text-[#2C2A29]"
               >
                 Cancelar
               </button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-5 gap-2.5">
               <div>
                 <input
@@ -660,7 +669,7 @@ export default function OrderForm({
         </div>
       ) : (
         <div id="apparel-selection-panel" className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
+
           {/* Garment Selector Column (7 Cols) */}
           <div className="lg:col-span-7 bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1 border-b border-slate-100">
@@ -668,7 +677,7 @@ export default function OrderForm({
                 <ShoppingBag className="h-4.5 w-4.5" />
                 <span>2. Catálogo de Referencias</span>
               </h3>
-              
+
               <div className="flex flex-wrap items-center gap-2">
                 <select
                   id="select-catalog-category-filter"
@@ -711,11 +720,10 @@ export default function OrderForm({
                     id={`catalog-item-${prenda.ref}`}
                     key={prenda.ref}
                     onClick={() => handleSelectPrenda(prenda)}
-                    className={`p-2.5 border rounded-xl cursor-pointer transition-all flex flex-col justify-between text-left ${
-                      isSelected 
-                        ? 'border-indigo-300 bg-indigo-50/40 shadow-xs' 
-                        : 'border-[#E2E8F0] bg-white hover:border-slate-300 hover:shadow-xs'
-                    }`}
+                    className={`p-2.5 border rounded-xl cursor-pointer transition-all flex flex-col justify-between text-left ${isSelected
+                      ? 'border-indigo-300 bg-indigo-50/40 shadow-xs'
+                      : 'border-[#E2E8F0] bg-white hover:border-slate-300 hover:shadow-xs'
+                      }`}
                   >
                     <div>
                       <div className="flex items-center justify-between gap-1 border-b border-slate-100 pb-1.5">
@@ -730,7 +738,7 @@ export default function OrderForm({
                         {prenda.nombre}
                       </h4>
                     </div>
-                    
+
                     <div className="mt-2.5 pt-1.5 border-t border-slate-100 flex items-center justify-between">
                       <span className="text-[11px] font-black text-[#4A5D4E] font-mono">{formatCOP(prenda.precioBase)}</span>
                       <button
@@ -765,7 +773,7 @@ export default function OrderForm({
                   <div className="flex justify-between items-start gap-4 pb-2 border-b border-slate-100/60">
                     <div>
                       <span className="text-[9px] uppercase tracking-wider text-slate-400 block font-bold">Prenda Seleccionada</span>
-                      
+
                       {/* Big Reference Code (REF) */}
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-xl font-black tracking-wide font-mono text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-0.5 rounded-lg">
@@ -790,7 +798,7 @@ export default function OrderForm({
 
                   {/* Smaller Description (Nombre) */}
                   <h4 className="text-xs font-bold text-slate-600 mt-2 uppercase leading-normal">{selectedPrenda.nombre}</h4>
-                  
+
                   {/* Highlighted Unit Price box with softened shading - EDITABLE */}
                   <div className="mt-3.5 bg-gradient-to-r from-indigo-50/55 via-white to-indigo-50/55 border border-indigo-100 rounded-2xl p-4 text-center shadow-2xs">
                     <label htmlFor="input-custom-unit-price" className="text-[10px] text-indigo-600 uppercase font-extrabold tracking-widest block mb-1">
@@ -837,11 +845,10 @@ export default function OrderForm({
                               return copy;
                             });
                           }}
-                          className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ${
-                            isSelected
-                              ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm'
-                              : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 shadow-xs'
-                          }`}
+                          className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ${isSelected
+                            ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm'
+                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 shadow-xs'
+                            }`}
                         >
                           {t}
                         </button>
@@ -862,11 +869,10 @@ export default function OrderForm({
                           }
                         });
                       }}
-                      className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ml-auto ${
-                        !!tallasCantidades['N/A']
-                          ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 shadow-xs'
-                      }`}
+                      className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ml-auto ${!!tallasCantidades['N/A']
+                        ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm'
+                        : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 shadow-xs'
+                        }`}
                     >
                       N/A
                     </button>
@@ -978,9 +984,9 @@ export default function OrderForm({
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] mb-4 flex items-center justify-between">
           <span>3. Lista de Prendas en el Pedido Actual</span>
           {cart.length > 0 && (
-            <button 
+            <button
               id="btn-clear-order-cart"
-              type="button" 
+              type="button"
               onClick={handleClearCart}
               className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase tracking-wide flex items-center gap-1"
             >
@@ -1049,7 +1055,7 @@ export default function OrderForm({
 
             {/* Extra order settings: Payments, Delivery & Dates */}
             <div className="space-y-4 pt-4 border-t border-slate-100">
-              
+
               {/* Row 1: Dates (left) & Total Pedido (right) */}
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                 <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1140,7 +1146,7 @@ export default function OrderForm({
           </div>
         )}
       </div>
-      
+
       {showBillingErrorModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in-95 duration-200">
@@ -1163,9 +1169,9 @@ export default function OrderForm({
       )}
 
       {viewFotoPrenda && (
-        <ViewFotoModal 
-          prenda={viewFotoPrenda} 
-          onClose={() => setViewFotoPrenda(null)} 
+        <ViewFotoModal
+          prenda={viewFotoPrenda}
+          onClose={() => setViewFotoPrenda(null)}
         />
       )}
 

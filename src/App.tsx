@@ -472,13 +472,7 @@ export default function App() {
       const allClients = await db.clientes.toArray();
       const pendingClients = allClients.filter(c => c.id.startsWith('cli_off_'));
 
-      if (pendingOrders.length === 0 && pendingClients.length === 0) {
-        alert("No hay pedidos ni clientes nuevos pendientes de sincronización.");
-        setLoading(false);
-        return;
-      }
-
-      // Llamar al nuevo endpoint del backend
+      // Llamar al endpoint del backend
       const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pedidos/sync-batch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -489,27 +483,102 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Error al sincronizar con el servidor local');
+        throw new Error('Error al sincronizar con el servidor');
       }
 
       const result = await response.json();
 
-      // Marcar los pedidos sincronizados como sincronizados en local
-      if (result.syncedOrderIds && result.syncedOrderIds.length > 0) {
-        await db.pedidos
-          .where('id')
-          .anyOf(result.syncedOrderIds)
-          .modify({ sincronizado: 1 });
-      }
+      // Transacción para repoblar la base de datos local con los datos frescos del servidor
+      await db.transaction('rw', [db.clientes, db.pedidos, db.usuarios, db.campanas, db.campanasReferencias, db.prendas], async () => {
+        // Clientes
+        await db.clientes.clear();
+        if (result.clientes && result.clientes.length > 0) {
+          await db.clientes.bulkAdd(result.clientes);
+        }
 
-      // Recargar datos locales
+        // Pedidos (todos los pedidos descargados se marcan como sincronizados = 1)
+        await db.pedidos.clear();
+        if (result.pedidos && result.pedidos.length > 0) {
+          const synced = result.pedidos.map((p: any) => ({ ...p, sincronizado: 1 }));
+          await db.pedidos.bulkAdd(synced);
+        }
+
+        // Catálogo de Prendas
+        await db.prendas.clear();
+        if (result.prendas && result.prendas.length > 0) {
+          await db.prendas.bulkAdd(result.prendas);
+        }
+
+        // Usuarios
+        await db.usuarios.clear();
+        if (result.usuarios && result.usuarios.length > 0) {
+          await db.usuarios.bulkAdd(result.usuarios);
+        }
+
+        // Campañas
+        await db.campanas.clear();
+        if (result.campanas && result.campanas.length > 0) {
+          const mappedCampanas = result.campanas.map((c: any) => {
+            if (typeof c === 'string') {
+              return parseCampana(c);
+            }
+            return {
+              nombre: c.nombre,
+              anio: c.anio || 2026,
+              numero: c.numero || 1
+            };
+          });
+          await db.campanas.bulkAdd(mappedCampanas.map((c: any) => ({
+            id: `${c.nombre} ${c.anio}`,
+            nombre: c.nombre,
+            anio: c.anio,
+            numero: c.numero
+          })));
+        }
+
+        // Campañas Referencias
+        await db.campanasReferencias.clear();
+        if (result.campanasReferencias && Object.keys(result.campanasReferencias).length > 0) {
+          const refsArray = Object.keys(result.campanasReferencias).map(key => ({
+            campana: key,
+            referencias: result.campanasReferencias[key]
+          }));
+          await db.campanasReferencias.bulkAdd(refsArray);
+        }
+      });
+
+      // Recargar datos locales en React
       const dbClientes = await db.clientes.toArray();
+      const dbPrendas = await db.prendas.toArray();
       const dbPedidos = await db.pedidos.toArray();
+      const dbUsuarios = await db.usuarios.toArray();
+      const dbCampanas = await db.campanas.toArray();
+      const dbCampanasRefs = await db.campanasReferencias.toArray();
+
       setClientes(dbClientes);
       setPedidos(dbPedidos);
+      setCatalogGarments(dbPrendas);
+      setUsuarios(dbUsuarios);
+
+      const migratedCampanas = dbCampanas.map(c => ({
+        nombre: c.nombre,
+        anio: c.anio,
+        numero: c.numero
+      }));
+      setCampanasDisponibles(migratedCampanas);
+
+      const mappedRefs: Record<string, string[]> = {};
+      dbCampanasRefs.forEach(cr => {
+        mappedRefs[cr.campana] = cr.referencias;
+      });
+      setCampanasReferencias(mappedRefs);
+
+      if (result.vendedor) {
+        setVendedor(result.vendedor);
+      }
 
       setSyncStatus('synced');
-      alert(`Sincronización exitosa: ${result.syncedOrderIds?.length || 0} pedidos y ${result.syncedClientIds?.length || 0} clientes nuevos guardados en el servidor local.`);
+      alert(`Sincronización bidireccional exitosa.\n- Pedidos locales subidos: ${result.syncedOrderIds?.length || 0}\n- Clientes locales subidos: ${result.syncedClientIds?.length || 0}\n- Datos actualizados descargados desde el servidor.`);
     } catch (err: any) {
       console.error("Error durante la sincronización:", err);
       alert("Error al sincronizar con el servidor local: " + err.message);
@@ -1591,18 +1660,20 @@ export default function App() {
             <span>Referencias</span>
           </button>
 
-          <button
-            id="tab-configuracion"
-            onClick={() => setActiveTab('configuracion')}
-            className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-              activeTab === 'configuracion'
-                ? 'bg-[#1E293B] text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Settings className="h-4 w-4" />
-            <span>Configuración</span>
-          </button>
+          {currentUser?.rol === 'soporte' && (
+            <button
+              id="tab-configuracion"
+              onClick={() => setActiveTab('configuracion')}
+              className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
+                activeTab === 'configuracion'
+                  ? 'bg-[#1E293B] text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Settings className="h-4 w-4" />
+              <span>Configuración</span>
+            </button>
+          )}
         </nav>
 
         {/* Tab content renderer */}
@@ -1673,7 +1744,7 @@ export default function App() {
             />
           )}
 
-          {activeTab === 'configuracion' && (
+          {activeTab === 'configuracion' && currentUser?.rol === 'soporte' && (
             <div id="settings-page" className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {currentUser?.rol === 'soporte' && (
                 <>

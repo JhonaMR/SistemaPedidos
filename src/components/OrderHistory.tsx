@@ -58,6 +58,7 @@ export default function OrderHistory({
 }: OrderHistoryProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('Todos');
+  const [vendedorFilter, setVendedorFilter] = useState<string>('Todos');
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [showDeletedOnly, setShowDeletedOnly] = useState(false);
   const [showBackupsOnly, setShowBackupsOnly] = useState(false);
@@ -92,19 +93,19 @@ export default function OrderHistory({
   // Filter logic
   const filteredOrders = activePedidosList.filter(p => {
     const matchesSearch = 
-      p.numeroPedido.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.clienteNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (p.notas && p.notas.toLowerCase().includes(searchTerm.toLowerCase()));
+      p.clienteId.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'Todos' || p.estado === statusFilter;
+    const matchesVendedor = vendedorFilter === 'Todos' || p.vendedorNombre === vendedorFilter;
 
-    return matchesSearch && matchesStatus;
+    return matchesSearch && matchesStatus && matchesVendedor;
   });
 
   // Reset page when filtering or items per page change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, statusFilter, showDeletedOnly, showBackupsOnly, itemsPerPage]);
+  }, [searchTerm, statusFilter, vendedorFilter, showDeletedOnly, showBackupsOnly, itemsPerPage]);
 
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const paginatedOrders = filteredOrders.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -136,15 +137,31 @@ export default function OrderHistory({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Buscar por # pedido, cliente, confección..."
+            placeholder="Buscar por cliente o ID de cliente..."
             className="w-full pl-9 pr-4 py-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg text-sm text-[#2C2A29] focus:outline-none focus:ring-1 focus:ring-[#4A5D4E]"
           />
         </div>
 
+        {/* Support Only: Seller Filter */}
+        {currentUser?.rol === 'soporte' && (
+          <div className="flex items-center gap-2 bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg p-1.5 px-3 shrink-0">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[#64748B]">Vendedor:</span>
+            <select
+              value={vendedorFilter}
+              onChange={(e) => setVendedorFilter(e.target.value)}
+              className="bg-transparent text-xs font-bold text-slate-700 focus:outline-none cursor-pointer"
+            >
+              <option value="Todos">Todos</option>
+              {Array.from(new Set(activePedidosList.map(p => p.vendedorNombre))).filter(Boolean).sort().map(vend => (
+                <option key={vend} value={vend}>{vend}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Status filters */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-[#64748B] shrink-0" />
             <div className="flex flex-wrap gap-1">
               {['Todos', 'Pendiente', 'Procesado', 'Activo', 'Completo', 'Cancelado'].map((status) => {
                 return (

@@ -36,8 +36,14 @@ router.post('/clientes', async (req, res) => {
     if (!Array.isArray(clientes)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de clientes.' });
     }
-    await saveClientes(clientes);
-    res.json({ success: true, count: clientes.length });
+    const data = await getAllData();
+    const existingMap = new Map(data.clientes.map(c => [c.id, c]));
+    clientes.forEach(c => {
+      existingMap.set(c.id, c);
+    });
+    const merged = Array.from(existingMap.values());
+    await saveClientes(merged);
+    res.json({ success: true, count: merged.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar clientes', details: err.message });
   }
@@ -50,8 +56,15 @@ router.post('/pedidos', async (req, res) => {
     if (!Array.isArray(pedidos)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos.' });
     }
-    await savePedidos(pedidos);
-    res.json({ success: true, count: pedidos.length });
+    const data = await getAllData();
+    const existingMap = new Map(data.pedidos.map(p => [p.id, p]));
+    pedidos.forEach(p => {
+      existingMap.set(p.id, p);
+    });
+    const deletedIds = new Set((data.deletedPedidos || []).map(p => p.id));
+    const merged = Array.from(existingMap.values()).filter(p => !deletedIds.has(p.id));
+    await savePedidos(merged);
+    res.json({ success: true, count: merged.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar pedidos', details: err.message });
   }
@@ -64,8 +77,20 @@ router.post('/deleted-pedidos', async (req, res) => {
     if (!Array.isArray(deletedPedidos)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos eliminados.' });
     }
-    await saveDeletedPedidos(deletedPedidos);
-    res.json({ success: true, count: deletedPedidos.length });
+    const data = await getAllData();
+    const existingMap = new Map(data.deletedPedidos.map(p => [p.id, p]));
+    deletedPedidos.forEach(p => {
+      existingMap.set(p.id, p);
+    });
+    const merged = Array.from(existingMap.values());
+    await saveDeletedPedidos(merged);
+
+    // Also remove from active pedidos list
+    const deletedIds = new Set(merged.map(p => p.id));
+    const activePedidos = data.pedidos.filter(p => !deletedIds.has(p.id));
+    await savePedidos(activePedidos);
+
+    res.json({ success: true, count: merged.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar pedidos eliminados', details: err.message });
   }
@@ -78,8 +103,14 @@ router.post('/backups', async (req, res) => {
     if (!Array.isArray(backups)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de backups.' });
     }
-    await saveBackups(backups);
-    res.json({ success: true, count: backups.length });
+    const data = await getAllData();
+    const existingMap = new Map(data.backups.map(p => [p.id, p]));
+    backups.forEach(p => {
+      existingMap.set(p.id, p);
+    });
+    const merged = Array.from(existingMap.values());
+    await saveBackups(merged);
+    res.json({ success: true, count: merged.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar backups de pedidos', details: err.message });
   }
@@ -112,6 +143,7 @@ router.post('/prendas', async (req, res) => {
     res.status(500).json({ error: 'Error al guardar prendas del catálogo', details: err.message });
   }
 });
+
 // Save Usuarios
 router.post('/usuarios', async (req, res) => {
   try {
@@ -119,12 +151,19 @@ router.post('/usuarios', async (req, res) => {
     if (!Array.isArray(usuarios)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de usuarios.' });
     }
-    await saveUsuarios(usuarios);
-    res.json({ success: true, count: usuarios.length });
+    const data = await getAllData();
+    const existingMap = new Map(data.usuarios.map(u => [u.id, u]));
+    usuarios.forEach(u => {
+      existingMap.set(u.id, u);
+    });
+    const merged = Array.from(existingMap.values());
+    await saveUsuarios(merged);
+    res.json({ success: true, count: merged.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar usuarios', details: err.message });
   }
 });
+
 // Save Campanas
 router.post('/campanas', async (req, res) => {
   try {
@@ -132,8 +171,14 @@ router.post('/campanas', async (req, res) => {
     if (!Array.isArray(campanas)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de campañas.' });
     }
-    await saveCampanas(campanas);
-    res.json({ success: true, count: campanas.length });
+    const data = await getAllData();
+    const existingMap = new Map(data.campanas.map(c => [`${c.nombre} ${c.anio}`, c]));
+    campanas.forEach(c => {
+      existingMap.set(`${c.nombre} ${c.anio}`, c);
+    });
+    const merged = Array.from(existingMap.values());
+    await saveCampanas(merged);
+    res.json({ success: true, count: merged.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar campañas', details: err.message });
   }
@@ -193,12 +238,18 @@ router.post('/pedidos/sync-batch', async (req, res) => {
       }
     });
 
-    await savePedidos(Array.from(pedidosMap.values()));
+    const deletedIds = new Set((data.deletedPedidos || []).map(p => p.id));
+    const mergedPedidos = Array.from(pedidosMap.values()).filter(p => !deletedIds.has(p.id));
+    await savePedidos(mergedPedidos);
+
+    // Get the final fully-merged fresh server database state to return to client
+    const freshData = await getAllData();
 
     res.json({
       success: true,
       syncedOrderIds: nuevosPedidosIds,
-      syncedClientIds: nuevosClientesIds
+      syncedClientIds: nuevosClientesIds,
+      ...freshData
     });
   } catch (err: any) {
     res.status(500).json({ error: 'Error durante la sincronización en lote', details: err.message });
