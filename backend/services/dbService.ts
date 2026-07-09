@@ -29,6 +29,18 @@ export async function getAllData() {
   let pedidos = await safeReadFile(DB_PATHS.pedidos, '[]');
   const deletedPedidos = await safeReadFile(DB_PATHS.deletedPedidos, '[]');
 
+  // Clean up legacy idLocal from active database
+  let shouldSavePedidos = false;
+  if (Array.isArray(pedidos)) {
+    pedidos = pedidos.map((p: any) => {
+      if (p.idLocal !== undefined) {
+        delete p.idLocal;
+        shouldSavePedidos = true;
+      }
+      return p;
+    });
+  }
+
   // Auto-heal legacy ASYNC- orders in the active database
   let hasAsyncOrders = false;
   if (Array.isArray(pedidos)) {
@@ -36,6 +48,7 @@ export async function getAllData() {
   }
 
   if (hasAsyncOrders) {
+    shouldSavePedidos = true;
     const maxCorrelativos = new Map<string, number>();
     
     // 1. Scan for existing max sequential numbers
@@ -68,7 +81,9 @@ export async function getAllData() {
       }
       return p;
     });
+  }
 
+  if (shouldSavePedidos) {
     await safeWriteFile(DB_PATHS.pedidos, pedidos);
   }
   const backups = await safeReadFile(DB_PATHS.backups, '[]');

@@ -14,7 +14,8 @@ import {
   Percent,
   DollarSign,
   X,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Edit3
 } from 'lucide-react';
 import { ViewFotoModal } from './ViewFotoModal';
 
@@ -99,6 +100,12 @@ export default function OrderForm({
   const [novedad, setNovedad] = useState('');
   const [addFeedback, setAddFeedback] = useState<string | null>(null);
   const [customUnitPrice, setCustomUnitPrice] = useState<number>(0);
+
+  // Edit Cart Item modal state
+  const [editingCartItem, setEditingCartItem] = useState<ItemPedido | null>(null);
+  const [editTallasCantidades, setEditTallasCantidades] = useState<Record<string, number>>({});
+  const [editUnitPrice, setEditUnitPrice] = useState<number>(0);
+  const [editNovedad, setEditNovedad] = useState<string>('');
 
   useEffect(() => {
     if (selectedPrenda) {
@@ -281,6 +288,49 @@ export default function OrderForm({
     setCart([]);
   };
 
+  const handleOpenEditCartModal = (item: ItemPedido) => {
+    setEditingCartItem(item);
+    setEditTallasCantidades({ ...(item.tallasDetalle || {}) });
+    setEditUnitPrice(item.precioUnitario);
+    setEditNovedad(item.novedad || '');
+  };
+
+  const handleSaveEditCartItem = () => {
+    if (!editingCartItem) return;
+
+    const activeTallas = (Object.entries(editTallasCantidades) as [string, number][]).filter(([_, qty]) => qty > 0);
+    if (activeTallas.length === 0) {
+      alert('Por favor selecciona al menos una talla y define su cantidad.');
+      return;
+    }
+
+    const noveltyTrim = editNovedad.trim();
+    const noveltyText = noveltyTrim ? noveltyTrim : undefined;
+
+    const totalQty = activeTallas.reduce((sum, [_, q]) => sum + q, 0);
+    const formattedTallaStr = activeTallas
+      .map(([t, q]) => t === 'N/A' ? 'N/A' : `${t}-${q}`)
+      .join(', ');
+
+    const updatedCart = cart.map(item => {
+      if (item.id === editingCartItem.id) {
+        return {
+          ...item,
+          tallasDetalle: { ...editTallasCantidades } as Record<string, number>,
+          talla: formattedTallaStr,
+          novedad: noveltyText,
+          cantidad: totalQty,
+          precioUnitario: editUnitPrice,
+          total: totalQty * editUnitPrice
+        };
+      }
+      return item;
+    });
+
+    setCart(updatedCart);
+    setEditingCartItem(null);
+  };
+
   // Cart totals
   const subtotal = cart.reduce((sum, item) => sum + item.total, 0);
   const montoDescuento = Math.round((subtotal * porcentajeDescuento) / 100);
@@ -441,7 +491,7 @@ export default function OrderForm({
                         <X className="h-4 w-4" />
                       </button>
                     )}
- 
+
                     {/* Floating suggestions dropdown */}
                     {showClientSuggestions && clientSearchQuery.trim().length >= 3 && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto divide-y divide-slate-100">
@@ -470,7 +520,7 @@ export default function OrderForm({
                         )}
                       </div>
                     )}
- 
+
                     {clientSearchQuery.trim().length > 0 && clientSearchQuery.trim().length < 3 && (
                       <p className="text-[10px] text-[#A17A3D] mt-1 font-medium">Escribe {3 - clientSearchQuery.trim().length} caracteres más para buscar...</p>
                     )}
@@ -999,7 +1049,7 @@ export default function OrderForm({
                     className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase rounded-lg shadow-md transition-colors flex items-center justify-center gap-1.5"
                   >
                     <Plus className="h-4 w-4" />
-                    <span>Añadir Pedido</span>
+                    <span>Añadir Referencia</span>
                   </button>
                 </div>
 
@@ -1078,15 +1128,26 @@ export default function OrderForm({
                       <td className="py-2.5 text-right font-mono text-slate-600">{formatCOP(item.precioUnitario)}</td>
                       <td className="py-2.5 text-right font-mono font-bold text-slate-800">{formatCOP(item.total)}</td>
                       <td className="py-2.5 text-right">
-                        <button
-                          id={`btn-remove-cart-${item.id}`}
-                          type="button"
-                          onClick={() => handleRemoveFromCart(item.id)}
-                          className="p-1 text-slate-400 hover:text-red-500 rounded"
-                          title="Eliminar fila"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            id={`btn-edit-cart-${item.id}`}
+                            type="button"
+                            onClick={() => handleOpenEditCartModal(item)}
+                            className="p-1 text-slate-400 hover:text-indigo-650 rounded"
+                            title="Editar fila"
+                          >
+                            <Edit3 className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            id={`btn-remove-cart-${item.id}`}
+                            type="button"
+                            onClick={() => handleRemoveFromCart(item.id)}
+                            className="p-1 text-slate-400 hover:text-red-500 rounded"
+                            title="Eliminar fila"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1215,6 +1276,212 @@ export default function OrderForm({
           prenda={viewFotoPrenda}
           onClose={() => setViewFotoPrenda(null)}
         />
+      )}
+
+      {editingCartItem && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
+              <div>
+                <h3 className="text-sm font-bold text-slate-900">Editar Prenda en el Pedido</h3>
+                <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+                  Ref: {editingCartItem.prendaRef} • {editingCartItem.nombrePrenda}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingCartItem(null)}
+                className="p-1 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-650 transition-colors"
+                title="Cerrar modal"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="space-y-4 overflow-y-auto pr-1 flex-1 py-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* Price input */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Precio de Venta ($)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs font-mono">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      value={editUnitPrice}
+                      onChange={(e) => setEditUnitPrice(Math.max(0, parseInt(e.target.value) || 0))}
+                      className="w-full pl-7 p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-700 focus:ring-1 focus:ring-[#4A5D4E] focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Novelty input */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Requerimiento / Novedad
+                  </label>
+                  <input
+                    type="text"
+                    value={editNovedad}
+                    onChange={(e) => setEditNovedad(e.target.value)}
+                    placeholder="Ej. Ajuste de talle, etc."
+                    className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs text-slate-700 focus:ring-1 focus:ring-[#4A5D4E] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Sizes section */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                  Selecciona las Tallas
+                </label>
+                <div className="flex flex-wrap gap-1.5 items-center w-full">
+                  {(() => {
+                    const prenda = listToUse.find(p => p.ref === editingCartItem.prendaRef);
+                    const tallas = prenda ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) : ['S', 'M', 'L', 'XL', 'XXL'];
+                    
+                    return (
+                      <>
+                        {tallas.map((t) => {
+                          const isSelected = editTallasCantidades[t] !== undefined && editTallasCantidades[t] > 0;
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => {
+                                setEditTallasCantidades(prev => {
+                                  const copy = { ...prev };
+                                  delete copy['N/A'];
+                                  if (copy[t]) {
+                                    delete copy[t];
+                                  } else {
+                                    copy[t] = 1;
+                                  }
+                                  return copy;
+                                });
+                              }}
+                              className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ${
+                                isSelected
+                                  ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm animate-scale-up'
+                                  : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 hover:opacity-85'
+                              }`}
+                            >
+                              {t}
+                            </button>
+                          );
+                        })}
+                        
+                        {/* Extreme right N/A button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditTallasCantidades(prev => {
+                              const isSelected = !!prev['N/A'];
+                              if (isSelected) {
+                                return {};
+                              } else {
+                                return { 'N/A': 1 };
+                              }
+                            });
+                          }}
+                          className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ml-auto ${
+                            !!editTallasCantidades['N/A']
+                              ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm'
+                              : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 hover:opacity-85'
+                          }`}
+                        >
+                          N/A
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Quantity inputs for active sizes */}
+              {(() => {
+                const activeSizes = Object.keys(editTallasCantidades).filter(t => editTallasCantidades[t] > 0);
+                if (activeSizes.length === 0) return null;
+                
+                return (
+                  <div className="mt-3.5 p-3.5 bg-indigo-50/55 border border-indigo-100 rounded-xl space-y-2 animate-in fade-in duration-150">
+                    <span className="block text-[10px] font-black uppercase tracking-wider text-indigo-600">
+                      Cantidad por Talla
+                    </span>
+                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-0.5">
+                      {activeSizes.map((t) => (
+                        <div key={t} className="flex flex-col items-center gap-1.5 bg-white border border-slate-100 p-2 rounded-xl shadow-2xs min-w-[90px] animate-scale-up">
+                          <span className="text-[10px] font-extrabold text-slate-800 font-mono">Talla {t}</span>
+                          <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditTallasCantidades(prev => {
+                                  const current = prev[t] || 0;
+                                  if (current <= 1) {
+                                    const copy = { ...prev };
+                                    delete copy[t];
+                                    return copy;
+                                  }
+                                  return { ...prev, [t]: current - 1 };
+                                });
+                              }}
+                              className="p-1 hover:bg-slate-50 text-slate-500"
+                            >
+                              <Minus className="h-3 w-3" />
+                            </button>
+                            <input
+                              type="number"
+                              min="1"
+                              value={editTallasCantidades[t] || ''}
+                              onChange={(e) => {
+                                const val = Math.max(1, parseInt(e.target.value) || 1);
+                                setEditTallasCantidades(prev => ({ ...prev, [t]: val }));
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditTallasCantidades(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
+                              }}
+                              className="p-1 hover:bg-slate-50 text-slate-500"
+                            >
+                              <Plus className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-4 border-t border-slate-100 flex justify-end gap-2.5 mt-4">
+              <button
+                type="button"
+                onClick={() => setEditingCartItem(null)}
+                className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold rounded-xl text-slate-650 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveEditCartItem}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

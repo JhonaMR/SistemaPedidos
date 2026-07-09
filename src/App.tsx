@@ -745,8 +745,10 @@ export default function App() {
     const paddedNum = String(siguienteCorrelativo).padStart(3, '0');
     const orderNumber = `${prefijoVendedor}-${paddedNum}`;
     
+    const { idLocal, ...pedidoBase } = oldPedido as any;
+    
     const duplicated: PedidoOffline = {
-      ...oldPedido,
+      ...pedidoBase,
       id: `ped_${Date.now()}`,
       numeroPedido: orderNumber,
       clienteId: client.id,
