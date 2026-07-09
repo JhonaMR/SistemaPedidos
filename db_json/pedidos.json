@@ -1,80 +1,158 @@
 [
   {
-    "clienteId": "cli_002",
-    "clienteNombre": "INVERSIONES AM ACACIAS S.A.S.",
-    "clienteTelefono": "N/A",
-    "vendedorNombre": "Jhon Montoya",
-    "items": [
-      {
-        "id": "cart_1783362439425_bm5s",
-        "prendaRef": "12869",
-        "nombrePrenda": "BLS MAN BOLE",
-        "categoria": "Dama",
-        "talla": "S-10, M-10, L-10",
-        "tallasDetalle": {
-          "S": 10,
-          "M": 10,
-          "L": 10
-        },
-        "cantidad": 30,
-        "precioUnitario": 31900,
-        "total": 957000
-      }
-    ],
-    "subtotal": 957000,
-    "porcentajeDescuento": 0,
-    "montoDescuento": 0,
-    "total": 957000,
-    "estado": "Pendiente",
-    "notas": "",
-    "fechaEntregaEstimada": "2026-07-06",
-    "fechaLimiteDespacho": "",
-    "facturacionFE": 100,
-    "facturacionRM": 0,
-    "id": "ped_1783362444757",
-    "numeroPedido": "JAM-001",
-    "fecha": "2026-07-06",
-    "campana": "Vacaciones 2026",
-    "sincronizado": 1,
-    "idLocal": 1
-  },
-  {
-    "clienteId": "cli_029",
-    "clienteNombre": "ARIZUL DEL CARIBE S.A.S",
+    "clienteId": "cli_081",
+    "clienteNombre": "MODATEXTIL DEL CARIBE S.A.S.",
     "clienteTelefono": "N/A",
     "vendedorNombre": "Usuario Soporte",
     "items": [
       {
-        "id": "cart_1783544272302_l8ao",
-        "prendaRef": "12395",
-        "nombrePrenda": "CAMISETA ASIMETRICO BOLEROS POPELINA",
+        "id": "cart_1783451152327_cxb1",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
         "categoria": "Dama",
-        "talla": "S-1, M-1, L-1",
+        "talla": "N/A",
         "tallasDetalle": {
-          "S": 1,
-          "M": 1,
-          "L": 1
+          "N/A": 24
         },
-        "cantidad": 3,
-        "precioUnitario": 24900,
-        "total": 74700
+        "novedad": "solo beigs",
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
       }
     ],
-    "subtotal": 74700,
+    "subtotal": 717600,
     "porcentajeDescuento": 0,
     "montoDescuento": 0,
-    "total": 74700,
+    "total": 717600,
+    "estado": "Pendiente",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-07",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783451175286",
+    "numeroPedido": "SOP-001",
+    "fecha": "2026-07-07",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1,
+    "idLocal": 2
+  },
+  {
+    "clienteId": "cli_017",
+    "clienteNombre": "ALIANZA ESTRENO SAS",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783453620261_lnyz",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "novedad": "solo beigs",
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
+      },
+      {
+        "id": "cart_1783453656341_0y6c",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
+      }
+    ],
+    "subtotal": 1435200,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 1435200,
+    "estado": "Pendiente",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-07",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 50,
+    "facturacionRM": 50,
+    "id": "ped_1783453670194",
+    "numeroPedido": "SOP-002",
+    "fecha": "2026-07-07",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1,
+    "idLocal": 3
+  },
+  {
+    "clienteId": "cli_270",
+    "clienteNombre": "AL MUSTAKIM",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783540658214_0rpf",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "S-8, M-8, L-6",
+        "tallasDetalle": {
+          "S": 8,
+          "M": 8,
+          "L": 6
+        },
+        "cantidad": 22,
+        "precioUnitario": 29900,
+        "total": 657800
+      },
+      {
+        "id": "cart_1783540695831_i25z",
+        "prendaRef": "13296",
+        "nombrePrenda": "CAMISETA COLOMBIA",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "novedad": "solo amarilla",
+        "cantidad": 24,
+        "precioUnitario": 24900,
+        "total": 597600
+      },
+      {
+        "id": "cart_1783540735138_pxse",
+        "prendaRef": "13282",
+        "nombrePrenda": "BLUSON CRUZADO BOTONES",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 22
+        },
+        "novedad": "recargar beigs",
+        "cantidad": 22,
+        "precioUnitario": 22900,
+        "total": 503800
+      }
+    ],
+    "subtotal": 1759200,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 1759200,
     "estado": "Pendiente",
     "notas": "",
     "fechaEntregaEstimada": "2026-07-08",
     "fechaLimiteDespacho": "",
-    "facturacionFE": 100,
-    "facturacionRM": 0,
-    "id": "ped_1783544275248",
-    "numeroPedido": "SOP-001",
+    "facturacionFE": 50,
+    "facturacionRM": 50,
+    "id": "ped_1783540747588",
+    "numeroPedido": "SOP-003",
     "fecha": "2026-07-08",
     "campana": "Vacaciones 2026",
     "sincronizado": 1,
-    "idLocal": 2
+    "idLocal": 4
   }
 ]

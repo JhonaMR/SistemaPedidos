@@ -1,4 +1,18 @@
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import { Pedido, Cliente, Prenda } from '../types';
+
+const formatDate = (dateStr?: string | null) => {
+  if (!dateStr) return '—';
+  const parts = dateStr.split('T')[0].split('-');
+  if (parts.length === 3) {
+    const [year, month, day] = parts;
+    return `${day}/${month}/${year}`;
+  }
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+};
 
 const formatCOP = (val: number) => {
   return new Intl.NumberFormat('es-CO', {
@@ -8,153 +22,347 @@ const formatCOP = (val: number) => {
   }).format(val);
 };
 
-export const printOrderReceipt = (
+export const printOrderReceipt = async (
   order: Pedido,
   clientes: Cliente[],
   catalogGarments: Prenda[]
 ) => {
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    console.error('No se pudo abrir la ventana de impresión.');
-    return;
-  }
+  const brandColor = '#f2bfbe';
+  const brandTextColor = '#6b2a35';
+  const logoSrc = '/logos/plow-192x192.png';
+  const sellerFull = (order.vendedorNombre || '').toUpperCase();
+
+  const brandInfo = [
+    'ARARE S.A.S.',
+    'NIT: 901453438',
+    '3146320002',
+    'Itagüí (Ant)',
+    'Dirección: CLL 77 a # 45 a 30 - 301',
+  ];
 
   const client = clientes.find(c => c.id === order.clienteId);
-  const clientAddress = client ? client.direccion : 'No registrada';
-  const clientCity = client ? client.ciudad : '';
+  const clientName = client?.nombre || order.clienteNombre || '—';
+  const clientNit = client?.documentoIdentidad || '—';
+  const clientAddress = client?.direccion || 'No registrada';
+  const clientCity = client?.ciudad || '—';
+  const clientId = (client?.id || order.clienteId || '—').replace(/^cli_/, '');
 
-  const fe = order.facturacionFE !== undefined ? order.facturacionFE : 100;
-  const rm = order.facturacionRM !== undefined ? order.facturacionRM : 0;
-  const printFacturacion = fe === 100 ? "FE 100%" : `FE ${fe}% / RM ${rm}%`;
+  const totalUnits = order.items.reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0);
 
-  const totalUnidades = order.items.reduce((sum, item) => sum + item.cantidad, 0);
-  const totalReferencias = order.items.length;
+  // Check if any item has a size breakdown (S, M, L, XL or child equivalents)
+  const hasSizes = order.items.some((i: any) => {
+    if (!i.tallasDetalle) return false;
+    const keys = Object.keys(i.tallasDetalle);
+    return keys.some(k => ['S', 'M', 'L', 'XL', '2-4', '6-8', '10-12', '14-16'].includes(k));
+  });
 
-  const itemsRows = order.items.map(item => {
+  const itemRows = order.items.map((item) => {
     const garment = catalogGarments?.find(g => g.ref === item.prendaRef);
-    const skuCode = garment ? garment.ref : item.prendaRef;
-    const cleanTalla = item.talla.replace(/\s*\((\d+)\)/g, '-$1');
-    return `
-      <tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 10px 0; font-weight: bold; font-size: 13px; font-family: monospace;">
-          ${skuCode}
-        </td>
-        <td style="text-align: center; font-weight: bold; white-space: nowrap;">${cleanTalla}</td>
-        <td style="text-align: center; font-style: italic; color: #666;">${item.novedad || '-'}</td>
-        <td style="text-align: center; font-weight: bold;">${item.cantidad}</td>
-        <td style="text-align: right; font-family: monospace;">${formatCOP(item.precioUnitario)}</td>
-        <td style="text-align: right; font-weight: bold; font-family: monospace;">${formatCOP(item.total)}</td>
-      </tr>
-    `;
-  }).join('');
+    const qty = Number(item.cantidad) || 0;
+    const price = Number(item.precioUnitario) || 0;
+    return {
+      ...item,
+      description: garment?.nombre || item.nombrePrenda || '',
+      qty,
+      price,
+      subtotal: item.total || qty * price
+    };
+  });
 
-  const htmlContent = `
-    <html>
-      <head>
-        <title>Pedido ${order.numeroPedido} - ARARE S.A.S.</title>
-        <style>
-          body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #333; padding: 30px; line-height: 1.5; }
-          .header { display: flex; justify-content: space-between; border-b: 2px solid #333; padding-bottom: 20px; }
-          .title { font-size: 24px; font-weight: bold; margin: 0; font-family: sans-serif; }
-          .meta-grid { display: flex; flex-direction: row; gap: 20px; margin: 30px 0; }
-          .meta-box { border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
-          .meta-title { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #777; margin-bottom: 5px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th { border-bottom: 2px solid #ddd; padding-bottom: 8px; font-size: 11px; text-transform: uppercase; color: #555; }
-          .total-section { float: right; width: 300px; margin-top: 30px; }
-          .total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; }
-          .grand-total { border-top: 2px solid #333; padding-top: 10px; font-size: 16px; font-weight: bold; }
-          .footer { clear: both; margin-top: 40px; text-align: center; font-size: 11px; color: #555; border-top: 1.5px solid #bbb; padding-top: 20px; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <div>
-            <div class="title" style="font-family: sans-serif; letter-spacing: -0.5px;">ARARE S.A.S.</div>
-            <div style="font-size: 12px; font-weight: bold; color: #444; margin-top: 2px;">Nit: 901453438</div>
-            <div style="font-size: 11px; color: #666; margin-top: 1px;">Itagüí (ANT)</div>
-            <div style="font-size: 11px; color: #555; margin-top: 4px; font-weight: 500;">Toma de Pedidos para Clientes</div>
+  // ── 1. Renderizar header + info con html2canvas ──
+  const headerHtml = `
+  <div id="pdf-header" style="font-family:Arial,sans-serif;font-size:11px;color:#1e293b;width:900px;background:#fff">
+      <div style="background:${brandColor};padding:16px 24px;display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:12px">
+              <img src="${logoSrc}" style="width:48px;height:48px;border-radius:8px;background:#fff;padding:4px" crossorigin="anonymous"/>
+              <div>
+                  <div style="color:${brandTextColor};font-size:18px;font-weight:900;letter-spacing:1px;line-height:1.3">${brandInfo[0]}</div>
+                  <div style="color:${brandTextColor};opacity:0.85;font-size:12px;line-height:1.4">${brandInfo[1]}</div>
+              </div>
           </div>
-          <div style="text-align: right;">
-            <div style="font-size: 18px; font-weight: bold; color: #111;">PEDIDO</div>
-            <div style="font-size: 13px; font-weight: bold; font-family: monospace; color: #555;">${order.numeroPedido}</div>
-            <div style="font-size: 11px; color: #777; margin-top: 5px;">Fecha: ${order.fecha}</div>
-            <div style="font-size: 11px; color: #111; font-weight: bold; margin-top: 5px; font-family: monospace; background: #f1f5f9; padding: 4px 8px; border: 1.5px dashed #cbd5e1; border-radius: 6px; display: inline-block;">
-              FACTURACIÓN: ${printFacturacion}
-            </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;margin-left:20px;margin-right:auto">
+              ${brandInfo.slice(2).map(l => `<div style="color:${brandTextColor};opacity:0.85;font-size:12px;line-height:1.4">${l}</div>`).join('')}
           </div>
-        </div>
+          <div style="text-align:right;color:${brandTextColor}">
+              <div style="font-size:10px;opacity:0.8">N° Pedido</div>
+              <div style="font-size:22px;font-weight:900">${order.numeroPedido ?? '—'}</div>
+          </div>
+      </div>
+      <div style="display:flex;border-bottom:2px solid #e2e8f0">
+          <div style="flex:3;padding:5px 24px;border-right:1px solid #e2e8f0">
+              <div style="font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">Datos del Cliente</div>
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <tr><td style="color:#64748b;width:110px;padding:2px 0">NOMBRE</td><td style="font-weight:700">${clientName}</td></tr>
+                  <tr><td style="color:#64748b;padding:2px 0">NIT</td><td>${clientNit}</td></tr>
+                  <tr><td style="color:#64748b;padding:2px 0">DIRECCIÓN</td><td>${clientAddress}</td></tr>
+                  <tr><td style="color:#64748b;padding:2px 0">CIUDAD</td><td>${clientCity}</td></tr>
+                  <tr><td style="color:#64748b;padding:2px 0">ID</td><td>${clientId}</td></tr>
+              </table>
+          </div>
+          <div style="flex:2;padding:5px 24px">
+              <div style="font-size:9px;font-weight:900;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Datos del Pedido</div>
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <tr><td style="color:#64748b;width:130px;padding:3px 0">VENDEDOR</td><td style="font-weight:700">${sellerFull}</td></tr>
+                  <tr><td style="color:#64748b;padding:3px 0">FECHA PEDIDO</td><td>${formatDate(order.fecha)}</td></tr>
+                  <tr><td style="color:#64748b;padding:3px 0">% Fact.</td><td>${order.facturacionFE ?? 100} / ${order.facturacionRM ?? 0}</td></tr>
+              </table>
+              <div style="margin-top:5px;background:#f9d8d8;border-radius:6px;padding:8px;min-width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center">
+                  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+                      <div style="text-align:center">
+                          <div style="color:#7c2230;font-size:8px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600">Inicio despacho</div>
+                          <div style="color:#5c1a24;font-weight:700;font-size:11px">${formatDate(order.fechaEntregaEstimada)}</div>
+                      </div>
+                      <div style="color:#c45a6a;font-size:14px;padding:0 8px">→</div>
+                      <div style="text-align:center">
+                          <div style="color:#7c2230;font-size:8px;text-transform:uppercase;letter-spacing:0.5px;font-weight:600">Fin despacho</div>
+                          <div style="color:#5c1a24;font-weight:700;font-size:11px">${formatDate(order.fechaLimiteDespacho)}</div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>`;
 
-        <div class="meta-grid">
-          <div class="meta-box" style="flex: 1.6;">
-            <div class="meta-title">Datos del Cliente</div>
-            <div style="font-weight: bold; font-size: 14px;">${order.clienteNombre}</div>
-            <div style="font-size: 12px; color: #333; margin-top: 5px;">Teléfono: ${order.clienteTelefono}</div>
-            <div style="font-size: 12px; color: #333; margin-top: 2px;">Dirección: ${clientAddress}${clientCity ? `, ${clientCity}` : ''}</div>
-          </div>
-          <div class="meta-box" style="flex: 1;">
-            <div class="meta-title">Información Comercial</div>
-            <div style="font-size: 13px;">Vendedor: <strong>${order.vendedorNombre}</strong></div>
-            <div style="font-size: 13px; margin-top: 2px;">Inicio desp.: <strong>${order.fechaEntregaEstimada}</strong></div>
-            <div style="font-size: 13px; margin-top: 2px;">Fin desp.: <strong>${order.fechaLimiteDespacho || 'No asignada'}</strong></div>
-          </div>
-        </div>
+  const container = document.createElement('div');
+  container.style.cssText = 'position:fixed;top:0;left:0;z-index:-1;opacity:0;pointer-events:none';
+  container.innerHTML = headerHtml;
+  document.body.appendChild(container);
 
-        <table>
-          <thead>
-            <tr>
-              <th style="text-align: left;">Prendas pedidas</th>
-              <th>Talla</th>
-              <th>Novedad / Requerimiento</th>
-              <th>Cant.</th>
-              <th style="text-align: right;">Precio Unitario</th>
-              <th style="text-align: right;">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsRows}
-          </tbody>
-        </table>
+  const headerEl = container.querySelector('#pdf-header') as HTMLElement;
+  const headerCanvas = await html2canvas(headerEl, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+  document.body.removeChild(container);
 
-        <div class="total-section">
-          <div class="total-row">
-            <span>Total de referencias:</span>
-            <span style="font-weight: bold; font-family: monospace;">${totalReferencias}</span>
-          </div>
-          <div class="total-row">
-            <span>Total de unidades:</span>
-            <span style="font-weight: bold; font-family: monospace;">${totalUnidades}</span>
-          </div>
-          ${order.porcentajeDescuento > 0 ? `
-            <div class="total-row" style="color: #c0392b;">
-              <span>Descuento (${order.porcentajeDescuento}%):</span>
-              <span style="font-family: monospace;">-${formatCOP(order.montoDescuento)}</span>
-            </div>
-          ` : ''}
-          <div class="total-row grand-total">
-            <span>Total valor:</span>
-            <span style="font-family: monospace; font-weight: bold;">${formatCOP(order.total)}</span>
-          </div>
-        </div>
+  // ── 2. Construir PDF con jsPDF ──
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
+  const PW = 215.9; // ancho carta portrait
+  const PH = 279.4;
+  const margin = 0;
 
-        <div style="clear: both;"></div>
+  // Pegar header capturado
+  const headerImgData = headerCanvas.toDataURL('image/png');
+  const headerRatio = headerCanvas.width / headerCanvas.height;
+  const headerW = PW;
+  const headerH = headerW / headerRatio;
+  pdf.addImage(headerImgData, 'PNG', margin, 0, headerW, headerH);
 
-        ${order.notas ? `
-          <div style="margin-top: 30px; border-left: 3px solid #777; padding-left: 10px; font-style: italic; font-size: 12px; color: #555;">
-            <strong>Notas / Instrucciones de Confección:</strong><br/>
-            ${order.notas}
-          </div>
-        ` : ''}
+  let curY = headerH + 2;
 
-        <div class="footer">
-          <p>Este comprobante de pedido fue emitido por el sistema móvil de vendedores de Arare S.A.S.</p>
-          <p>Arare S.A.S. - Sistema de toma de pedidos.</p>
-        </div>
-      </body>
-    </html>
-  `;
+  // ── 3. Tabla con jsPDF directo ──
+  const ROW_H = 7; // mm por fila
+  const HEADER_H = 7;
+  const FS = 8; // font size pts
 
-  printWindow.document.write(htmlContent);
-  printWindow.document.close();
-  printWindow.print();
+  // Definir columnas (x, width en mm, align)
+  type Col = { label: string; subLabel?: string; x: number; w: number; align: 'left' | 'center' | 'right'; headerAlign?: 'left' | 'center' | 'right' };
+  const cols: Col[] = hasSizes ? [
+    { label: 'Referencia',  x: 0,   w: 22,  align: 'center' },
+    { label: 'Descripción', x: 22,  w: 60,  align: 'left'   },
+    { label: 'S',  subLabel: '2-4',   x: 82,  w: 10,  align: 'center' },
+    { label: 'M',  subLabel: '6-8',   x: 92,  w: 10,  align: 'center' },
+    { label: 'L',  subLabel: '10-12', x: 102, w: 10,  align: 'center' },
+    { label: 'XL', subLabel: '14-16', x: 112, w: 10,  align: 'center' },
+    { label: 'Novedad',     x: 122, w: 24,  align: 'left'   },
+    { label: 'Cant.',       x: 146, w: 10,  align: 'center', headerAlign: 'center'  },
+    { label: 'Precio V.',   x: 156, w: 25,  align: 'center' },
+    { label: 'Subtotal',    x: 181, w: 29,  align: 'right'  },
+  ] : [
+    { label: 'Referencia',  x: 0,   w: 22,  align: 'center' },
+    { label: 'Descripción', x: 22,  w: 82,  align: 'left'   },
+    { label: 'Cant.',       x: 104, w: 10,  align: 'center', headerAlign: 'center'  },
+    { label: 'Novedad',     x: 114, w: 32,  align: 'left'   },
+    { label: 'Precio V.',   x: 146, w: 28,  align: 'center' },
+    { label: 'Subtotal',    x: 174, w: 36,  align: 'right'  },
+  ];
+
+  const truncate = (text: string, maxW: number): string => {
+    const ellipsis = '...';
+    if (pdf.getTextWidth(text) <= maxW) return text;
+    let t = text;
+    while (t.length > 0 && pdf.getTextWidth(t + ellipsis) > maxW) {
+      t = t.slice(0, -1);
+    }
+    return t + ellipsis;
+  };
+
+  const drawRow = (y: number, bg: [number,number,number] | null, cells: string[], bold = false) => {
+    if (bg) {
+      pdf.setFillColor(bg[0], bg[1], bg[2]);
+      pdf.rect(margin, y, PW - margin * 2, ROW_H, 'F');
+    }
+    pdf.setFont('helvetica', bold ? 'bold' : 'normal');
+    pdf.setFontSize(FS);
+    pdf.setTextColor(30, 41, 59);
+    const textY = y + ROW_H / 2 + (FS * 0.3528) / 2;
+    const pad = 1.5;
+    cols.forEach((col, i) => {
+      const raw = cells[i] ?? '';
+      const text = truncate(raw, col.w - pad * 2);
+      if (col.align === 'right') {
+        pdf.text(text, margin + col.x + col.w - pad * 3, textY, { align: 'right' });
+      } else if (col.align === 'center') {
+        pdf.text(text, margin + col.x + col.w / 2, textY, { align: 'center' });
+      } else {
+        pdf.text(text, margin + col.x + pad, textY, { align: 'left' });
+      }
+    });
+    pdf.setDrawColor(226, 232, 240);
+    pdf.line(margin, y + ROW_H, PW - margin, y + ROW_H);
+    cols.slice(1).forEach(col => {
+      pdf.line(margin + col.x, y, margin + col.x, y + ROW_H);
+    });
+  };
+
+  const drawTableHeader = (y: number) => {
+    const [hr, hg, hb] = [226, 232, 240];
+    pdf.setFillColor(hr, hg, hb);
+    pdf.rect(margin, y, PW - margin * 2, HEADER_H, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(FS - 0.5);
+    pdf.setTextColor(71, 85, 105);
+    const hTextY = y + HEADER_H / 2 + ((FS - 0.5) * 0.3528) / 2;
+    cols.forEach(col => {
+      const pad = 1.5;
+      const isCenter = col.label === 'Novedad' || col.label === 'Subtotal' || col.label === 'Descripción';
+      const ha: 'left' | 'center' | 'right' = isCenter ? 'center' : (col.headerAlign || col.align);
+      const cx = margin + col.x + (ha === 'center' ? col.w / 2 : ha === 'right' ? col.w - pad : pad);
+      if (col.subLabel) {
+        const lineH = (FS - 0.5) * 0.3528;
+        const y1 = y + HEADER_H / 2 - lineH * 0.3;
+        const y2 = y + HEADER_H / 2 + lineH * 1.1;
+        pdf.text(col.label.toUpperCase(), cx, y1, { align: ha });
+        pdf.setFontSize(FS - 2);
+        pdf.text(col.subLabel, cx, y2, { align: ha });
+        pdf.setFontSize(FS - 0.5);
+      } else {
+        pdf.text(col.label.toUpperCase(), cx, hTextY, { align: ha });
+      }
+    });
+    pdf.setDrawColor(203, 213, 225);
+    pdf.line(margin, y + HEADER_H, PW - margin, y + HEADER_H);
+    cols.slice(1).forEach(col => {
+      pdf.line(margin + col.x, y, margin + col.x, y + HEADER_H);
+    });
+    return y + HEADER_H;
+  };
+
+  let currentPage = 1;
+  const checkPage = (y: number): number => {
+    if (y + ROW_H > PH - 10) {
+      pdf.setFont('helvetica', 'italic');
+      pdf.setFontSize(7);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(`Hoja ${currentPage}`, PW / 2, PH - 4, { align: 'center' });
+
+      pdf.addPage();
+      currentPage++;
+
+      pdf.addImage(headerImgData, 'PNG', margin, 0, headerW, headerH);
+      let newY = headerH + 2;
+      newY = drawTableHeader(newY);
+      return newY;
+    }
+    return y;
+  };
+
+  curY = drawTableHeader(curY);
+
+  // Filas de datos
+  itemRows.forEach((item, i) => {
+    curY = checkPage(curY);
+    const bg: [number,number,number] = i % 2 === 0 ? [255,255,255] : [248,250,252];
+    const cells = hasSizes ? [
+      item.prendaRef,
+      item.description,
+      String(item.tallasDetalle?.S || item.tallasDetalle?.['2-4'] || ''),
+      String(item.tallasDetalle?.M || item.tallasDetalle?.['6-8'] || ''),
+      String(item.tallasDetalle?.L || item.tallasDetalle?.['10-12'] || ''),
+      String(item.tallasDetalle?.XL || item.tallasDetalle?.['14-16'] || ''),
+      item.novedad || '',
+      String(item.cantidad),
+      formatCOP(item.precioUnitario),
+      formatCOP(item.subtotal),
+    ] : [
+      item.prendaRef,
+      item.description,
+      String(item.cantidad),
+      [
+        item.talla !== 'N/A' && item.talla ? `Talla: ${item.talla}` : '',
+        item.novedad || ''
+      ].filter(Boolean).join(' | '),
+      formatCOP(item.precioUnitario),
+      formatCOP(item.subtotal),
+    ];
+    drawRow(curY, bg, cells);
+    curY += ROW_H;
+  });
+
+  // Fila descuento (si aplica)
+  if (order.porcentajeDescuento > 0) {
+    curY = checkPage(curY);
+    pdf.setFillColor(254, 242, 242); // light red background for discount
+    pdf.rect(margin, curY, PW - margin * 2, ROW_H, 'F');
+    pdf.setDrawColor(203, 213, 225);
+    pdf.line(margin, curY + ROW_H, PW - margin, curY + ROW_H);
+
+    const discountCells = hasSizes
+      ? ['', '', '', '', '', '', '', '', `DESC. (${order.porcentajeDescuento}%)`, `-${formatCOP(order.montoDescuento)}`]
+      : ['', '', '', '', `DESC. (${order.porcentajeDescuento}%)`, `-${formatCOP(order.montoDescuento)}` ];
+    drawRow(curY, null, discountCells, true);
+    curY += ROW_H;
+  }
+
+  // Fila totales
+  curY = checkPage(curY);
+  pdf.setFillColor(241, 245, 249);
+  pdf.rect(margin, curY, PW - margin * 2, ROW_H, 'F');
+  pdf.setDrawColor(203, 213, 225);
+  pdf.line(margin, curY, PW - margin, curY);
+  const totalCells = hasSizes
+    ? [`${itemRows.length} refs`, '', '', '', '', '', '', String(totalUnits), 'TOTAL', formatCOP(order.total)]
+    : [`${itemRows.length} refs`, '', String(totalUnits), '', 'TOTAL', formatCOP(order.total)];
+  drawRow(curY, null, totalCells, true);
+  curY += ROW_H;
+
+  // Observaciones
+  const obs: string[] = order.notas ? order.notas.split('\n').map(n => n.trim()).filter(Boolean) : [];
+  if (obs.length > 0) {
+    const obsHeight = 6 + obs.length * 5;
+    if (curY + obsHeight > PH - 10) {
+      pdf.setFont('helvetica', 'italic');
+      pdf.setFontSize(7);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(`Hoja ${currentPage}`, PW / 2, PH - 4, { align: 'center' });
+
+      pdf.addPage();
+      currentPage++;
+
+      pdf.addImage(headerImgData, 'PNG', margin, 0, headerW, headerH);
+      curY = headerH + 2;
+    }
+
+    curY += 3;
+    pdf.setFillColor(255, 245, 245);
+    pdf.rect(margin, curY, PW - margin * 2, obsHeight, 'F');
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(7);
+    pdf.setTextColor(248, 113, 113);
+    pdf.text('OBSERVACIONES', margin + 4, curY + 4);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(55, 65, 81);
+    obs.forEach((o, i) => {
+      pdf.text(`${i + 1}. ${o}`, margin + 4, curY + 9 + i * 5);
+    });
+    curY += obsHeight;
+  }
+
+  // Footer con número de hoja final
+  curY += 3;
+  pdf.setFont('helvetica', 'italic');
+  pdf.setFontSize(7);
+  pdf.setTextColor(148, 163, 184);
+  pdf.text(`Hoja ${currentPage}`, PW / 2, PH - 4, { align: 'center' });
+  pdf.text(`Generado por: ${order.vendedorNombre || '—'}`, margin + 4, PH - 4);
+  pdf.text(new Date().toLocaleString('es-CO'), PW - margin - 4, PH - 4, { align: 'right' });
+
+  pdf.save(`${order.numeroPedido}_${clientName.replace(/\s+/g, '_')}.pdf`);
 };

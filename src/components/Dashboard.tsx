@@ -1,5 +1,5 @@
 import { Pedido } from '../types';
-import { Clock, CheckCircle2, ChevronRight, ShoppingBag, Package, Truck, AlertTriangle } from 'lucide-react';
+import { Clock, CheckCircle2, ChevronRight, ShoppingBag, Package, Truck, AlertTriangle, TrendingUp } from 'lucide-react';
 
 interface DashboardProps {
   pedidos: Pedido[];
@@ -115,50 +115,87 @@ export default function Dashboard({ pedidos, vendedor, onNavigateToRegister, cur
             })}
           </div>
 
-          {/* Side Efficiency summary card */}
-          <div className="lg:col-span-4 flex flex-col justify-between p-5 bg-[#FDFDFD] border border-slate-100 rounded-xl">
-            <div className="space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Eficacia Comercial</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Porcentaje de prendas entregadas con éxito sobre el total de órdenes procesadas en el sistema.
-              </p>
-            </div>
+          {(() => {
+            // Calcular referencias más vendidas de pedidos activos (excluyendo Cancelado)
+            const pedidosActivos = pedidos.filter(p => p.estado !== 'Cancelado');
+            
+            const refMap: Record<string, { ref: string; nombre: string; cantidad: number; totalVendido: number }> = {};
+            
+            pedivosLoop: pedidosActivos.forEach(p => {
+              (p.items || []).forEach(item => {
+                const ref = item.prendaRef;
+                if (!refMap[ref]) {
+                  refMap[ref] = {
+                    ref,
+                    nombre: item.nombrePrenda,
+                    cantidad: 0,
+                    totalVendido: 0
+                  };
+                }
+                refMap[ref].cantidad += item.cantidad || 0;
+                refMap[ref].totalVendido += item.total || 0;
+              });
+            });
 
-            <div className="my-6 flex flex-col items-center justify-center">
-              <div className="relative flex items-center justify-center h-28 w-28">
-                {/* Simplified SVG Ring chart */}
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  <path
-                    className="text-slate-100"
-                    strokeWidth="3"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path
-                    className="text-emerald-500"
-                    strokeDasharray={`${successRate}, 100`}
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
-                <div className="absolute text-center">
-                  <span className="text-2xl font-black text-slate-800">{successRate}%</span>
-                  <span className="block text-[8px] uppercase font-bold tracking-wider text-slate-400">Éxito</span>
+            const topReferences = Object.values(refMap)
+              .sort((a, b) => b.cantidad - a.cantidad)
+              .slice(0, 5);
+
+            const maxQty = topReferences.length > 0 ? topReferences[0].cantidad : 1;
+
+            return (
+              <div className="lg:col-span-4 p-5 bg-[#FDFDFD] border border-slate-100 rounded-xl flex flex-col justify-between min-h-[320px]">
+                <div>
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                      <TrendingUp className="h-4 w-4 text-indigo-600" />
+                      <span>Top 5 Referencias Más Vendidas</span>
+                    </h4>
+                  </div>
+                  
+                  {topReferences.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-xs">
+                      No hay ventas registradas aún.
+                    </div>
+                  ) : (
+                    <div className="space-y-3.5 max-h-[380px] overflow-y-auto pr-1">
+                      {topReferences.map((refData, index) => {
+                        const percentage = Math.round((refData.cantidad / maxQty) * 100);
+                        return (
+                          <div key={refData.ref} className="relative group">
+                            {/* Background Bar */}
+                            <div 
+                              className="absolute inset-0 bg-indigo-50/20 rounded-lg -z-10 group-hover:bg-indigo-50/40 transition-colors"
+                              style={{ width: `${percentage}%` }}
+                            />
+                            <div className="flex items-center justify-between p-2 rounded-lg text-xs">
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <span className={`h-5 w-5 rounded-md flex items-center justify-center font-bold text-[10px] ${
+                                  index === 0 ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                                  index === 1 ? 'bg-slate-100 text-slate-700 border border-slate-200' :
+                                  index === 2 ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                                  'bg-slate-50 text-slate-500 border border-slate-100'
+                                }`}>
+                                  {index + 1}
+                                </span>
+                                <div className="min-w-0">
+                                  <div className="font-bold text-slate-800 truncate leading-snug">Ref: {refData.ref}</div>
+                                  <div className="text-[10px] text-slate-500 font-semibold truncate leading-snug">{refData.nombre}</div>
+                                </div>
+                              </div>
+                              <div className="text-right shrink-0">
+                                <div className="font-extrabold text-slate-800 leading-snug">{refData.cantidad} uds</div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-
-            <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-lg flex items-center gap-2.5">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
-              <span className="text-[11px] font-bold text-emerald-800 leading-tight">
-                {successRate}% de entregas completadas satisfactoriamente
-              </span>
-            </div>
-          </div>
+            );
+          })()}
         </div>
       </div>
     </div>

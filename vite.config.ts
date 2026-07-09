@@ -12,7 +12,8 @@ export default defineConfig(() => {
       VitePWA({
         registerType: 'autoUpdate',
         workbox: {
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}']
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}'],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
         },
         manifest: {
           name: 'Toma Pedido App',

@@ -77,6 +77,22 @@ export default function OrderForm({
   const [quickDoc, setQuickDoc] = useState('');
   const [quickTel, setQuickTel] = useState('');
   const [quickCiudad, setQuickCiudad] = useState('');
+  const [quickDireccion, setQuickDireccion] = useState('');
+
+  useEffect(() => {
+    if (isQuickAdding && clientes) {
+      const consecutiveCodes = clientes
+        .map(c => {
+          const match = c.codigoCliente?.match(/\d+/);
+          return match ? parseInt(match[0], 10) : NaN;
+        })
+        .filter(n => !isNaN(n));
+      const maxCode = consecutiveCodes.length > 0 ? Math.max(...consecutiveCodes) : 0;
+      const nextConsecutive = String(maxCode + 1).padStart(3, '0');
+      setQuickCodigo(nextConsecutive);
+    }
+  }, [isQuickAdding, clientes]);
+
   // Active Catalog Item selection state
   const [selectedPrenda, setSelectedPrenda] = useState<Prenda | null>(null);
   const [tallasCantidades, setTallasCantidades] = useState<Record<string, number>>({});
@@ -167,8 +183,8 @@ export default function OrderForm({
       nombre: quickNombre,
       documentoIdentidad: quickDoc,
       telefono: quickTel,
-      correo: '',
-      direccion: '',
+      correo: 'N/A',
+      direccion: quickDireccion,
       ciudad: quickCiudad || 'Sin especificar',
       notas: 'Añadido rápido en toma de pedido.'
     });
@@ -180,6 +196,7 @@ export default function OrderForm({
     setQuickDoc('');
     setQuickTel('');
     setQuickCiudad('');
+    setQuickDireccion('');
   };
 
   const handleAddToCart = () => {
@@ -355,37 +372,37 @@ export default function OrderForm({
             <User className="h-4.5 w-4.5" />
             <span>1. Datos del Cliente</span>
           </h3>
-          {!isQuickAdding && !selectedClientId && (
-            <button
-              id="btn-quick-add-client-toggle"
-              type="button"
-              onClick={() => setIsQuickAdding(true)}
-              className="px-3 py-1.5 bg-[#FAF7F0] border border-[#C4BFA6] hover:bg-[#F3EFE4] text-xs font-bold uppercase rounded-lg text-[#6A5E4E] transition-all shrink-0"
-            >
-              + Nuevo cliente
-            </button>
-          )}
-          {selectedClientId && (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {!isQuickAdding && !selectedClientId && (
               <button
+                id="btn-quick-add-client-toggle"
                 type="button"
-                onClick={onCancel}
-                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
+                onClick={() => setIsQuickAdding(true)}
+                className="px-3 py-1.5 bg-[#FAF7F0] border border-[#C4BFA6] hover:bg-[#F3EFE4] text-xs font-bold uppercase rounded-lg text-[#6A5E4E] transition-all shrink-0 animate-fade-in"
               >
-                Cancelar
+                + Nuevo cliente
               </button>
+            )}
+            {selectedClientId && (
               <button
                 type="button"
                 onClick={() => {
                   setSelectedClientId('');
                   setClientSearchQuery('');
                 }}
-                className="px-3 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
+                className="px-3 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm animate-fade-in"
               >
                 Cambiar Cliente
               </button>
-            </div>
-          )}
+            )}
+            <button
+              type="button"
+              onClick={onCancel}
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
+            >
+              Cancelar
+            </button>
+          </div>
         </div>
 
         {!isQuickAdding ? (
@@ -407,9 +424,24 @@ export default function OrderForm({
                         setShowClientSuggestions(true);
                       }}
                       onFocus={() => setShowClientSuggestions(true)}
-                      className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-[#4A5D4E] focus:outline-none"
+                      className="w-full p-2.5 pr-10 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-sm text-slate-700 focus:ring-1 focus:ring-[#4A5D4E] focus:outline-none"
                     />
 
+                    {clientSearchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setClientSearchQuery('');
+                          setSelectedClientId('');
+                          setShowClientSuggestions(false);
+                        }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 transition-colors p-1"
+                        title="Limpiar búsqueda"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+ 
                     {/* Floating suggestions dropdown */}
                     {showClientSuggestions && clientSearchQuery.trim().length >= 3 && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto divide-y divide-slate-100">
@@ -426,7 +458,7 @@ export default function OrderForm({
                             >
                               <div>
                                 <span className="font-bold text-slate-800">{c.nombre}</span>
-                                <span className="block text-[10px] text-slate-500 font-mono">ID: {c.codigoCliente} • NIT: {c.documentoIdentidad}</span>
+                                <span className="block text-[10px] text-slate-500 font-mono">ID: {c.codigoCliente} . NIT: {c.documentoIdentidad} . DIR: {c.direccion || 'N/A'}</span>
                               </div>
                               <span className="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-600 font-semibold">{c.ciudad}</span>
                             </div>
@@ -438,7 +470,7 @@ export default function OrderForm({
                         )}
                       </div>
                     )}
-
+ 
                     {clientSearchQuery.trim().length > 0 && clientSearchQuery.trim().length < 3 && (
                       <p className="text-[10px] text-[#A17A3D] mt-1 font-medium">Escribe {3 - clientSearchQuery.trim().length} caracteres más para buscar...</p>
                     )}
@@ -593,7 +625,7 @@ export default function OrderForm({
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-6 gap-2.5">
               <div>
                 <input
                   type="text"
@@ -632,6 +664,15 @@ export default function OrderForm({
                   placeholder="Teléfono Celular"
                   value={quickTel}
                   onChange={(e) => setQuickTel(e.target.value)}
+                  className="w-full p-2 bg-white border border-slate-200 rounded text-xs"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  placeholder="Dirección"
+                  value={quickDireccion}
+                  onChange={(e) => setQuickDireccion(e.target.value)}
                   className="w-full p-2 bg-white border border-slate-200 rounded text-xs"
                 />
               </div>
@@ -880,15 +921,15 @@ export default function OrderForm({
 
                   {/* Size quantities drawer */}
                   {Object.keys(tallasCantidades).length > 0 && (
-                    <div className="mt-3.5 p-3.5 bg-indigo-50/55 border border-indigo-100 rounded-xl space-y-2.5 animate-in fade-in duration-150">
+                    <div className="mt-3.5 p-3.5 bg-indigo-50/55 border border-indigo-100 rounded-xl space-y-2 animate-in fade-in duration-150">
                       <span className="block text-[10px] font-black uppercase tracking-wider text-indigo-600">
                         Cantidad por Talla
                       </span>
-                      <div className="space-y-1.5 max-h-36 overflow-y-auto pr-0.5">
+                      <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-0.5">
                         {Object.keys(tallasCantidades).map((t) => (
-                          <div key={t} className="flex items-center justify-between bg-white border border-slate-100 p-2 rounded-lg shadow-2xs">
-                            <span className="text-xs font-extrabold text-slate-800 font-mono">Talla {t}</span>
-                            <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden">
+                          <div key={t} className="flex flex-col items-center gap-1.5 bg-white border border-slate-100 p-2 rounded-xl shadow-2xs min-w-[90px]">
+                            <span className="text-[10px] font-extrabold text-slate-800 font-mono">Talla {t}</span>
+                            <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -904,7 +945,7 @@ export default function OrderForm({
                                 }}
                                 className="p-1 hover:bg-slate-50 text-slate-500"
                               >
-                                <Minus className="h-3.5 w-3.5" />
+                                <Minus className="h-3 w-3" />
                               </button>
                               <input
                                 type="number"
@@ -915,7 +956,7 @@ export default function OrderForm({
                                   setTallasCantidades(prev => ({ ...prev, [t]: val }));
                                 }}
                                 onFocus={(e) => e.target.select()}
-                                className="w-10 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
+                                className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
                               />
                               <button
                                 type="button"
@@ -924,7 +965,7 @@ export default function OrderForm({
                                 }}
                                 className="p-1 hover:bg-slate-50 text-slate-500"
                               >
-                                <Plus className="h-3.5 w-3.5" />
+                                <Plus className="h-3 w-3" />
                               </button>
                             </div>
                           </div>
@@ -1124,6 +1165,7 @@ export default function OrderForm({
                         setClientSearchQuery('');
                         setCart([]);
                         setNotas('');
+                        onCancel();
                       }
                     }}
                     className="h-[42px] px-4 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex-1 flex items-center justify-center"

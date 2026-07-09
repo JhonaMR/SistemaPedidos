@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Search, Tag, Package, Sparkles, X, Image as ImageIcon, Plus, Edit2, Upload, ChevronLeft, ChevronRight } from 'lucide-react';
-import { Prenda } from '../types';
+import { Prenda, Campana } from '../types';
 import { ViewFotoModal } from './ViewFotoModal';
 
 interface ReferenciasCatalogProps {
@@ -9,24 +9,38 @@ interface ReferenciasCatalogProps {
   currentUser?: any;
   activeCampana?: string;
   campanasReferencias?: Record<string, string[]>;
+  campanasDisponibles?: Campana[];
 }
 
-export default function ReferenciasCatalog({ 
-  prendas = [], 
-  onUpdatePrendas = () => {}, 
+export default function ReferenciasCatalog({
+  prendas = [],
+  onUpdatePrendas = () => { },
   currentUser,
   activeCampana,
-  campanasReferencias
+  campanasReferencias,
+  campanasDisponibles = []
 }: ReferenciasCatalogProps) {
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [viewFotoPrenda, setViewFotoPrenda] = useState<Prenda | null>(null);
-  
+
+  const [selectedYearFilter, setSelectedYearFilter] = useState<number>(() => {
+    if (activeCampana) {
+      const match = activeCampana.match(/\d{4}/);
+      if (match) return parseInt(match[0], 10);
+    }
+    return new Date().getFullYear();
+  });
+
   const [selectedCampanaFilter, setSelectedCampanaFilter] = useState<string>(activeCampana || 'Todas');
 
   useEffect(() => {
     if (activeCampana) {
       setSelectedCampanaFilter(activeCampana);
+      const match = activeCampana.match(/\d{4}/);
+      if (match) {
+        setSelectedYearFilter(parseInt(match[0], 10));
+      }
     }
   }, [activeCampana]);
 
@@ -92,25 +106,39 @@ export default function ReferenciasCatalog({
   };
 
   const filteredPrendas = prendas.filter(p => {
-    // Campaign filtering based on selectedCampanaFilter
-    const isEnabledInCampaign = selectedCampanaFilter === 'Todas' || !campanasReferencias || 
-      !campanasReferencias[selectedCampanaFilter] || 
-      campanasReferencias[selectedCampanaFilter].includes(p.ref);
+    // Filtrado por campaña/año
+    let isEnabledInCampaign = true;
+    if (selectedCampanaFilter !== 'Todas') {
+      isEnabledInCampaign = !campanasReferencias ||
+        !campanasReferencias[selectedCampanaFilter] ||
+        campanasReferencias[selectedCampanaFilter].includes(p.ref);
+    } else {
+      // Si es Todas, filtramos por todas las campañas del año seleccionado
+      const campanasDelAnio = (campanasDisponibles || [])
+        .filter(c => c.anio === selectedYearFilter)
+        .map(c => `${c.nombre} ${c.anio}`);
 
-    const matchesSearch = 
+      if (campanasDelAnio.length > 0 && campanasReferencias) {
+        isEnabledInCampaign = campanasDelAnio.some(campName =>
+          campanasReferencias[campName] && campanasReferencias[campName].includes(p.ref)
+        );
+      }
+    }
+
+    const matchesSearch =
       p.nombre.toLowerCase().includes(search.toLowerCase()) ||
       p.ref.toLowerCase().includes(search.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'Todas' || 
+
+    const matchesCategory = selectedCategory === 'Todas' ||
       (Array.isArray(p.categoria) ? p.categoria.includes(selectedCategory as any) : p.categoria === selectedCategory);
-    
+
     return isEnabledInCampaign && matchesSearch && matchesCategory;
   });
 
   // Reset page when search, category filter, campaign filter or itemsPerPage changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, selectedCategory, selectedCampanaFilter, itemsPerPage]);
+  }, [search, selectedCategory, selectedCampanaFilter, selectedYearFilter, itemsPerPage]);
 
   const totalPages = Math.ceil(filteredPrendas.length / itemsPerPage);
   const paginatedPrendas = filteredPrendas.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -130,8 +158,8 @@ export default function ReferenciasCatalog({
     setEditingPrenda(prenda);
     setFormRef(prenda.ref);
     setFormNombre(prenda.nombre);
-    const initialCats = Array.isArray(prenda.categoria) 
-      ? prenda.categoria 
+    const initialCats = Array.isArray(prenda.categoria)
+      ? prenda.categoria
       : (prenda.categoria ? [prenda.categoria] : ['Dama']);
     setFormCategorias(initialCats as any);
     setFormPrecio(prenda.precioBase);
@@ -152,9 +180,9 @@ export default function ReferenciasCatalog({
   };
 
   const toggleFormTalla = (talla: string) => {
-    setFormTallas(prev => 
-      prev.includes(talla) 
-        ? prev.filter(t => t !== talla) 
+    setFormTallas(prev =>
+      prev.includes(talla)
+        ? prev.filter(t => t !== talla)
         : [...prev, talla]
     );
   };
@@ -199,7 +227,7 @@ export default function ReferenciasCatalog({
         alert('Este código de referencia ya existe.');
         return;
       }
-      
+
       const newPrenda: Prenda = {
         ref: refUpper,
         nombre: formNombre.trim(),
@@ -226,7 +254,7 @@ export default function ReferenciasCatalog({
             <span>Base de Referencias Activas</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Catálogo completo de prendas de vestir disponibles para la toma de pedidos.
+            Catálogo completo de referencias disponibles para la toma de pedidos.
           </p>
           {activeCampana && (
             <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 text-[10px] font-extrabold rounded-md uppercase tracking-wider">
@@ -238,7 +266,7 @@ export default function ReferenciasCatalog({
             </div>
           )}
         </div>
-        
+
         <div className="flex items-center gap-3">
           {currentUser?.rol === 'soporte' && (
             <button
@@ -252,16 +280,51 @@ export default function ReferenciasCatalog({
             </button>
           )}
 
-          <select
-            value={selectedCampanaFilter}
-            onChange={(e) => setSelectedCampanaFilter(e.target.value)}
-            className="text-xs bg-white border border-[#E2E8F0] rounded-xl px-3 py-2 font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors"
-          >
-            <option value="Todas">Ver Todo (Todas las Campañas)</option>
-            {Object.keys(campanasReferencias || {}).map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
+          {/* Selectores de Campaña Duplicados */}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Año:</span>
+            <select
+              value={selectedYearFilter}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                setSelectedYearFilter(val);
+
+                // Seleccionar automáticamente la primera campaña de este año
+                const campaignsForYear = (campanasDisponibles || [])
+                  .filter(c => c.anio === val)
+                  .sort((a, b) => a.numero - b.numero);
+
+                if (campaignsForYear.length > 0) {
+                  setSelectedCampanaFilter(`${campaignsForYear[0].nombre} ${campaignsForYear[0].anio}`);
+                } else {
+                  setSelectedCampanaFilter('Todas');
+                }
+              }}
+              className="p-1.5 px-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors"
+            >
+              <option value={2026}>2026</option>
+              <option value={2027}>2027</option>
+              <option value={2028}>2028</option>
+              <option value={2029}>2029</option>
+            </select>
+
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 ml-1">Campaña:</span>
+            <select
+              value={selectedCampanaFilter}
+              onChange={(e) => setSelectedCampanaFilter(e.target.value)}
+              className="p-1.5 px-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors max-w-[155px] truncate"
+            >
+              <option value="Todas">Ver todas</option>
+              {(campanasDisponibles || [])
+                .filter(c => c.anio === selectedYearFilter)
+                .sort((a, b) => a.numero - b.numero)
+                .map((c) => (
+                  <option key={`${c.nombre} ${c.anio}`} value={`${c.nombre} ${c.anio}`} title={`${c.nombre} ${c.anio}`}>
+                    {c.nombre} {c.anio}
+                  </option>
+                ))}
+            </select>
+          </div>
 
           <div className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-800 font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shrink-0">
             <Sparkles className="h-4 w-4" />
@@ -290,11 +353,10 @@ export default function ReferenciasCatalog({
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                selectedCategory === cat
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === cat
                   ? 'bg-indigo-600 text-white shadow-sm'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -311,20 +373,20 @@ export default function ReferenciasCatalog({
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {paginatedPrendas.map((prenda) => (
-              <div 
-                key={prenda.ref} 
+              <div
+                key={prenda.ref}
                 className="bg-white border border-[#E2E8F0] rounded-xl p-3.5 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between space-y-3 relative text-left"
               >
                 <div className="space-y-1.5">
-              <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-indigo-50 text-[9px] text-indigo-700 font-extrabold uppercase rounded border border-indigo-100">
-                  <Tag className="h-3 w-3" />
-                  {Array.isArray(prenda.categoria) ? prenda.categoria.join(' / ') : prenda.categoria}
-                </span>
-                <span className="text-[10px] font-black font-mono text-slate-800 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded tracking-wide">
-                  {prenda.ref}
-                </span>
-              </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-indigo-50 text-[9px] text-indigo-700 font-extrabold uppercase rounded border border-indigo-100">
+                      <Tag className="h-3 w-3" />
+                      {Array.isArray(prenda.categoria) ? prenda.categoria.join(' / ') : prenda.categoria}
+                    </span>
+                    <span className="text-[10px] font-black font-mono text-slate-800 bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded tracking-wide">
+                      {prenda.ref}
+                    </span>
+                  </div>
                   <h3 className="text-xs font-black text-slate-900 leading-tight line-clamp-1" title={prenda.nombre}>
                     {prenda.nombre}
                   </h3>
@@ -339,7 +401,7 @@ export default function ReferenciasCatalog({
                   <div className="flex items-center justify-between gap-1.5 pt-1">
                     <div className="flex flex-wrap gap-0.5 max-w-[100px]">
                       {prenda.tallasDisponibles.map((t) => (
-                        <span 
+                        <span
                           key={t}
                           className="px-1 py-0.5 bg-slate-50 border border-slate-200 rounded text-[8px] font-extrabold text-slate-500 font-mono"
                         >
@@ -347,7 +409,7 @@ export default function ReferenciasCatalog({
                         </span>
                       ))}
                     </div>
-                    
+
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         type="button"
@@ -429,19 +491,19 @@ export default function ReferenciasCatalog({
 
       {/* Ver Foto Modal */}
       {viewFotoPrenda && (
-        <ViewFotoModal 
-          prenda={viewFotoPrenda} 
-          onClose={() => setViewFotoPrenda(null)} 
+        <ViewFotoModal
+          prenda={viewFotoPrenda}
+          onClose={() => setViewFotoPrenda(null)}
         />
       )}
 
       {/* Manual Creation / Editing Modal Form */}
       {showFormModal && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4"
           onClick={() => setShowFormModal(false)}
         >
-          <div 
+          <div
             className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-150 text-left"
             onClick={(e) => e.stopPropagation()}
           >
@@ -467,7 +529,7 @@ export default function ReferenciasCatalog({
 
             {/* Form Scroll Container */}
             <form onSubmit={handleSavePrenda} className="space-y-4 py-4 overflow-y-auto pr-1 flex-1 text-xs">
-              
+
               <div className="grid grid-cols-2 gap-4">
                 {/* REF */}
                 <div className="col-span-2 sm:col-span-1">
@@ -499,22 +561,21 @@ export default function ReferenciasCatalog({
                           onClick={() => {
                             setFormCategorias(prev => {
                               if (prev.includes(cat)) {
-                                  if (prev.length === 1) return prev;
-                                  return prev.filter(c => c !== cat);
+                                if (prev.length === 1) return prev;
+                                return prev.filter(c => c !== cat);
                               } else {
-                                  if (prev.length >= 2) {
-                                    alert('Solo puedes elegir hasta dos etiquetas.');
-                                    return prev;
-                                  }
-                                  return [...prev, cat];
+                                if (prev.length >= 2) {
+                                  alert('Solo puedes elegir hasta dos etiquetas.');
+                                  return prev;
+                                }
+                                return [...prev, cat];
                               }
                             });
                           }}
-                          className={`py-1.5 px-0.5 rounded-md border text-center font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] truncate transition-all ${
-                            isSelected
+                          className={`py-1.5 px-0.5 rounded-md border text-center font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] truncate transition-all ${isSelected
                               ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
                               : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
-                          }`}
+                            }`}
                         >
                           {cat}
                         </button>
@@ -571,11 +632,10 @@ export default function ReferenciasCatalog({
                           key={t}
                           type="button"
                           onClick={() => toggleFormTalla(t)}
-                          className={`py-1.5 px-1 rounded-md border text-center font-mono font-black text-[10px] transition-all ${
-                            isSelected
+                          className={`py-1.5 px-1 rounded-md border text-center font-mono font-black text-[10px] transition-all ${isSelected
                               ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
                               : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
-                          }`}
+                            }`}
                         >
                           {t}
                         </button>
@@ -593,9 +653,9 @@ export default function ReferenciasCatalog({
                 <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
                   <div className="h-12 w-12 rounded-lg bg-slate-200 border border-slate-300 overflow-hidden shrink-0 flex items-center justify-center text-slate-400">
                     {formImagenUrl ? (
-                      <img 
-                        src={formImagenUrl} 
-                        alt="Preview" 
+                      <img
+                        src={formImagenUrl}
+                        alt="Preview"
                         className="h-full w-full object-cover"
                         referrerPolicy="no-referrer"
                       />
@@ -604,15 +664,15 @@ export default function ReferenciasCatalog({
                     )}
                   </div>
                   <div className="space-y-1">
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleImageUpload} 
-                      className="hidden" 
-                      id="input-prenda-photo-upload" 
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="input-prenda-photo-upload"
                     />
-                    <label 
-                      htmlFor="input-prenda-photo-upload" 
+                    <label
+                      htmlFor="input-prenda-photo-upload"
                       className="cursor-pointer py-1.5 px-3 border border-slate-300 rounded-lg text-[10px] bg-white hover:bg-slate-50 transition-colors flex items-center gap-1 font-bold text-slate-600 inline-flex"
                     >
                       <Upload className="h-3 w-3" />

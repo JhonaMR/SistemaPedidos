@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Pedido, ItemPedido, Cliente, Prenda } from '../types';
 import { printOrderReceipt } from '../services/printService';
+import { exportOrderToExcel } from '../services/exportOrderExcelService';
 import { 
   Search, 
   Filter, 
@@ -79,6 +80,7 @@ export default function OrderHistory({
   const [deleteConfirmPedido, setDeleteConfirmPedido] = useState<Pedido | null>(null);
   const [permDeleteConfirmPedido, setPermDeleteConfirmPedido] = useState<Pedido | null>(null);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+  const [printModalOrder, setPrintModalOrder] = useState<Pedido | null>(null);
 
   const showFeedback = (msg: string) => {
     setFeedbackMessage(msg);
@@ -120,8 +122,17 @@ export default function OrderHistory({
     }).format(val);
   };
 
-  const handlePrint = (order: Pedido) => {
-    printOrderReceipt(order, clientes, catalogGarments);
+  const handlePrint = async (order: Pedido) => {
+    if (currentUser?.rol === 'soporte') {
+      setPrintModalOrder(order);
+    } else {
+      try {
+        await printOrderReceipt(order, clientes, catalogGarments);
+      } catch (error) {
+        console.error("Error al generar el comprobante PDF:", error);
+        alert("Hubo un error al generar el PDF del comprobante.");
+      }
+    }
   };
 
   return (
@@ -930,6 +941,69 @@ export default function OrderHistory({
         <div className="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl z-50 flex items-center gap-2 border border-slate-700 animate-in slide-in-from-bottom-5 duration-200">
           <CheckCircle className="h-4 w-4 text-emerald-400" />
           <span className="font-semibold">{feedbackMessage}</span>
+        </div>
+      )}
+
+      {/* Selection Modal for Support Print Format */}
+      {printModalOrder && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4" onClick={() => setPrintModalOrder(null)}>
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-sm w-full p-6 shadow-2xl relative space-y-5 animate-in fade-in zoom-in-95 duration-150 text-left" onClick={(e) => e.stopPropagation()}>
+            <div className="space-y-1">
+              <h4 className="text-sm font-extrabold text-slate-950 uppercase tracking-wide">Imprimir Comprobante</h4>
+              <p className="text-xs text-slate-500">
+                Selecciona el formato de comprobante para el pedido <strong>{printModalOrder.numeroPedido}</strong>:
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={async () => {
+                  const order = printModalOrder;
+                  setPrintModalOrder(null);
+                  try {
+                    await printOrderReceipt(order, clientes, catalogGarments);
+                  } catch (error) {
+                    console.error("Error al generar el comprobante PDF:", error);
+                    alert("Hubo un error al generar el PDF del comprobante.");
+                  }
+                }}
+                className="flex flex-col items-center justify-center p-4 bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl text-rose-700 font-bold transition-all gap-1.5 cursor-pointer active:scale-98"
+              >
+                <span className="text-lg">📄</span>
+                <span className="text-xs">Descargar PDF</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  const order = printModalOrder;
+                  setPrintModalOrder(null);
+                  try {
+                    const client = clientes.find(c => c.id === order.clienteId);
+                    await exportOrderToExcel(order, client, catalogGarments, false);
+                  } catch (error) {
+                    console.error("Error al generar el comprobante Excel:", error);
+                    alert("Hubo un error al generar el Excel del comprobante.");
+                  }
+                }}
+                className="flex flex-col items-center justify-center p-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-emerald-700 font-bold transition-all gap-1.5 cursor-pointer active:scale-98"
+              >
+                <span className="text-lg">📊</span>
+                <span className="text-xs">Descargar Excel</span>
+              </button>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => setPrintModalOrder(null)}
+                className="px-4 py-1.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold rounded-lg text-slate-600 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

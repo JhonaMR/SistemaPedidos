@@ -1638,7 +1638,7 @@ export default function App() {
               onUpdatePedido={handleUpdatePedido}
               onCancel={() => {
                 setEditingPedido(null);
-                setActiveTab('pedidos');
+                setActiveTab('dashboard');
               }}
             />
           )}
@@ -1677,6 +1677,7 @@ export default function App() {
               currentUser={currentUser}
               activeCampana={activeCampana}
               campanasReferencias={filteredCampanasReferencias}
+              campanasDisponibles={campanasDisponibles}
             />
           )}
 
