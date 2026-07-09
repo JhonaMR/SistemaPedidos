@@ -505,7 +505,9 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pedidos: pendingOrders,
-          clientes: pendingClients
+          clientes: pendingClients,
+          deletedPedidos: deletedPedidos,
+          user: currentUser ? { rol: currentUser.rol, nombre: currentUser.nombre } : undefined
         })
       });
 
@@ -589,7 +591,7 @@ export default function App() {
         const p2 = apiSavePedidos(updatedPedidos);
         let p3 = Promise.resolve(true);
         if (updatedDeletedPedidos) {
-          p3 = apiSaveDeletedPedidos(updatedDeletedPedidos);
+          p3 = apiSaveDeletedPedidos(updatedDeletedPedidos, currentUser ? { rol: currentUser.rol, nombre: currentUser.nombre } : undefined);
         }
         let p4 = Promise.resolve(true);
         if (updatedBackups) {
@@ -619,6 +621,8 @@ export default function App() {
           setErrorMessage(null);
           // Marcar pedidos como sincronizados en local
           await db.pedidos.where('sincronizado').equals(0).modify({ sincronizado: 1 });
+          // Recargar todos los datos desde el servidor (incluyendo números de pedidos ya secuenciales)
+          await inicializarIndexedDBDesdeServidor();
         } else {
           setSyncStatus('error');
         }
@@ -702,7 +706,8 @@ export default function App() {
         return { 
           ...p, 
           estado: status,
-          fechaCancelado: status === 'Cancelado' ? (fechaCancelado || new Date().toISOString().split('T')[0]) : undefined
+          fechaCancelado: status === 'Cancelado' ? (fechaCancelado || new Date().toISOString().split('T')[0]) : undefined,
+          sincronizado: 0 as const
         };
       }
       return p;
@@ -1079,6 +1084,7 @@ export default function App() {
     if (!orderToRestore) return;
 
     const { fechaEliminacion, ...restoredOrder } = orderToRestore as any;
+    (restoredOrder as any).sincronizado = 0; // Marcar como no sincronizado para que el backend lo restaure de eliminados
 
     const updatedDeleted = deletedPedidos.filter(p => p.id !== orderId);
     const updatedPedidos = [restoredOrder as Pedido, ...pedidos];
@@ -1125,7 +1131,7 @@ export default function App() {
       setPedidoBackups(updatedBackups);
     }
 
-    const updatedList = pedidos.map(p => p.id === updated.id ? { ...updated, editado: true } : p);
+    const updatedList = pedidos.map(p => p.id === updated.id ? { ...updated, editado: true, sincronizado: 0 as const } : p);
     setPedidos(updatedList);
     setEditingPedido(null);
     localStorage.setItem('prenda_pedidos', JSON.stringify(updatedList));
@@ -1617,6 +1623,7 @@ export default function App() {
           {activeTab === 'dashboard' && (
             <Dashboard 
               pedidos={visiblePedidos} 
+              todosLosPedidos={pedidos}
               vendedor={vendedor} 
               currentUser={currentUser}
               activeCampana={activeCampana}

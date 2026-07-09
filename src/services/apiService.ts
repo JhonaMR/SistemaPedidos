@@ -45,11 +45,14 @@ export async function apiSavePedidos(pedidos: Pedido[]): Promise<boolean> {
   return response.ok;
 }
 
-export async function apiSaveDeletedPedidos(deletedPedidos: Pedido[]): Promise<boolean> {
+export async function apiSaveDeletedPedidos(
+  deletedPedidos: Pedido[],
+  user?: { rol: string; nombre: string }
+): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/deleted-pedidos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ deletedPedidos }),
+    body: JSON.stringify({ deletedPedidos, user }),
   });
   return response.ok;
 }

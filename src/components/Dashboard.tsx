@@ -3,13 +3,21 @@ import { Clock, CheckCircle2, ChevronRight, ShoppingBag, Package, Truck, AlertTr
 
 interface DashboardProps {
   pedidos: Pedido[];
+  todosLosPedidos?: Pedido[];
   vendedor: { nombre: string; codigo: string };
   onNavigateToRegister?: () => void;
   currentUser?: any;
   activeCampana?: string;
 }
 
-export default function Dashboard({ pedidos, vendedor, onNavigateToRegister, currentUser, activeCampana = 'Campaña General' }: DashboardProps) {
+export default function Dashboard({ 
+  pedidos, 
+  todosLosPedidos,
+  vendedor, 
+  onNavigateToRegister, 
+  currentUser, 
+  activeCampana = 'Campaña General' 
+}: DashboardProps) {
   const totalOrders = pedidos.length;
   const nombreVendedor = currentUser?.nombre || vendedor.nombre;
   const codigoVendedor = currentUser?.usuario || vendedor.codigo;
@@ -116,12 +124,13 @@ export default function Dashboard({ pedidos, vendedor, onNavigateToRegister, cur
           </div>
 
           {(() => {
-            // Calcular referencias más vendidas de pedidos activos (excluyendo Cancelado)
-            const pedidosActivos = pedidos.filter(p => p.estado !== 'Cancelado');
+            // Calcular referencias más vendidas de todos los pedidos activos de la campaña actual (sin importar el usuario, excluyendo Cancelado)
+            const listaPedidosParaTop = todosLosPedidos || pedidos;
+            const pedidosActivosCampaña = listaPedidosParaTop.filter(p => p.estado !== 'Cancelado' && p.campana === activeCampana);
             
             const refMap: Record<string, { ref: string; nombre: string; cantidad: number; totalVendido: number }> = {};
             
-            pedivosLoop: pedidosActivos.forEach(p => {
+            pedidosActivosCampaña.forEach(p => {
               (p.items || []).forEach(item => {
                 const ref = item.prendaRef;
                 if (!refMap[ref]) {

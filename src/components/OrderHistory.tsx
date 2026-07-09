@@ -481,7 +481,7 @@ export default function OrderHistory({
                                 <span>Restaurar</span>
                               </button>
                             )}
-                            {onPermanentDelete && (
+                            {onPermanentDelete && currentUser?.rol === 'soporte' && (
                               <button
                                 id={`btn-permanent-delete-order-${pedido.id}`}
                                 onClick={() => {

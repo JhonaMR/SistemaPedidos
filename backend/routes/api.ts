@@ -49,6 +49,39 @@ router.post('/clientes', async (req, res) => {
   }
 });
 
+// Helper to assign next sequential number for a salesperson prefix
+function getSiguienteCorrelativo(
+  prefijoVendedor: string,
+  pedidosConsolidados: any[],
+  maxCorrelativosPorVendedor: Map<string, number>
+) {
+  if (maxCorrelativosPorVendedor.has(prefijoVendedor)) {
+    const next = maxCorrelativosPorVendedor.get(prefijoVendedor)! + 1;
+    maxCorrelativosPorVendedor.set(prefijoVendedor, next);
+    return next;
+  }
+  
+  const pedidosVendedor = pedidosConsolidados.filter(p => 
+    p.numeroPedido && 
+    p.numeroPedido.startsWith(`${prefijoVendedor}-`) &&
+    !p.numeroPedido.startsWith('ASYNC-')
+  );
+  
+  let maxCorr = 0;
+  if (pedidosVendedor.length > 0) {
+    const correlativos = pedidosVendedor.map(p => {
+      const parts = p.numeroPedido.split('-');
+      const corr = parseInt(parts[1], 10);
+      return isNaN(corr) ? 0 : corr;
+    });
+    maxCorr = Math.max(...correlativos);
+  }
+  
+  const next = maxCorr + 1;
+  maxCorrelativosPorVendedor.set(prefijoVendedor, next);
+  return next;
+}
+
 // Save Pedidos
 router.post('/pedidos', async (req, res) => {
   try {
@@ -58,11 +91,42 @@ router.post('/pedidos', async (req, res) => {
     }
     const data = await getAllData();
     const existingMap = new Map((data.pedidos as any[]).map(p => [p.id, p]));
+    
+    const maxCorrelativosPorVendedor = new Map<string, number>();
+    
     pedidos.forEach(p => {
-      existingMap.set(p.id, p);
+      const isNew = !existingMap.has(p.id);
+      const pedidoParaGuardar = { ...p };
+
+      if (isNew) {
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith('ASYNC-')) {
+          const parts = pedidoParaGuardar.numeroPedido.split('-');
+          const prefijoVendedor = parts[1] || '01';
+          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(existingMap.values()), maxCorrelativosPorVendedor);
+          const paddedNum = String(siguienteCorr).padStart(3, '0');
+          pedidoParaGuardar.numeroPedido = `${prefijoVendedor}-${paddedNum}`;
+        }
+        existingMap.set(p.id, pedidoParaGuardar);
+      } else {
+        const existingPedido = existingMap.get(p.id);
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith('ASYNC-') && existingPedido && existingPedido.numeroPedido && !existingPedido.numeroPedido.startsWith('ASYNC-')) {
+          pedidoParaGuardar.numeroPedido = existingPedido.numeroPedido;
+        }
+        existingMap.set(p.id, { ...existingPedido, ...pedidoParaGuardar });
+      }
     });
-    const deletedIds = new Set(((data.deletedPedidos as any[]) || []).map((p: any) => p.id));
+
+    // Clean up cross-references:
+    // 1. Remove active orders from the deleted list (restores)
+    const activeIds = new Set(Array.from(existingMap.keys()));
+    const serverDeletedPedidos = data.deletedPedidos || [];
+    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIds.has(p.id));
+    await saveDeletedPedidos(finalDeleted);
+
+    // 2. Remove deleted orders from the active list (deletions)
+    const deletedIds = new Set(finalDeleted.map((p: any) => p.id));
     const merged = Array.from(existingMap.values()).filter((p: any) => !deletedIds.has(p.id));
+    
     await savePedidos(merged);
     res.json({ success: true, count: merged.length });
   } catch (err: any) {
@@ -73,24 +137,41 @@ router.post('/pedidos', async (req, res) => {
 // Save Deleted Pedidos
 router.post('/deleted-pedidos', async (req, res) => {
   try {
-    const { deletedPedidos } = req.body;
+    const { deletedPedidos, user } = req.body;
     if (!Array.isArray(deletedPedidos)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos eliminados.' });
     }
     const data = await getAllData();
-    const existingMap = new Map((data.deletedPedidos as any[]).map(p => [p.id, p]));
-    deletedPedidos.forEach(p => {
-      existingMap.set(p.id, p);
-    });
-    const merged = Array.from(existingMap.values());
-    await saveDeletedPedidos(merged);
+    let serverDeletedPedidos = data.deletedPedidos || [];
+    
+    if (user) {
+      if (user.rol === 'soporte') {
+        serverDeletedPedidos = deletedPedidos;
+      } else {
+        const otherSellersDeleted = serverDeletedPedidos.filter((p: any) => p.vendedorNombre !== user.nombre);
+        serverDeletedPedidos = [...otherSellersDeleted, ...deletedPedidos];
+      }
+    } else {
+      // Fallback (retrocompatibility)
+      const existingMap = new Map(serverDeletedPedidos.map((p: any) => [p.id, p]));
+      deletedPedidos.forEach(p => {
+        existingMap.set(p.id, p);
+      });
+      serverDeletedPedidos = Array.from(existingMap.values());
+    }
 
-    // Also remove from active pedidos list
-    const deletedIds = new Set(merged.map((p: any) => p.id));
+    // Clean up cross-references:
+    // 1. Remove active orders from the deleted list (restores)
+    const activeIds = new Set((data.pedidos || []).map((p: any) => p.id));
+    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIds.has(p.id));
+    await saveDeletedPedidos(finalDeleted);
+
+    // 2. Remove deleted orders from the active list (deletions)
+    const deletedIds = new Set(finalDeleted.map((p: any) => p.id));
     const activePedidos = (data.pedidos as any[]).filter((p: any) => !deletedIds.has(p.id));
     await savePedidos(activePedidos);
 
-    res.json({ success: true, count: merged.length });
+    res.json({ success: true, count: finalDeleted.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar pedidos eliminados', details: err.message });
   }
@@ -201,7 +282,7 @@ router.post('/campanas-referencias', async (req, res) => {
 // Sincronización en lote desde móviles (Offline-First)
 router.post('/pedidos/sync-batch', async (req, res) => {
   try {
-    const { pedidos, clientes } = req.body;
+    const { pedidos, clientes, deletedPedidos, user } = req.body;
     
     if (!Array.isArray(pedidos) || !Array.isArray(clientes)) {
       return res.status(400).json({ error: 'Formato incorrecto. Se requieren arrays de pedidos y clientes.' });
@@ -227,59 +308,53 @@ router.post('/pedidos/sync-batch', async (req, res) => {
     await saveClientes(Array.from(clientesMap.values()));
 
     // 2. Procesar Pedidos Offline
-    const pedidosActuales = data.pedidos || [];
-    const pedidosMap = new Map(pedidosActuales.map(p => [p.id, p]));
+    const pedidosActuales = (data.pedidos as any[]) || [];
+    const pedidosMap = new Map<string, any>(pedidosActuales.map(p => [p.id, p]));
     const nuevosPedidosIds: string[] = [];
 
     const maxCorrelativosPorVendedor = new Map<string, number>();
 
-    const getSiguienteCorrelativo = (prefijoVendedor: string, pedidosConsolidados: any[]) => {
-      if (maxCorrelativosPorVendedor.has(prefijoVendedor)) {
-        const next = maxCorrelativosPorVendedor.get(prefijoVendedor)! + 1;
-        maxCorrelativosPorVendedor.set(prefijoVendedor, next);
-        return next;
-      }
-      
-      const pedidosVendedor = pedidosConsolidados.filter(p => 
-        p.numeroPedido && 
-        p.numeroPedido.startsWith(`${prefijoVendedor}-`) &&
-        !p.numeroPedido.startsWith('ASYNC-')
-      );
-      
-      let maxCorr = 0;
-      if (pedidosVendedor.length > 0) {
-        const correlativos = pedidosVendedor.map(p => {
-          const parts = p.numeroPedido.split('-');
-          const corr = parseInt(parts[1], 10);
-          return isNaN(corr) ? 0 : corr;
-        });
-        maxCorr = Math.max(...correlativos);
-      }
-      
-      const next = maxCorr + 1;
-      maxCorrelativosPorVendedor.set(prefijoVendedor, next);
-      return next;
-    };
-
     pedidos.forEach(p => {
-      if (!pedidosMap.has(p.id)) {
-        const pedidoParaGuardar = { ...p };
-        
-        // Si el número de pedido es temporal (ej: ASYNC-02-1783500000000)
+      const isNew = !pedidosMap.has(p.id);
+      const pedidoParaGuardar = { ...p };
+
+      if (isNew) {
         if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith('ASYNC-')) {
           const parts = pedidoParaGuardar.numeroPedido.split('-');
           const prefijoVendedor = parts[1] || '01';
-          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(pedidosMap.values()));
+          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(pedidosMap.values()), maxCorrelativosPorVendedor);
           const paddedNum = String(siguienteCorr).padStart(3, '0');
           pedidoParaGuardar.numeroPedido = `${prefijoVendedor}-${paddedNum}`;
         }
-        
         pedidosMap.set(p.id, pedidoParaGuardar);
+        nuevosPedidosIds.push(p.id);
+      } else {
+        const existingPedido = pedidosMap.get(p.id);
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith('ASYNC-') && existingPedido && existingPedido.numeroPedido && !existingPedido.numeroPedido.startsWith('ASYNC-')) {
+          pedidoParaGuardar.numeroPedido = existingPedido.numeroPedido;
+        }
+        pedidosMap.set(p.id, { ...existingPedido, ...pedidoParaGuardar });
         nuevosPedidosIds.push(p.id);
       }
     });
 
-    const deletedIds = new Set(((data.deletedPedidos as any[]) || []).map((p: any) => p.id));
+    // 3. Procesar Pedidos Eliminados Offline
+    let serverDeletedPedidos = data.deletedPedidos || [];
+    if (Array.isArray(deletedPedidos) && user) {
+      if (user.rol === 'soporte') {
+        serverDeletedPedidos = deletedPedidos;
+      } else {
+        const otherSellersDeleted = serverDeletedPedidos.filter((p: any) => p.vendedorNombre !== user.nombre);
+        serverDeletedPedidos = [...otherSellersDeleted, ...deletedPedidos];
+      }
+    }
+
+    // 4. Consolidar Pedidos Activos y Eliminados (Evitar colisiones cruzadas)
+    const activeIds = new Set(Array.from(pedidosMap.keys()));
+    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIds.has(p.id));
+    await saveDeletedPedidos(finalDeleted);
+
+    const deletedIds = new Set(finalDeleted.map((p: any) => p.id));
     const mergedPedidos = Array.from(pedidosMap.values()).filter((p: any) => !deletedIds.has(p.id));
     await savePedidos(mergedPedidos);
 

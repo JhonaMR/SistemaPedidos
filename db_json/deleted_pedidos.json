@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "clienteId": "cli_017",
+    "clienteNombre": "ALIANZA ESTRENO SAS",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783453620261_lnyz",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "novedad": "solo beigs",
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
+      },
+      {
+        "id": "cart_1783453656341_0y6c",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
+      }
+    ],
+    "subtotal": 1435200,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 1435200,
+    "estado": "Completo",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-07",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 50,
+    "facturacionRM": 50,
+    "id": "ped_1783453670194",
+    "numeroPedido": "SOP-002",
+    "fecha": "2026-07-07",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1,
+    "idLocal": 3,
+    "fechaEliminacion": "9/7/2026, 1:41:51 p. m."
+  }
+]
