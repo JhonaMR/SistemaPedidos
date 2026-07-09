@@ -22,7 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
-  AlertTriangle
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 
 interface OrderHistoryProps {
@@ -300,7 +301,17 @@ export default function OrderHistory({
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-mono font-black text-slate-800">{pedido.numeroPedido}</span>
+                        {pedido.numeroPedido.startsWith('ASYNC-') ? (
+                          <span 
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-3xs animate-pulse"
+                            title="El pedido fue tomado offline y está pendiente de sincronización para obtener su consecutivo final."
+                          >
+                            <RefreshCw className="h-2.5 w-2.5 animate-spin" />
+                            <span>Pendiente de Sync</span>
+                          </span>
+                        ) : (
+                          <span className="font-mono font-black text-slate-800">{pedido.numeroPedido}</span>
+                        )}
                         <span className="text-slate-300">•</span>
                         <span className="text-xs font-bold text-slate-700">{pedido.clienteNombre}</span>
                         {(() => {
@@ -409,6 +420,8 @@ export default function OrderHistory({
                             <select
                               id={`select-status-update-${pedido.id}`}
                               value={pedido.estado}
+                              disabled={currentUser?.rol !== 'soporte'}
+                              title={currentUser?.rol !== 'soporte' ? "Solo los usuarios tipo soporte pueden cambiar el estado logístico del pedido" : "Cambiar estado del pedido"}
                               onChange={(e) => {
                                 const newStatus = e.target.value as any;
                                 if (newStatus === 'Cancelado') {
@@ -420,7 +433,11 @@ export default function OrderHistory({
                                   showFeedback(`Estado de pedido actualizado a ${newStatus}.`);
                                 }
                               }}
-                              className="p-1.5 border border-slate-200 rounded text-xs bg-white text-slate-700 font-semibold focus:outline-none cursor-pointer hover:border-slate-300 transition-colors"
+                              className={`p-1.5 border border-slate-200 rounded text-xs text-slate-700 font-semibold focus:outline-none transition-colors ${
+                                currentUser?.rol === 'soporte'
+                                  ? 'bg-white cursor-pointer hover:border-slate-300'
+                                  : 'bg-slate-50 cursor-not-allowed opacity-75'
+                              }`}
                             >
                               <option value="Pendiente">Pendiente</option>
                               <option value="Procesado">Procesado</option>

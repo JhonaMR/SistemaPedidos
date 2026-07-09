@@ -57,12 +57,12 @@ router.post('/pedidos', async (req, res) => {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos.' });
     }
     const data = await getAllData();
-    const existingMap = new Map(data.pedidos.map(p => [p.id, p]));
+    const existingMap = new Map((data.pedidos as any[]).map(p => [p.id, p]));
     pedidos.forEach(p => {
       existingMap.set(p.id, p);
     });
-    const deletedIds = new Set((data.deletedPedidos || []).map(p => p.id));
-    const merged = Array.from(existingMap.values()).filter(p => !deletedIds.has(p.id));
+    const deletedIds = new Set(((data.deletedPedidos as any[]) || []).map((p: any) => p.id));
+    const merged = Array.from(existingMap.values()).filter((p: any) => !deletedIds.has(p.id));
     await savePedidos(merged);
     res.json({ success: true, count: merged.length });
   } catch (err: any) {
@@ -78,7 +78,7 @@ router.post('/deleted-pedidos', async (req, res) => {
       return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos eliminados.' });
     }
     const data = await getAllData();
-    const existingMap = new Map(data.deletedPedidos.map(p => [p.id, p]));
+    const existingMap = new Map((data.deletedPedidos as any[]).map(p => [p.id, p]));
     deletedPedidos.forEach(p => {
       existingMap.set(p.id, p);
     });
@@ -86,8 +86,8 @@ router.post('/deleted-pedidos', async (req, res) => {
     await saveDeletedPedidos(merged);
 
     // Also remove from active pedidos list
-    const deletedIds = new Set(merged.map(p => p.id));
-    const activePedidos = data.pedidos.filter(p => !deletedIds.has(p.id));
+    const deletedIds = new Set(merged.map((p: any) => p.id));
+    const activePedidos = (data.pedidos as any[]).filter((p: any) => !deletedIds.has(p.id));
     await savePedidos(activePedidos);
 
     res.json({ success: true, count: merged.length });
@@ -231,15 +231,56 @@ router.post('/pedidos/sync-batch', async (req, res) => {
     const pedidosMap = new Map(pedidosActuales.map(p => [p.id, p]));
     const nuevosPedidosIds: string[] = [];
 
+    const maxCorrelativosPorVendedor = new Map<string, number>();
+
+    const getSiguienteCorrelativo = (prefijoVendedor: string, pedidosConsolidados: any[]) => {
+      if (maxCorrelativosPorVendedor.has(prefijoVendedor)) {
+        const next = maxCorrelativosPorVendedor.get(prefijoVendedor)! + 1;
+        maxCorrelativosPorVendedor.set(prefijoVendedor, next);
+        return next;
+      }
+      
+      const pedidosVendedor = pedidosConsolidados.filter(p => 
+        p.numeroPedido && 
+        p.numeroPedido.startsWith(`${prefijoVendedor}-`) &&
+        !p.numeroPedido.startsWith('ASYNC-')
+      );
+      
+      let maxCorr = 0;
+      if (pedidosVendedor.length > 0) {
+        const correlativos = pedidosVendedor.map(p => {
+          const parts = p.numeroPedido.split('-');
+          const corr = parseInt(parts[1], 10);
+          return isNaN(corr) ? 0 : corr;
+        });
+        maxCorr = Math.max(...correlativos);
+      }
+      
+      const next = maxCorr + 1;
+      maxCorrelativosPorVendedor.set(prefijoVendedor, next);
+      return next;
+    };
+
     pedidos.forEach(p => {
       if (!pedidosMap.has(p.id)) {
-        pedidosMap.set(p.id, p);
+        const pedidoParaGuardar = { ...p };
+        
+        // Si el número de pedido es temporal (ej: ASYNC-02-1783500000000)
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith('ASYNC-')) {
+          const parts = pedidoParaGuardar.numeroPedido.split('-');
+          const prefijoVendedor = parts[1] || '01';
+          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(pedidosMap.values()));
+          const paddedNum = String(siguienteCorr).padStart(3, '0');
+          pedidoParaGuardar.numeroPedido = `${prefijoVendedor}-${paddedNum}`;
+        }
+        
+        pedidosMap.set(p.id, pedidoParaGuardar);
         nuevosPedidosIds.push(p.id);
       }
     });
 
-    const deletedIds = new Set((data.deletedPedidos || []).map(p => p.id));
-    const mergedPedidos = Array.from(pedidosMap.values()).filter(p => !deletedIds.has(p.id));
+    const deletedIds = new Set(((data.deletedPedidos as any[]) || []).map((p: any) => p.id));
+    const mergedPedidos = Array.from(pedidosMap.values()).filter((p: any) => !deletedIds.has(p.id));
     await savePedidos(mergedPedidos);
 
     // Get the final fully-merged fresh server database state to return to client

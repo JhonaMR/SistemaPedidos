@@ -194,7 +194,10 @@ export default function App() {
   // Database States (inicializados vacíos, se cargan de IndexedDB)
   const [clientes, setClientes] = useState<Cliente[]>([]);
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [deletedPedidos, setDeletedPedidos] = useState<Pedido[]>([]);
+  const [deletedPedidos, setDeletedPedidos] = useState<Pedido[]>(() => {
+    const saved = localStorage.getItem('prenda_deleted_pedidos');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [pedidoBackups, setPedidoBackups] = useState<Pedido[]>([]);
   const [catalogGarments, setCatalogGarments] = useState<Prenda[]>([]);
 
@@ -271,6 +274,15 @@ export default function App() {
           mappedRefs[cr.campana] = cr.referencias;
         });
         setCampanasReferencias(mappedRefs);
+
+        const savedDeleted = localStorage.getItem('prenda_deleted_pedidos');
+        if (savedDeleted) {
+          try { setDeletedPedidos(JSON.parse(savedDeleted)); } catch (e) {}
+        }
+        const savedBackups = localStorage.getItem('prenda_pedido_backups');
+        if (savedBackups) {
+          try { setPedidoBackups(JSON.parse(savedBackups)); } catch (e) {}
+        }
 
         // Si hay vendedor guardado en el usuario actual de localStorage
         if (currentUser) {
@@ -441,6 +453,21 @@ export default function App() {
       });
       setCampanasReferencias(mappedRefs);
 
+      if (data.deletedPedidos) {
+        setDeletedPedidos(data.deletedPedidos);
+        localStorage.setItem('prenda_deleted_pedidos', JSON.stringify(data.deletedPedidos));
+      } else {
+        setDeletedPedidos([]);
+        localStorage.setItem('prenda_deleted_pedidos', '[]');
+      }
+      if (data.backups) {
+        setPedidoBackups(data.backups);
+        localStorage.setItem('prenda_pedido_backups', JSON.stringify(data.backups));
+      } else {
+        setPedidoBackups([]);
+        localStorage.setItem('prenda_pedido_backups', '[]');
+      }
+
       if (data.vendedor) {
         setVendedor(data.vendedor);
       } else if (currentUser) {
@@ -488,94 +515,8 @@ export default function App() {
 
       const result = await response.json();
 
-      // Transacción para repoblar la base de datos local con los datos frescos del servidor
-      await db.transaction('rw', [db.clientes, db.pedidos, db.usuarios, db.campanas, db.campanasReferencias, db.prendas], async () => {
-        // Clientes
-        await db.clientes.clear();
-        if (result.clientes && result.clientes.length > 0) {
-          await db.clientes.bulkAdd(result.clientes);
-        }
-
-        // Pedidos (todos los pedidos descargados se marcan como sincronizados = 1)
-        await db.pedidos.clear();
-        if (result.pedidos && result.pedidos.length > 0) {
-          const synced = result.pedidos.map((p: any) => ({ ...p, sincronizado: 1 }));
-          await db.pedidos.bulkAdd(synced);
-        }
-
-        // Catálogo de Prendas
-        await db.prendas.clear();
-        if (result.prendas && result.prendas.length > 0) {
-          await db.prendas.bulkAdd(result.prendas);
-        }
-
-        // Usuarios
-        await db.usuarios.clear();
-        if (result.usuarios && result.usuarios.length > 0) {
-          await db.usuarios.bulkAdd(result.usuarios);
-        }
-
-        // Campañas
-        await db.campanas.clear();
-        if (result.campanas && result.campanas.length > 0) {
-          const mappedCampanas = result.campanas.map((c: any) => {
-            if (typeof c === 'string') {
-              return parseCampana(c);
-            }
-            return {
-              nombre: c.nombre,
-              anio: c.anio || 2026,
-              numero: c.numero || 1
-            };
-          });
-          await db.campanas.bulkAdd(mappedCampanas.map((c: any) => ({
-            id: `${c.nombre} ${c.anio}`,
-            nombre: c.nombre,
-            anio: c.anio,
-            numero: c.numero
-          })));
-        }
-
-        // Campañas Referencias
-        await db.campanasReferencias.clear();
-        if (result.campanasReferencias && Object.keys(result.campanasReferencias).length > 0) {
-          const refsArray = Object.keys(result.campanasReferencias).map(key => ({
-            campana: key,
-            referencias: result.campanasReferencias[key]
-          }));
-          await db.campanasReferencias.bulkAdd(refsArray);
-        }
-      });
-
-      // Recargar datos locales en React
-      const dbClientes = await db.clientes.toArray();
-      const dbPrendas = await db.prendas.toArray();
-      const dbPedidos = await db.pedidos.toArray();
-      const dbUsuarios = await db.usuarios.toArray();
-      const dbCampanas = await db.campanas.toArray();
-      const dbCampanasRefs = await db.campanasReferencias.toArray();
-
-      setClientes(dbClientes);
-      setPedidos(dbPedidos);
-      setCatalogGarments(dbPrendas);
-      setUsuarios(dbUsuarios);
-
-      const migratedCampanas = dbCampanas.map(c => ({
-        nombre: c.nombre,
-        anio: c.anio,
-        numero: c.numero
-      }));
-      setCampanasDisponibles(migratedCampanas);
-
-      const mappedRefs: Record<string, string[]> = {};
-      dbCampanasRefs.forEach(cr => {
-        mappedRefs[cr.campana] = cr.referencias;
-      });
-      setCampanasReferencias(mappedRefs);
-
-      if (result.vendedor) {
-        setVendedor(result.vendedor);
-      }
+      // Forzar recarga completa y transparente desde el servidor
+      await inicializarIndexedDBDesdeServidor();
 
       setSyncStatus('synced');
       alert(`Sincronización bidireccional exitosa.\n- Pedidos locales subidos: ${result.syncedOrderIds?.length || 0}\n- Clientes locales subidos: ${result.syncedClientIds?.length || 0}\n- Datos actualizados descargados desde el servidor.`);
@@ -736,22 +677,8 @@ export default function App() {
   const handleAddPedido = async (newPedidoData: Omit<Pedido, 'id' | 'numeroPedido' | 'fecha'>) => {
     const prefijoVendedor = currentUser?.idVendedor || vendedor.codigo.replace('V-', '') || '01';
     
-    // Obtener pedidos de IndexedDB para calcular el correlativo correcto de este vendedor
-    const todosLosPedidos = await db.pedidos.toArray();
-    const pedidosVendedor = todosLosPedidos.filter(p => p.numeroPedido.startsWith(`${prefijoVendedor}-`));
-    
-    let siguienteCorrelativo = 1;
-    if (pedidosVendedor.length > 0) {
-      const correlativos = pedidosVendedor.map(p => {
-        const parts = p.numeroPedido.split('-');
-        const corr = parseInt(parts[1], 10);
-        return isNaN(corr) ? 0 : corr;
-      });
-      siguienteCorrelativo = Math.max(...correlativos) + 1;
-    }
-    
-    const paddedNum = String(siguienteCorrelativo).padStart(3, '0');
-    const orderNumber = `${prefijoVendedor}-${paddedNum}`;
+    // Generar consecutivo temporal para evitar colisiones
+    const orderNumber = `ASYNC-${prefijoVendedor}-${Date.now()}`;
 
     const newPedido: PedidoOffline = {
       ...newPedidoData,
@@ -765,6 +692,7 @@ export default function App() {
     await db.pedidos.put(newPedido);
     const updated = await db.pedidos.toArray();
     setPedidos(updated);
+    localStorage.setItem('prenda_pedidos', JSON.stringify(updated));
     await syncWithServer(clientes, updated);
   };
 
@@ -1139,6 +1067,9 @@ export default function App() {
 
     setPedidos(updatedPedidos);
     setDeletedPedidos(updatedDeleted);
+    
+    localStorage.setItem('prenda_pedidos', JSON.stringify(updatedPedidos));
+    localStorage.setItem('prenda_deleted_pedidos', JSON.stringify(updatedDeleted));
 
     syncWithServer(clientes, updatedPedidos, null, updatedDeleted, pedidoBackups);
   };
@@ -1154,6 +1085,9 @@ export default function App() {
 
     setPedidos(updatedPedidos);
     setDeletedPedidos(updatedDeleted);
+    
+    localStorage.setItem('prenda_pedidos', JSON.stringify(updatedPedidos));
+    localStorage.setItem('prenda_deleted_pedidos', JSON.stringify(updatedDeleted));
 
     syncWithServer(clientes, updatedPedidos, null, updatedDeleted, pedidoBackups);
   };
@@ -1161,12 +1095,13 @@ export default function App() {
   const handlePermanentDeletePedido = (orderId: string) => {
     const updatedDeleted = deletedPedidos.filter(p => p.id !== orderId);
     setDeletedPedidos(updatedDeleted);
+    localStorage.setItem('prenda_deleted_pedidos', JSON.stringify(updatedDeleted));
     syncWithServer(clientes, pedidos, null, updatedDeleted, pedidoBackups);
   };
 
   const handleEmptyTrash = () => {
     setDeletedPedidos([]);
-    localStorage.removeItem('prenda_deleted_pedidos');
+    localStorage.setItem('prenda_deleted_pedidos', '[]');
     syncWithServer(clientes, pedidos, null, [], pedidoBackups);
     alert('¡La papelera ha sido vaciada por completo!');
   };
@@ -1194,6 +1129,7 @@ export default function App() {
     setPedidos(updatedList);
     setEditingPedido(null);
     localStorage.setItem('prenda_pedidos', JSON.stringify(updatedList));
+    localStorage.setItem('prenda_pedido_backups', JSON.stringify(updatedBackups));
     syncWithServer(clientes, updatedList, null, deletedPedidos, updatedBackups);
     setActiveTab('pedidos');
   };
