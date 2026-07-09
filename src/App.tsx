@@ -584,37 +584,41 @@ export default function App() {
       console.error("Error al escribir en IndexedDB:", err);
     }
 
-    // 2. Server API sync attempt
+    // 2. Server API sync attempt sequentially to prevent race conditions on file database writes
     if (navigator.onLine) {
       try {
-        const p1 = apiSaveClientes(updatedClientes);
-        const p2 = apiSavePedidos(updatedPedidos);
-        let p3 = Promise.resolve(true);
+        let r1 = true;
+        if (updatedClientes) {
+          r1 = await apiSaveClientes(updatedClientes);
+        }
+        let r2 = true;
+        if (updatedPedidos) {
+          r2 = await apiSavePedidos(updatedPedidos);
+        }
+        let r3 = true;
         if (updatedDeletedPedidos) {
-          p3 = apiSaveDeletedPedidos(updatedDeletedPedidos, currentUser ? { rol: currentUser.rol, nombre: currentUser.nombre } : undefined);
+          r3 = await apiSaveDeletedPedidos(updatedDeletedPedidos, currentUser ? { rol: currentUser.rol, nombre: currentUser.nombre } : undefined);
         }
-        let p4 = Promise.resolve(true);
+        let r4 = true;
         if (updatedBackups) {
-          p4 = apiSaveBackups(updatedBackups);
+          r4 = await apiSaveBackups(updatedBackups);
         }
-        let p5 = Promise.resolve(true);
+        let r5 = true;
         if (updatedVendedor) {
-          p5 = apiSaveVendedor(updatedVendedor);
+          r5 = await apiSaveVendedor(updatedVendedor);
         }
-        let p6 = Promise.resolve(true);
+        let r6 = true;
         if (updatedUsuarios) {
-          p6 = apiSaveUsuarios(updatedUsuarios);
+          r6 = await apiSaveUsuarios(updatedUsuarios);
         }
-        let p7 = Promise.resolve(true);
+        let r7 = true;
         if (updatedCampanas) {
-          p7 = apiSaveCampanas(updatedCampanas);
+          r7 = await apiSaveCampanas(updatedCampanas);
         }
-        let p8 = Promise.resolve(true);
+        let r8 = true;
         if (updatedCampanasRefs) {
-          p8 = apiSaveCampanasReferencias(updatedCampanasRefs);
+          r8 = await apiSaveCampanasReferencias(updatedCampanasRefs);
         }
-
-        const [r1, r2, r3, r4, r5, r6, r7, r8] = await Promise.all([p1, p2, p3, p4, p5, p6, p7, p8]);
 
         if (r1 && r2 && r3 && r4 && r5 && r6 && r7 && r8) {
           setSyncStatus('synced');

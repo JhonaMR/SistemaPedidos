@@ -26,8 +26,51 @@ async function safeWriteFile(filePath: string, data: any) {
 
 export async function getAllData() {
   const clientes = await safeReadFile(DB_PATHS.clientes, '[]');
-  const pedidos = await safeReadFile(DB_PATHS.pedidos, '[]');
+  let pedidos = await safeReadFile(DB_PATHS.pedidos, '[]');
   const deletedPedidos = await safeReadFile(DB_PATHS.deletedPedidos, '[]');
+
+  // Auto-heal legacy ASYNC- orders in the active database
+  let hasAsyncOrders = false;
+  if (Array.isArray(pedidos)) {
+    hasAsyncOrders = pedidos.some((p: any) => p.numeroPedido && p.numeroPedido.startsWith('ASYNC-'));
+  }
+
+  if (hasAsyncOrders) {
+    const maxCorrelativos = new Map<string, number>();
+    
+    // 1. Scan for existing max sequential numbers
+    pedidos.forEach((p: any) => {
+      if (p.numeroPedido && !p.numeroPedido.startsWith('ASYNC-')) {
+        const parts = p.numeroPedido.split('-');
+        const prefijo = parts[0] || '01';
+        const corr = parseInt(parts[1], 10);
+        if (!isNaN(corr)) {
+          const maxVal = maxCorrelativos.get(prefijo) || 0;
+          if (corr > maxVal) {
+            maxCorrelativos.set(prefijo, corr);
+          }
+        }
+      }
+    });
+
+    // 2. Assign numbers to ASYNC orders sequentially
+    pedidos = pedidos.map((p: any) => {
+      if (p.numeroPedido && p.numeroPedido.startsWith('ASYNC-')) {
+        const parts = p.numeroPedido.split('-');
+        const prefijoVendedor = parts[1] || '01';
+        const nextCorr = (maxCorrelativos.get(prefijoVendedor) || 0) + 1;
+        maxCorrelativos.set(prefijoVendedor, nextCorr);
+        const paddedNum = String(nextCorr).padStart(3, '0');
+        return {
+          ...p,
+          numeroPedido: `${prefijoVendedor}-${paddedNum}`
+        };
+      }
+      return p;
+    });
+
+    await safeWriteFile(DB_PATHS.pedidos, pedidos);
+  }
   const backups = await safeReadFile(DB_PATHS.backups, '[]');
   const vendedor = await safeReadFile(DB_PATHS.vendedor, '{"nombre": "Lina Pulgarin", "codigo": "V-102"}');
   const prendas = await safeReadFile(DB_PATHS.prendas, '[]');
