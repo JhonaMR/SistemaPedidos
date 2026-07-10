@@ -4,23 +4,25 @@
  */
 
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { 
-  TrendingUp, 
-  ShoppingBag, 
-  Users, 
-  FileText, 
-  Settings, 
-  Download, 
-  Upload, 
-  RefreshCw, 
-  AlertCircle, 
+import {
+  TrendingUp,
+  ShoppingBag,
+  Users,
+  FileText,
+  Settings,
+  Download,
+  Upload,
+  RefreshCw,
+  AlertCircle,
   CheckCircle,
   Database,
   Shirt,
   Package,
   LogOut,
   FileSpreadsheet,
-  UserCog
+  UserCog,
+  Menu,
+  X
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { Cliente, Pedido, UsuarioApp, Prenda, Campana } from './types';
@@ -49,7 +51,7 @@ export function parseCampana(nombreCompleto: string): Campana {
   const anio = match ? parseInt(match[0], 10) : 2026;
   const cleanName = nombreCompleto.replace(new RegExp(`\\s*${anio}\\s*`, 'g'), '').trim();
   const norm = cleanName.toLowerCase();
-  
+
   let numero = 1;
   if (norm.includes('inicio')) numero = 1;
   else if (norm.includes('madre')) numero = 2;
@@ -62,14 +64,14 @@ export function parseCampana(nombreCompleto: string): Campana {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'nuevo-pedido' | 'pedidos' | 'clientes' | 'configuracion' | 'referencias'>('dashboard');
-  
+
   // Multi-User States
   const [usuarios, setUsuarios] = useState<UsuarioApp[]>(() => {
     const saved = localStorage.getItem('prenda_usuarios');
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {}
+      } catch (e) { }
     }
     return [];
   });
@@ -79,7 +81,7 @@ export default function App() {
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {}
+      } catch (e) { }
     }
     return null;
   });
@@ -100,12 +102,14 @@ export default function App() {
           if (typeof first === 'string') return first;
           return `${first.nombre} ${first.anio}`;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return '';
   });
   const [showCampanaModal, setShowCampanaModal] = useState(false);
   const [showEditUserModal, setShowEditUserModal] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [clientToEditOnRedirect, setClientToEditOnRedirect] = useState<Cliente | null>(null);
   const [selectedUserToEdit, setSelectedUserToEdit] = useState<UsuarioApp | null>(null);
   const [editUserRol, setEditUserRol] = useState<'general' | 'soporte'>('general');
   const [editUserResetStatus, setEditUserResetStatus] = useState(false);
@@ -145,7 +149,7 @@ export default function App() {
     if (saved) {
       try {
         return JSON.parse(saved);
-      } catch (e) {}
+      } catch (e) { }
     }
     return {};
   });
@@ -158,10 +162,10 @@ export default function App() {
     setCurrentUser(user);
     localStorage.setItem('prenda_current_user', JSON.stringify(user));
 
-    const updatedVendedor = { 
-      ...vendedor, 
-      nombre: user.nombre, 
-      codigo: `V-${user.usuario}` 
+    const updatedVendedor = {
+      ...vendedor,
+      nombre: user.nombre,
+      codigo: `V-${user.usuario}`
     };
     setVendedor(updatedVendedor);
 
@@ -282,11 +286,11 @@ export default function App() {
 
         const savedDeleted = localStorage.getItem('prenda_deleted_pedidos');
         if (savedDeleted) {
-          try { setDeletedPedidos(JSON.parse(savedDeleted)); } catch (e) {}
+          try { setDeletedPedidos(JSON.parse(savedDeleted)); } catch (e) { }
         }
         const savedBackups = localStorage.getItem('prenda_pedido_backups');
         if (savedBackups) {
-          try { setPedidoBackups(JSON.parse(savedBackups)); } catch (e) {}
+          try { setPedidoBackups(JSON.parse(savedBackups)); } catch (e) { }
         }
 
         // Si hay vendedor guardado en el usuario actual de localStorage
@@ -296,7 +300,7 @@ export default function App() {
             codigo: currentUser.idVendedor || `V-${currentUser.usuario}`
           });
         }
-        
+
         setSyncStatus('synced');
       }
     } catch (err: any) {
@@ -344,7 +348,7 @@ export default function App() {
     };
 
     const updatedCampanas = [...campanasDisponibles, newCampanaObj];
-    
+
     // Set campaign references entry as empty for this new campaign
     const updatedRefs = {
       ...campanasReferencias,
@@ -354,20 +358,20 @@ export default function App() {
     // Update React states
     setCampanasDisponibles(updatedCampanas);
     setCampanasReferencias(updatedRefs);
-    
+
     // Save to localStorage for quick cache access
     localStorage.setItem('prenda_campanas_disponibles', JSON.stringify(updatedCampanas));
     localStorage.setItem('prenda_campanas_referencias', JSON.stringify(updatedRefs));
 
     // Save and sync with server/IndexedDB
     await syncWithServer(
-      clientes, 
-      pedidos, 
-      null, 
-      deletedPedidos, 
-      pedidoBackups, 
-      usuarios, 
-      updatedCampanas, 
+      clientes,
+      pedidos,
+      null,
+      deletedPedidos,
+      pedidoBackups,
+      usuarios,
+      updatedCampanas,
       updatedRefs
     );
 
@@ -382,7 +386,7 @@ export default function App() {
   const inicializarIndexedDBDesdeServidor = async () => {
     try {
       const data = await fetchServerData();
-      
+
       // Escribir en IndexedDB en una transacción limpia
       await db.transaction('rw', [db.clientes, db.prendas, db.usuarios, db.campanas, db.campanasReferencias, db.pedidos], async () => {
         await db.clientes.clear();
@@ -495,7 +499,7 @@ export default function App() {
       alert("No hay conexión a internet para sincronizar.");
       return;
     }
-    
+
     setLoading(true);
     try {
       // Obtener pedidos no sincronizados
@@ -538,9 +542,9 @@ export default function App() {
 
   // Sync state to local storage and server when updated
   const syncWithServer = async (
-    updatedClientes: Cliente[], 
-    updatedPedidos: Pedido[], 
-    updatedVendedor?: any, 
+    updatedClientes: Cliente[],
+    updatedPedidos: Pedido[],
+    updatedVendedor?: any,
     updatedDeletedPedidos?: Pedido[],
     updatedBackups?: Pedido[],
     updatedUsuarios?: UsuarioApp[],
@@ -647,7 +651,7 @@ export default function App() {
   const handleAddCliente = async (newClienteData: Omit<Cliente, 'id' | 'fechaRegistro'>) => {
     const isOffline = !navigator.onLine;
     const idTemporal = `cli_off_${Date.now()}`;
-    
+
     const newCliente: Cliente = {
       ...newClienteData,
       id: isOffline ? idTemporal : `cli_${Date.now()}`,
@@ -666,12 +670,13 @@ export default function App() {
     const updated = await db.clientes.toArray();
     setClientes(updated);
     await syncWithServer(updated, pedidos);
+    setClientToEditOnRedirect(null);
   };
 
   const handleQuickAddCliente = (newClienteData: Omit<Cliente, 'id' | 'fechaRegistro'>): Cliente => {
     const isOffline = !navigator.onLine;
     const idTemporal = `cli_off_${Date.now()}`;
-    
+
     const newCliente: Cliente = {
       ...newClienteData,
       id: isOffline ? idTemporal : `cli_${Date.now()}`,
@@ -689,7 +694,7 @@ export default function App() {
   // Order Handlers
   const handleAddPedido = async (newPedidoData: Omit<Pedido, 'id' | 'numeroPedido' | 'fecha'>) => {
     const prefijoVendedor = currentUser?.idVendedor || vendedor.codigo.replace('V-', '') || '01';
-    
+
     // Generar consecutivo temporal para evitar colisiones
     const orderNumber = `ASYNC-${prefijoVendedor}-${Date.now()}`;
 
@@ -712,8 +717,8 @@ export default function App() {
   const handleUpdatePedidoStatus = async (orderId: string, status: Pedido['estado'], fechaCancelado?: string, motivoCancelado?: string) => {
     const updated = pedidos.map(p => {
       if (p.id === orderId) {
-        return { 
-          ...p, 
+        return {
+          ...p,
           estado: status,
           fechaCancelado: status === 'Cancelado' ? (fechaCancelado || new Date().toISOString().split('T')[0]) : undefined,
           motivoCancelado: status === 'Cancelado' ? motivoCancelado : undefined,
@@ -734,10 +739,10 @@ export default function App() {
     }
 
     const prefijoVendedor = currentUser?.idVendedor || vendedor.codigo.replace('V-', '') || '01';
-    
+
     const todosLosPedidos = await db.pedidos.toArray();
     const pedidosVendedor = todosLosPedidos.filter(p => p.numeroPedido.startsWith(`${prefijoVendedor}-`));
-    
+
     let siguienteCorrelativo = 1;
     if (pedidosVendedor.length > 0) {
       const correlativos = pedidosVendedor.map(p => {
@@ -747,12 +752,12 @@ export default function App() {
       });
       siguienteCorrelativo = Math.max(...correlativos) + 1;
     }
-    
+
     const paddedNum = String(siguienteCorrelativo).padStart(3, '0');
     const orderNumber = `${prefijoVendedor}-${paddedNum}`;
-    
+
     const { idLocal, ...pedidoBase } = oldPedido as any;
-    
+
     const duplicated: PedidoOffline = {
       ...pedidoBase,
       id: `ped_${Date.now()}`,
@@ -778,7 +783,7 @@ export default function App() {
     setCatalogGarments(newList);
     localStorage.setItem('prenda_catalog_garments', JSON.stringify(newList));
     apiSavePrendas(newList);
-    
+
     // Auto-enable any newly created references in campanasReferencias
     setCampanasReferencias(prev => {
       const copy = { ...prev };
@@ -803,7 +808,7 @@ export default function App() {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 }) as any[][];
-        
+
         const newPrendas: Prenda[] = [];
         const addedRefs: string[] = [];
 
@@ -811,7 +816,7 @@ export default function App() {
         for (let i = 1; i < rows.length; i++) {
           const row = rows[i];
           if (!row || row.length === 0) continue;
-          
+
           const ref = String(row[0] || '').trim().toUpperCase();
           if (!ref) continue;
 
@@ -831,7 +836,7 @@ export default function App() {
           if (validTags.includes(tag2) && !categories.includes(tag2 as any)) {
             categories.push(tag2 as any);
           }
-          
+
           if (categories.length === 0) {
             categories.push('Dama');
           }
@@ -893,21 +898,21 @@ export default function App() {
           const mergedList = Array.from(map.values());
           localStorage.setItem('prenda_catalog_garments', JSON.stringify(mergedList));
           apiSavePrendas(mergedList);
-          
+
           if (selectedCampanaImport) {
             setCampanasReferencias(prevRefs => {
               const updated = { ...prevRefs };
               const currentCampaignRefs = updated[selectedCampanaImport] || [];
               const combined = Array.from(new Set([...currentCampaignRefs, ...addedRefs]));
               updated[selectedCampanaImport] = combined;
-              
+
               syncWithServer(clientes, pedidos, mergedList, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, updated);
               return updated;
             });
           } else {
             syncWithServer(clientes, pedidos, mergedList, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, campanasReferencias);
           }
-          
+
           return mergedList;
         });
 
@@ -991,7 +996,7 @@ export default function App() {
           });
           const mergedList = Array.from(map.values());
           localStorage.setItem('prenda_clientes', JSON.stringify(mergedList));
-          
+
           syncWithServer(mergedList, pedidos, catalogGarments, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, campanasReferencias);
           return mergedList;
         });
@@ -1051,7 +1056,7 @@ export default function App() {
           updated[selectedCampanaMapping] = combined;
 
           syncWithServer(clientes, pedidos, catalogGarments, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, updated);
-          
+
           if (missingFromCatalog.length > 0) {
             const warningMsg = `¡Mapeo importado con éxito!\n\nSe asociaron ${refsToImport.length} referencias a la campaña "${selectedCampanaMapping}".\n\n⚠️ AVISO: Las siguientes ${missingFromCatalog.length} referencias no existen aún en el catálogo general:\n${missingFromCatalog.join(', ')}`;
             alert(warningMsg);
@@ -1084,7 +1089,7 @@ export default function App() {
 
     setPedidos(updatedPedidos);
     setDeletedPedidos(updatedDeleted);
-    
+
     localStorage.setItem('prenda_pedidos', JSON.stringify(updatedPedidos));
     localStorage.setItem('prenda_deleted_pedidos', JSON.stringify(updatedDeleted));
 
@@ -1103,7 +1108,7 @@ export default function App() {
 
     setPedidos(updatedPedidos);
     setDeletedPedidos(updatedDeleted);
-    
+
     localStorage.setItem('prenda_pedidos', JSON.stringify(updatedPedidos));
     localStorage.setItem('prenda_deleted_pedidos', JSON.stringify(updatedDeleted));
 
@@ -1162,10 +1167,10 @@ export default function App() {
   // Import / Export Data as Backup JSON
   const handleExportData = () => {
     const dataStr = JSON.stringify({ clientes, pedidos, vendedor }, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
     const exportFileDefaultName = `backup_pedidos_sastreria_${new Date().toISOString().split('T')[0]}.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -1205,10 +1210,10 @@ export default function App() {
 
   if (!isLoggedIn) {
     return (
-      <Login 
-        usuarios={usuarios} 
-        onLogin={handleLogin} 
-        onUpdateUsuarios={handleUpdateUsuarios} 
+      <Login
+        usuarios={usuarios}
+        onLogin={handleLogin}
+        onUpdateUsuarios={handleUpdateUsuarios}
       />
     );
   }
@@ -1225,7 +1230,7 @@ export default function App() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-6 relative overflow-hidden text-left">
             <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600" />
-            
+
             <div className="space-y-1">
               <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                 <Package className="h-5 w-5 text-indigo-600" />
@@ -1248,11 +1253,10 @@ export default function App() {
                       setActiveCampana(fullName);
                       localStorage.setItem('prenda_campana', fullName);
                     }}
-                    className={`w-full p-3.5 text-left rounded-xl text-xs font-bold transition-all border flex items-center justify-between ${
-                      isSelected
+                    className={`w-full p-3.5 text-left rounded-xl text-xs font-bold transition-all border flex items-center justify-between ${isSelected
                         ? 'bg-indigo-50 border-indigo-500 text-indigo-900 ring-1 ring-indigo-500'
                         : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                    }`}
+                      }`}
                   >
                     <span>{fullName}</span>
                     {isSelected && (
@@ -1279,7 +1283,7 @@ export default function App() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-6 relative overflow-hidden text-left">
             <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600" />
-            
+
             <div className="space-y-1">
               <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
                 <UserCog className="h-5 w-5 text-indigo-600" />
@@ -1386,11 +1390,10 @@ export default function App() {
                 <button
                   type="submit"
                   disabled={!selectedUserToEdit}
-                  className={`w-1/2 py-2.5 text-white text-xs font-bold uppercase rounded-lg shadow-sm transition-colors ${
-                    selectedUserToEdit 
-                      ? 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer' 
+                  className={`w-1/2 py-2.5 text-white text-xs font-bold uppercase rounded-lg shadow-sm transition-colors ${selectedUserToEdit
+                      ? 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
                       : 'bg-slate-300 cursor-not-allowed'
-                  }`}
+                    }`}
                 >
                   Guardar
                 </button>
@@ -1405,7 +1408,7 @@ export default function App() {
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 shadow-xl space-y-4 relative flex flex-col max-h-[90vh] text-left">
             <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600" />
-            
+
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
               <div>
                 <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
@@ -1481,7 +1484,7 @@ export default function App() {
                     return p.ref.toLowerCase().includes(query) || p.nombre.toLowerCase().includes(query);
                   }).map((prenda) => {
                     const isEnabled = (campanasReferencias[selectedCampanaConfig] || []).includes(prenda.ref);
-                    
+
                     const handleToggle = () => {
                       if (currentUser?.rol !== 'soporte') return;
                       const updated = { ...campanasReferencias };
@@ -1514,15 +1517,14 @@ export default function App() {
                             type="button"
                             onClick={handleToggle}
                             disabled={!isSoporte}
-                            className={`px-3 py-1.5 rounded-lg text-[9px] font-extrabold uppercase tracking-wider transition-all border ${
-                              !isSoporte 
-                                ? isEnabled 
+                            className={`px-3 py-1.5 rounded-lg text-[9px] font-extrabold uppercase tracking-wider transition-all border ${!isSoporte
+                                ? isEnabled
                                   ? 'bg-emerald-50/60 border-emerald-200 text-emerald-600 cursor-not-allowed'
                                   : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'
                                 : isEnabled
                                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
                                   : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
-                            }`}
+                              }`}
                           >
                             {isEnabled ? 'Habilitada' : 'Desactivada'}
                           </button>
@@ -1552,12 +1554,20 @@ export default function App() {
 
       {/* Main navigation & content container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
+
         {/* Top Navbar */}
         <header className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 pb-5 mb-6 gap-4 bg-white p-5 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-600 text-white rounded-xl">
-              <Shirt className="h-6 w-6" />
+            <button
+              type="button"
+              onClick={() => setShowSidebar(true)}
+              className="p-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl transition-colors cursor-pointer border border-indigo-100 shadow-3xs"
+              title="Abrir menú"
+            >
+              <Menu className="h-5.5 w-5.5" />
+            </button>
+            <div className="p-1 bg-white border border-indigo-100 rounded-xl overflow-hidden shadow-3xs flex items-center justify-center">
+              <img src="/logos/plow-192x192.png" className="h-10 w-10 object-contain" alt="Plow Logo" />
             </div>
             <div>
               <h1 className="text-xl font-extrabold text-slate-950 flex flex-col sm:flex-row sm:items-center gap-2">
@@ -1577,12 +1587,12 @@ export default function App() {
                 onChange={(e) => {
                   const val = parseInt(e.target.value, 10);
                   setSelectedHeaderYear(val);
-                  
+
                   // Auto-select first campaign of this year
                   const campaignsForYear = campanasDisponibles
                     .filter(c => c.anio === val)
                     .sort((a, b) => a.numero - b.numero);
-                  
+
                   if (campaignsForYear.length > 0) {
                     const newActive = `${campaignsForYear[0].nombre} ${campaignsForYear[0].anio}`;
                     setActiveCampana(newActive);
@@ -1635,12 +1645,12 @@ export default function App() {
               ) : syncStatus === 'synced' ? (
                 <>
                   <Database className="h-3.5 w-3.5 text-emerald-600" />
-                  <span className="text-emerald-700">Conectado (Servidor)</span>
+                  <span className="text-emerald-700">Conectado</span>
                 </>
               ) : (
                 <>
                   <Database className="h-3.5 w-3.5 text-amber-600" />
-                  <span className="text-amber-700">Offline (Local)</span>
+                  <span className="text-amber-700">Offline</span>
                 </>
               )}
             </div>
@@ -1650,129 +1660,211 @@ export default function App() {
               id="btn-trigger-sync"
               onClick={handleSincronizarPedidos}
               title="Sincronizar pedidos pendientes con el servidor"
-              className="py-1.5 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all flex items-center gap-1.5"
+              className="py-1.5 px-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span>Sincronizar</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Sidebar Navigation Drawer */}
+        {/* Backdrop Overlay */}
+        <div
+          onClick={() => setShowSidebar(false)}
+          className={`fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 transition-opacity duration-300 ${showSidebar ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
+        />
+
+        {/* Menu Drawer */}
+        <div className={`fixed inset-y-0 left-0 max-w-xs w-72 bg-white z-50 shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out text-left ${showSidebar ? 'translate-x-0' : '-translate-x-full'
+          }`}>
+          <div>
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1 bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center shadow-3xs">
+                  <img src="/logos/plow-192x192.png" className="h-8 w-8 object-contain" alt="Plow Logo" />
+                </div>
+                <div>
+                  <h2 className="font-extrabold text-sm text-slate-950">Arare S.A.S.</h2>
+                  <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{currentUser?.nombre || vendedor.nombre}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSidebar(false)}
+                className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <nav className="p-4 flex flex-col gap-1">
+              <button
+                onClick={() => {
+                  setActiveTab('dashboard');
+                  setShowSidebar(false);
+                }}
+                className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'dashboard'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  }`}
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span>Inicio</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('nuevo-pedido');
+                  setShowSidebar(false);
+                }}
+                className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'nuevo-pedido'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  }`}
+              >
+                <ShoppingBag className="h-4 w-4" />
+                <span>Registrar Pedido</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('pedidos');
+                  setShowSidebar(false);
+                }}
+                className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-all cursor-pointer border ${activeTab === 'pedidos'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  }`}
+              >
+                <div className="flex items-center gap-3">
+                  <FileText className="h-4 w-4" />
+                  <span>Histórico de Pedidos</span>
+                </div>
+                {pedidos.length > 0 && (
+                  <span className="bg-indigo-100 text-indigo-800 text-[10px] font-black py-0.5 px-2.5 rounded-full">
+                    {pedidos.length}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('clientes');
+                  setShowSidebar(false);
+                }}
+                className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'clientes'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  }`}
+              >
+                <Users className="h-4 w-4" />
+                <span>Control de clientes</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveTab('referencias');
+                  setShowSidebar(false);
+                }}
+                className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'referencias'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  }`}
+              >
+                <Package className="h-4 w-4" />
+                <span>Referencias</span>
+              </button>
+
+              {currentUser?.rol === 'soporte' && (
+                <button
+                  onClick={() => {
+                    setActiveTab('configuracion');
+                    setShowSidebar(false);
+                  }}
+                  className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'configuracion'
+                      ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                      : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                    }`}
+                >
+                  <Settings className="h-4 w-4" />
+                  <span>Configuración</span>
+                </button>
+              )}
+            </nav>
+          </div>
+
+          {/* Footer containing Sync and Logout */}
+          <div className="p-4 border-t border-slate-100 bg-slate-50 space-y-4">
+            {/* Sync Pill status */}
+            <div className="flex items-center justify-between px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-white">
+              <span className="text-slate-400 text-[10px] uppercase font-bold">Estado:</span>
+              <div className="flex items-center gap-1.5">
+                {loading ? (
+                  <>
+                    <RefreshCw className="h-3 w-3 text-indigo-500 animate-spin" />
+                    <span className="text-slate-600 text-xs">Procesando...</span>
+                  </>
+                ) : syncStatus === 'synced' ? (
+                  <>
+                    <Database className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="text-emerald-700 text-xs">Conectado (Servidor)</span>
+                  </>
+                ) : (
+                  <>
+                    <Database className="h-3.5 w-3.5 text-amber-600" />
+                    <span className="text-amber-700 text-xs">Offline (Local)</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Sincronizar Button */}
+            <button
+              id="btn-trigger-sync-sidebar"
+              onClick={handleSincronizarPedidos}
+              title="Sincronizar pedidos pendientes con el servidor"
+              className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               <span>Sincronizar</span>
             </button>
 
             {/* Logout button */}
             <button
-              id="btn-header-logout"
-              onClick={handleLogout}
-              title="Cerrar Sesión"
-              className="p-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 rounded-lg transition-colors"
+              id="btn-sidebar-logout"
+              onClick={() => {
+                setShowSidebar(false);
+                handleLogout();
+              }}
+              className="w-full py-2.5 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-600 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
+              <span>Cerrar Sesión</span>
             </button>
           </div>
-        </header>
-
-        {/* Tab Selection Navigation Bar */}
-        <nav className="flex overflow-x-auto pb-2 border-b border-slate-200 mb-6 gap-1 scrollbar-none">
-          <button
-            id="tab-dashboard"
-            onClick={() => setActiveTab('dashboard')}
-            className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-              activeTab === 'dashboard'
-                ? 'bg-[#1E293B] text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <TrendingUp className="h-4 w-4" />
-            <span>Inicio</span>
-          </button>
-
-          <button
-            id="tab-nuevo-pedido"
-            onClick={() => setActiveTab('nuevo-pedido')}
-            className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-              activeTab === 'nuevo-pedido'
-                ? 'bg-[#1E293B] text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <ShoppingBag className="h-4 w-4" />
-            <span>Registrar Pedido</span>
-          </button>
-
-          <button
-            id="tab-pedidos"
-            onClick={() => setActiveTab('pedidos')}
-            className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-              activeTab === 'pedidos'
-                ? 'bg-[#1E293B] text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <FileText className="h-4 w-4" />
-            <span>Histórico de Pedidos</span>
-            {pedidos.length > 0 && (
-              <span className="bg-indigo-100 text-indigo-800 text-[10px] font-black py-0.5 px-2 rounded-full">
-                {pedidos.length}
-              </span>
-            )}
-          </button>
-
-          <button
-            id="tab-clientes"
-            onClick={() => setActiveTab('clientes')}
-            className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-              activeTab === 'clientes'
-                ? 'bg-[#1E293B] text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Users className="h-4 w-4" />
-            <span>Histórico de Clientes</span>
-          </button>
-
-          <button
-            id="tab-referencias"
-            onClick={() => setActiveTab('referencias')}
-            className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-              activeTab === 'referencias'
-                ? 'bg-[#1E293B] text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <Package className="h-4 w-4" />
-            <span>Referencias</span>
-          </button>
-
-          {currentUser?.rol === 'soporte' && (
-            <button
-              id="tab-configuracion"
-              onClick={() => setActiveTab('configuracion')}
-              className={`py-2.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shrink-0 ${
-                activeTab === 'configuracion'
-                  ? 'bg-[#1E293B] text-white shadow-sm'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Settings className="h-4 w-4" />
-              <span>Configuración</span>
-            </button>
-          )}
-        </nav>
+        </div>
 
         {/* Tab content renderer */}
         <section id="tab-content-area" className="transition-opacity duration-150">
           {activeTab === 'dashboard' && (
-            <Dashboard 
-              pedidos={visiblePedidos} 
+            <Dashboard
+              pedidos={visiblePedidos}
               todosLosPedidos={pedidos}
-              vendedor={vendedor} 
+              vendedor={vendedor}
               currentUser={currentUser}
               activeCampana={activeCampana}
-              onNavigateToRegister={() => setActiveTab('nuevo-pedido')} 
+              onNavigateToRegister={() => setActiveTab('nuevo-pedido')}
             />
           )}
 
           {activeTab === 'nuevo-pedido' && (
-            <OrderForm 
-              clientes={clientes} 
-              onAddPedido={handleAddPedido} 
+            <OrderForm
+              clientes={clientes}
+              onAddPedido={handleAddPedido}
               onQuickAddCliente={handleQuickAddCliente}
               vendedor={{ ...vendedor, nombre: currentUser?.nombre || vendedor.nombre, codigo: currentUser?.usuario || vendedor.codigo }}
               pedidos={pedidos}
@@ -1785,12 +1877,19 @@ export default function App() {
                 setEditingPedido(null);
                 setActiveTab('dashboard');
               }}
+              onUpdateActiveClientRedirect={(clientId) => {
+                const client = clientes.find(c => c.id === clientId);
+                if (client) {
+                  setClientToEditOnRedirect(client);
+                  setActiveTab('clientes');
+                }
+              }}
             />
           )}
 
           {activeTab === 'pedidos' && (
-            <OrderHistory 
-              pedidos={visiblePedidos} 
+            <OrderHistory
+              pedidos={visiblePedidos}
               clientes={clientes}
               catalogGarments={catalogGarments}
               onUpdateStatus={handleUpdatePedidoStatus}
@@ -1807,16 +1906,18 @@ export default function App() {
           )}
 
           {activeTab === 'clientes' && (
-            <ClientSection 
-              clientes={clientes} 
-              pedidos={visiblePedidos} 
+            <ClientSection
+              clientes={clientes}
+              pedidos={visiblePedidos}
               onAddCliente={handleAddCliente}
               onEditCliente={handleEditCliente}
+              initialEditingClient={clientToEditOnRedirect}
+              onCancelEdit={() => setClientToEditOnRedirect(null)}
             />
           )}
 
           {activeTab === 'referencias' && (
-            <ReferenciasCatalog 
+            <ReferenciasCatalog
               prendas={catalogGarments}
               onUpdatePrendas={handleUpdateCatalogGarments}
               currentUser={currentUser}
@@ -1881,7 +1982,7 @@ export default function App() {
                         </h3>
                         <p className="text-xs text-slate-500 mt-1">Cargue masivamente datos de referencias y clientes utilizando archivos de Excel.</p>
                       </div>
-                      
+
                       <button
                         type="button"
                         onClick={() => setShowTemplateModal(true)}
@@ -2037,13 +2138,13 @@ export default function App() {
                     </button>
                   </div>
 
-                  <form 
+                  <form
                     onSubmit={(e) => {
                       e.preventDefault();
                       const form = e.currentTarget;
                       const nombreInput = form.elements.namedItem('nuevoNombre') as HTMLInputElement;
                       const usuarioInput = form.elements.namedItem('nuevoUsuario') as HTMLInputElement;
-                      
+
                       const cleanNombre = nombreInput.value.trim();
                       const cleanUsuario = usuarioInput.value.trim().toUpperCase();
 
@@ -2073,7 +2174,7 @@ export default function App() {
 
                       const updatedList = [...usuarios, newUser];
                       handleUpdateUsuarios(updatedList);
-                      
+
                       alert(`Usuario ${cleanUsuario} creado con éxito. ID Vendedor asignado: ${consecutivo}. Clave inicial: 1234`);
                       form.reset();
                     }}
@@ -2159,11 +2260,10 @@ export default function App() {
                                     handleUpdateUsuarios(updatedList);
                                     alert(`Usuario ${u.usuario} ha sido ${!isCurrentlyActive ? 'habilitado' : 'inhabilitado'}.`);
                                   }}
-                                  className={`px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide rounded-md transition-colors ${
-                                    u.activo !== false
+                                  className={`px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide rounded-md transition-colors ${u.activo !== false
                                       ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
                                       : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
-                                  }`}
+                                    }`}
                                 >
                                   {u.activo !== false ? 'Inhabilitar' : 'Habilitar'}
                                 </button>
@@ -2236,11 +2336,10 @@ export default function App() {
                     return (
                       <div
                         key={fullName}
-                        className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-all ${
-                          isActive 
-                            ? 'bg-indigo-50/50 border-indigo-200 shadow-xs' 
+                        className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-all ${isActive
+                            ? 'bg-indigo-50/50 border-indigo-200 shadow-xs'
                             : 'bg-slate-50/50 border-slate-200'
-                        }`}
+                          }`}
                       >
                         <div className="space-y-2">
                           <div className="flex items-center justify-between gap-1.5">
@@ -2249,7 +2348,7 @@ export default function App() {
                               <span className="text-[8px] bg-indigo-600 text-white px-1.5 py-0.5 rounded-full font-bold uppercase shrink-0">Activa</span>
                             )}
                           </div>
-                          
+
                           <div className="grid grid-cols-2 gap-1.5 text-[10px] bg-white p-2 rounded-lg border border-slate-100 font-medium">
                             <div className="text-slate-400">Año: <span className="font-semibold text-slate-700">{campana.anio}</span></div>
                             <div className="text-slate-400 text-right">Orden: <span className="font-mono font-bold text-indigo-600">#{campana.numero}</span></div>
@@ -2287,11 +2386,11 @@ export default function App() {
 
       {/* Plantillas de Ejemplo Modal */}
       {showTemplateModal && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4"
           onClick={() => setShowTemplateModal(false)}
         >
-          <div 
+          <div
             className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in duration-150 text-left"
             onClick={(e) => e.stopPropagation()}
           >
@@ -2313,8 +2412,8 @@ export default function App() {
             </div>
 
             <div className="space-y-2.5">
-              <a 
-                href="/plantillas/plantilla_referencias.xlsx" 
+              <a
+                href="/plantillas/plantilla_referencias.xlsx"
                 download="plantilla_referencias.xlsx"
                 className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 rounded-xl transition-all group text-left"
               >
@@ -2325,8 +2424,8 @@ export default function App() {
                 <Download className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
               </a>
 
-              <a 
-                href="/plantillas/plantilla_clientes.xlsx" 
+              <a
+                href="/plantillas/plantilla_clientes.xlsx"
                 download="plantilla_clientes.xlsx"
                 className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 rounded-xl transition-all group text-left"
               >
@@ -2337,8 +2436,8 @@ export default function App() {
                 <Download className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
               </a>
 
-              <a 
-                href="/plantillas/plantilla_campana_mapeo.xlsx" 
+              <a
+                href="/plantillas/plantilla_campana_mapeo.xlsx"
                 download="plantilla_campana_mapeo.xlsx"
                 className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 rounded-xl transition-all group text-left"
               >
@@ -2363,11 +2462,11 @@ export default function App() {
 
       {/* Crear Nueva Campaña Modal */}
       {showNewCampanaModal && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4"
           onClick={() => setShowNewCampanaModal(false)}
         >
-          <form 
+          <form
             onSubmit={handleCreateCampana}
             className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in duration-150 text-left"
             onClick={(e) => e.stopPropagation()}

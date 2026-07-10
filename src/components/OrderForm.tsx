@@ -32,6 +32,7 @@ interface OrderFormProps {
   editingPedido?: Pedido | null;
   onUpdatePedido?: (updated: Pedido) => void;
   onCancel?: () => void;
+  onUpdateActiveClientRedirect?: (clientId: string) => void;
 }
 
 export default function OrderForm({
@@ -45,7 +46,8 @@ export default function OrderForm({
   catalogGarments = [],
   editingPedido = null,
   onUpdatePedido = () => { },
-  onCancel = () => { }
+  onCancel = () => { },
+  onUpdateActiveClientRedirect
 }: OrderFormProps) {
   // Filter catalogGarments by campaign references
   const listToUse = catalogGarments || [];
@@ -104,6 +106,7 @@ export default function OrderForm({
 
   // Edit Cart Item modal state
   const [editingCartItem, setEditingCartItem] = useState<ItemPedido | null>(null);
+  const [showUpdateClientConfirmModal, setShowUpdateClientConfirmModal] = useState(false);
   const [editTallasCantidades, setEditTallasCantidades] = useState<Record<string, number>>({});
   const [editUnitPrice, setEditUnitPrice] = useState<number>(0);
   const [editNovedad, setEditNovedad] = useState<string>('');
@@ -429,16 +432,33 @@ export default function OrderForm({
               </button>
             )}
             {selectedClientId && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedClientId('');
-                  setClientSearchQuery('');
-                }}
-                className="px-3 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm animate-fade-in"
-              >
-                Cambiar Cliente
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedClientId('');
+                    setClientSearchQuery('');
+                  }}
+                  className="px-3 py-1.5 bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 hover:text-rose-800 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm animate-fade-in cursor-pointer"
+                >
+                  Cambiar Cliente
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (cart.length > 0) {
+                      setShowUpdateClientConfirmModal(true);
+                    } else {
+                      if (onUpdateActiveClientRedirect) {
+                        onUpdateActiveClientRedirect(selectedClientId);
+                      }
+                    }
+                  }}
+                  className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-800 hover:text-amber-900 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm animate-fade-in cursor-pointer"
+                >
+                  Actualizar Cliente
+                </button>
+              </>
             )}
             <button
               type="button"
@@ -1473,6 +1493,45 @@ export default function OrderForm({
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer"
               >
                 Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showUpdateClientConfirmModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4 relative overflow-hidden text-left animate-in fade-in zoom-in-95 duration-150">
+            <div className="absolute top-0 left-0 w-full h-1 bg-amber-500" />
+            <h3 className="text-sm font-black text-slate-950 uppercase tracking-wider flex items-center gap-2">
+              ⚠️ Confirmar actualización de cliente
+            </h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              ¿Está seguro de que desea ir a actualizar los datos del cliente?
+              <br />
+              <strong className="text-slate-700 font-bold">
+                Tenga en cuenta que al salir de esta pantalla se perderán las referencias que haya agregado en este momento en el pedido actual.
+              </strong>
+            </p>
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowUpdateClientConfirmModal(false)}
+                className="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-xl transition-all cursor-pointer text-center"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUpdateClientConfirmModal(false);
+                  if (onUpdateActiveClientRedirect) {
+                    onUpdateActiveClientRedirect(selectedClientId);
+                  }
+                }}
+                className="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold uppercase rounded-xl shadow-md transition-all cursor-pointer text-center"
+              >
+                Aceptar y Salir
               </button>
             </div>
           </div>

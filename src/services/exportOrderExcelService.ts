@@ -26,7 +26,9 @@ export const exportOrderToExcel = async (
         // CABECERA
         worksheet.getCell('M4').value = order.numeroPedido != null ? order.numeroPedido : ''; // número del pedido
         worksheet.getCell('M7').value = (order.vendedorNombre || '').split(' ')[0].toUpperCase();
-        worksheet.getCell('N9').value = (client?.id || order.clienteId || '').replace(/^cli_/, ''); // codigo cliente
+        const rawClientId = (client?.id || order.clienteId || '').replace(/^cli_/, '');
+        const numClientId = Number(rawClientId);
+        worksheet.getCell('N9').value = isNaN(numClientId) ? rawClientId : numClientId; // codigo cliente
         worksheet.getCell('C9').value = client?.nombre || order.clienteNombre || ''; // nombre cliente
         worksheet.getCell('C11').value = client?.direccion || ''; // direccion 
         worksheet.getCell('K11').value = client?.documentoIdentidad || ''; // NIT

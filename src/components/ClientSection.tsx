@@ -7,9 +7,18 @@ interface ClientSectionProps {
   pedidos: Pedido[];
   onAddCliente: (cliente: Omit<Cliente, 'id' | 'fechaRegistro'>) => void;
   onEditCliente: (cliente: Cliente) => void;
+  initialEditingClient?: Cliente | null;
+  onCancelEdit?: () => void;
 }
 
-export default function ClientSection({ clientes, pedidos, onAddCliente, onEditCliente }: ClientSectionProps) {
+export default function ClientSection({ 
+  clientes, 
+  pedidos, 
+  onAddCliente, 
+  onEditCliente,
+  initialEditingClient,
+  onCancelEdit
+}: ClientSectionProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -31,7 +40,7 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
   const [limiteFacturacion, setLimiteFacturacion] = useState('N/A');
 
   // Search filter - Only by Name or Client ID
-  const filteredClientes = clientes.filter(c => 
+  const filteredClientes = clientes.filter(c =>
     c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (c.codigoCliente || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -40,6 +49,23 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, itemsPerPage]);
+
+  useEffect(() => {
+    if (initialEditingClient) {
+      setSelectedClientId(null);
+      setEditingClient(initialEditingClient);
+      setCodigoCliente(initialEditingClient.codigoCliente || '');
+      setNombre(initialEditingClient.nombre);
+      setDocumentoIdentidad(initialEditingClient.documentoIdentidad);
+      setTelefono(initialEditingClient.telefono);
+      setCorreo(initialEditingClient.correo);
+      setDireccion(initialEditingClient.direccion);
+      setCiudad(initialEditingClient.ciudad);
+      setNotas(initialEditingClient.notas || '');
+      setLimiteFacturacion(initialEditingClient.limiteFacturacion || 'N/A');
+      setShowAddForm(true);
+    }
+  }, [initialEditingClient]);
 
   const totalPages = Math.ceil(filteredClientes.length / itemsPerPage);
   const paginatedClientes = filteredClientes.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -141,13 +167,13 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
   };
 
   return (
-    <div id="client-section-layout" className="max-w-4xl mx-auto">
+    <div id="client-section-layout" className="w-full">
       {!selectedClientId ? (
         /* Left side (Now main): Client search and List */
         <div id="client-list-column" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-[#1E293B] uppercase tracking-wider">Base de Clientes</h3>
-            <button 
+            <h3 className="text-base font-bold text-[#1E293B] uppercase tracking-wider">Base de datos de Clientes</h3>
+            <button
               id="btn-toggle-add-client"
               onClick={() => {
                 setEditingClient(null);
@@ -187,7 +213,7 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E]">
                 {editingClient ? 'Modificar Datos de Cliente' : 'Registrar Nuevo Cliente'}
               </h4>
-              
+
               <form onSubmit={handleSubmit} className="space-y-3">
                 <div>
                   <label className="block text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-0.5">Nombre Completo *</label>
@@ -288,11 +314,10 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
                     <button
                       type="button"
                       onClick={() => setLimiteFacturacion('N/A')}
-                      className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
-                        limiteFacturacion === 'N/A'
+                      className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${limiteFacturacion === 'N/A'
                           ? 'bg-[#1E293B] text-white border-[#1E293B]'
                           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                      }`}
+                        }`}
                     >
                       N/A
                     </button>
@@ -305,7 +330,7 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
                         value={limiteFacturacion !== 'N/A' ? limiteFacturacion : ''}
                         onChange={(e) => {
                           const val = e.target.value;
-                           if (val === '') {
+                          if (val === '') {
                             setLimiteFacturacion('N/A');
                           } else {
                             const num = Math.max(1, Math.min(31, parseInt(val) || 1));
@@ -325,6 +350,7 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
                     onClick={() => {
                       setShowAddForm(false);
                       setEditingClient(null);
+                      if (onCancelEdit) onCancelEdit();
                     }}
                     className="px-3 py-1.5 bg-[#E2E8F0] text-[#475569] text-xs font-bold rounded-md"
                   >
@@ -369,12 +395,19 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
                           <span className="inline-block px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 rounded text-[9px] font-bold">Pendiente ID</span>
                         )}
                       </h4>
-                      <p className="text-[10px] font-semibold text-[#64748B] mt-0.5">{c.documentoIdentidad} • {c.ciudad}</p>
-                      <p className="text-[11px] text-[#475569] mt-1 flex items-center gap-1 truncate max-w-[200px]" title={c.direccion}>
-                        <MapPin className="h-3 w-3 shrink-0 text-[#8C877D]" /> <span className="truncate">{c.direccion}</span>
+                      <p className="text-[10px] font-semibold text-[#64748B] mt-0.5">{c.documentoIdentidad}</p>
+                      <p className="text-[11px] text-[#475569] mt-0.5 flex items-center gap-1.5 truncate" title={c.direccion}>
+                        <span className="text-[10px] font-semibold text-[#64748B] shrink-0">{c.ciudad}</span>
+                        {c.direccion && (
+                          <>
+                            <span className="text-slate-300">•</span>
+                            <MapPin className="h-3 w-3 shrink-0 text-[#8C877D]" />
+                            <span className="truncate">{c.direccion}</span>
+                          </>
+                        )}
                       </p>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 shrink-0">
                       <div className="text-right">
                         <span className="text-[10px] uppercase tracking-wider text-[#94A3B8] block">Cant. pedidos</span>
@@ -453,9 +486,9 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
         /* Right side (now replaces left side): Client detailed records */
         selectedCliente && (
           <div id="selected-client-dashboard" className="bg-white border border-[#E2E8F0] rounded-xl p-6 space-y-6 shadow-sm">
-            
+
             {/* Clickable Header: Profile Card */}
-            <div 
+            <div
               onClick={() => setSelectedClientId(null)}
               className="flex items-center justify-between border-b border-[#F1F5F9] pb-4 cursor-pointer hover:bg-slate-50 -mx-4 -mt-4 p-4 rounded-t-xl transition-all group"
               title="Haz clic para volver a la lista"
@@ -481,7 +514,7 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
                 </div>
               </div>
 
-              <div 
+              <div
                 className="bg-[#FAF7F0] p-3 rounded-lg border border-[#EDECE3] text-center min-w-[120px]"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -560,7 +593,7 @@ export default function ClientSection({ clientes, pedidos, onAddCliente, onEditC
             {/* Client Order History Checklist */}
             <div className="space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-[#1E293B]">Historial de Pedidos de {selectedCliente.nombre}</h4>
-              
+
               {clientOrders.length === 0 ? (
                 <div className="text-center p-6 border border-dashed border-slate-200 rounded-lg text-xs text-[#64748B]">
                   Este cliente aún no registra ningún pedido de prendas.

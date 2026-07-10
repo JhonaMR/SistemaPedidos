@@ -200,7 +200,7 @@
     "numeroPedido": "SOP-004",
     "fecha": "2026-07-09",
     "campana": "Vacaciones 2026",
-    "sincronizado": 0,
+    "sincronizado": 1,
     "fechaCancelado": "2026-07-10",
     "motivoCancelado": "Pedido cancelado"
   },
