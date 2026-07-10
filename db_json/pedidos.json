@@ -34,8 +34,7 @@
     "numeroPedido": "SOP-001",
     "fecha": "2026-07-07",
     "campana": "Vacaciones 2026",
-    "sincronizado": 1,
-    "idLocal": 2
+    "sincronizado": 1
   },
   {
     "clienteId": "cli_270",
@@ -101,8 +100,7 @@
     "numeroPedido": "SOP-003",
     "fecha": "2026-07-08",
     "campana": "Vacaciones 2026",
-    "sincronizado": 1,
-    "idLocal": 4
+    "sincronizado": 1
   },
   {
     "clienteId": "cli_173",
@@ -149,11 +147,10 @@
     "facturacionFE": 100,
     "facturacionRM": 0,
     "id": "ped_1783622197668",
-    "numeroPedido": "ASYNC-SOP-1783622197668",
+    "numeroPedido": "SOP-006",
     "fecha": "2026-07-09",
     "campana": "Vacaciones 2026",
-    "sincronizado": 1,
-    "idLocal": 5
+    "sincronizado": 1
   },
   {
     "clienteId": "cli_082",
@@ -193,7 +190,7 @@
     "porcentajeDescuento": 0,
     "montoDescuento": 0,
     "total": 705400,
-    "estado": "Pendiente",
+    "estado": "Cancelado",
     "notas": "",
     "fechaEntregaEstimada": "2026-07-09",
     "fechaLimiteDespacho": "",
@@ -204,6 +201,490 @@
     "fecha": "2026-07-09",
     "campana": "Vacaciones 2026",
     "sincronizado": 0,
-    "idLocal": 5
+    "fechaCancelado": "2026-07-10",
+    "motivoCancelado": "Pedido cancelado"
+  },
+  {
+    "clienteId": "cli_093",
+    "clienteNombre": "EL SURTIDOR BG SAS #2",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Jhon Montoya",
+    "items": [
+      {
+        "id": "cart_1783686517860_iew8",
+        "prendaRef": "12869",
+        "nombrePrenda": "BLS MAN BOLE",
+        "categoria": "Dama",
+        "talla": "S-5, M-5",
+        "tallasDetalle": {
+          "S": 5,
+          "M": 5
+        },
+        "cantidad": 10,
+        "precioUnitario": 31900,
+        "total": 319000
+      },
+      {
+        "id": "cart_1783686526998_45ef",
+        "prendaRef": "13012",
+        "nombrePrenda": "BLUS CUELL NERU PLUSS",
+        "categoria": "Dama",
+        "talla": "S-6, L-6, M-4",
+        "tallasDetalle": {
+          "S": 6,
+          "L": 6,
+          "M": 4
+        },
+        "cantidad": 16,
+        "precioUnitario": 39900,
+        "total": 638400
+      },
+      {
+        "id": "cart_1783686536478_tgat",
+        "prendaRef": "13169",
+        "nombrePrenda": "BLUSA CORAZON BORDADO",
+        "categoria": "Dama",
+        "talla": "M-6, L-7",
+        "tallasDetalle": {
+          "M": 6,
+          "L": 7
+        },
+        "cantidad": 13,
+        "precioUnitario": 24500,
+        "total": 318500
+      },
+      {
+        "id": "cart_1783686540598_5kpu",
+        "prendaRef": "13183",
+        "nombrePrenda": "BLUSA NEW JERSEY",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 21900,
+        "total": 525600
+      },
+      {
+        "id": "cart_1783686546581_hsnv",
+        "prendaRef": "13198",
+        "nombrePrenda": "CAMISETA RALLAS",
+        "categoria": "Dama",
+        "talla": "S-3",
+        "tallasDetalle": {
+          "S": 3
+        },
+        "cantidad": 3,
+        "precioUnitario": 33900,
+        "total": 101700
+      },
+      {
+        "id": "cart_1783686562956_6xkx",
+        "prendaRef": "13237",
+        "nombrePrenda": "CAMISETA 3 BOTONES",
+        "categoria": "Dama",
+        "talla": "M-6, L-10",
+        "tallasDetalle": {
+          "M": 6,
+          "L": 10
+        },
+        "novedad": "sin negro",
+        "cantidad": 16,
+        "precioUnitario": 37900,
+        "total": 606400
+      }
+    ],
+    "subtotal": 2509600,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 2509600,
+    "estado": "Procesado",
+    "notas": "mitad un mes y mitad en agosto",
+    "fechaEntregaEstimada": "2026-07-10",
+    "fechaLimiteDespacho": "2026-08-31",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783686580098",
+    "numeroPedido": "01-001",
+    "fecha": "2026-07-10",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1
+  },
+  {
+    "clienteId": "cli_292",
+    "clienteNombre": "CLASIC AM S.A.S.",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783686342940_7swn",
+        "prendaRef": "12865",
+        "nombrePrenda": "TOP CARGADERA GRUESA BOTONES",
+        "categoria": "Dama",
+        "talla": "S-5, M-5, L-5",
+        "tallasDetalle": {
+          "S": 5,
+          "M": 5,
+          "L": 5
+        },
+        "cantidad": 15,
+        "precioUnitario": 16900,
+        "total": 253500
+      },
+      {
+        "id": "cart_1783686377117_5d94",
+        "prendaRef": "13109",
+        "nombrePrenda": "BLUSA PLUSS MANGA SISA RAYAS",
+        "categoria": "Dama",
+        "talla": "S-6, M-10",
+        "tallasDetalle": {
+          "S": 6,
+          "M": 10
+        },
+        "cantidad": 16,
+        "precioUnitario": 29900,
+        "total": 478400
+      },
+      {
+        "id": "cart_1783686398197_im1x",
+        "prendaRef": "13012",
+        "nombrePrenda": "BLUS CUELL NERU PLUSS",
+        "categoria": "Dama",
+        "talla": "S-4",
+        "tallasDetalle": {
+          "S": 4
+        },
+        "cantidad": 4,
+        "precioUnitario": 39900,
+        "total": 159600
+      },
+      {
+        "id": "cart_1783686414587_sjhg",
+        "prendaRef": "13175",
+        "nombrePrenda": "BODY MAYATEX FRANJA ANAGAELITA",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "novedad": "Blanco",
+        "cantidad": 24,
+        "precioUnitario": 24900,
+        "total": 597600
+      },
+      {
+        "id": "cart_1783686426300_4u7y",
+        "prendaRef": "13263",
+        "nombrePrenda": "CAMISETA CORTE LATERAL",
+        "categoria": "Dama",
+        "talla": "L-7, M-10",
+        "tallasDetalle": {
+          "L": 7,
+          "M": 10
+        },
+        "cantidad": 17,
+        "precioUnitario": 23900,
+        "total": 406300
+      },
+      {
+        "id": "cart_1783686443686_ygy2",
+        "prendaRef": "13279",
+        "nombrePrenda": "CAMISETA FONDEO DE BOLAS",
+        "categoria": "Dama",
+        "talla": "S-4, M-6, L-6",
+        "tallasDetalle": {
+          "S": 4,
+          "M": 6,
+          "L": 6
+        },
+        "novedad": "Sin aplique",
+        "cantidad": 16,
+        "precioUnitario": 24900,
+        "total": 398400
+      }
+    ],
+    "subtotal": 2293800,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 2293800,
+    "estado": "Procesado",
+    "notas": "Mandar por terminal",
+    "fechaEntregaEstimada": "2026-07-10",
+    "fechaLimiteDespacho": "2026-07-31",
+    "facturacionFE": 30,
+    "facturacionRM": 70,
+    "id": "ped_1783686467403",
+    "numeroPedido": "SOP-005",
+    "fecha": "2026-07-10",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1,
+    "editado": true
+  },
+  {
+    "clienteId": "cli_094",
+    "clienteNombre": "EL SURTIDOR BG SAS",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Jhon Montoya",
+    "items": [
+      {
+        "id": "cart_1783686517860_iew8",
+        "prendaRef": "12869",
+        "nombrePrenda": "BLS MAN BOLE",
+        "categoria": "Dama",
+        "talla": "S-5, M-5",
+        "tallasDetalle": {
+          "S": 5,
+          "M": 5
+        },
+        "cantidad": 10,
+        "precioUnitario": 31900,
+        "total": 319000
+      },
+      {
+        "id": "cart_1783686526998_45ef",
+        "prendaRef": "13012",
+        "nombrePrenda": "BLUS CUELL NERU PLUSS",
+        "categoria": "Dama",
+        "talla": "S-6, L-6, M-4",
+        "tallasDetalle": {
+          "S": 6,
+          "L": 6,
+          "M": 4
+        },
+        "cantidad": 16,
+        "precioUnitario": 39900,
+        "total": 638400
+      },
+      {
+        "id": "cart_1783686536478_tgat",
+        "prendaRef": "13169",
+        "nombrePrenda": "BLUSA CORAZON BORDADO",
+        "categoria": "Dama",
+        "talla": "M-6, L-7",
+        "tallasDetalle": {
+          "M": 6,
+          "L": 7
+        },
+        "cantidad": 13,
+        "precioUnitario": 24500,
+        "total": 318500
+      },
+      {
+        "id": "cart_1783686540598_5kpu",
+        "prendaRef": "13183",
+        "nombrePrenda": "BLUSA NEW JERSEY",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 21900,
+        "total": 525600
+      },
+      {
+        "id": "cart_1783686546581_hsnv",
+        "prendaRef": "13198",
+        "nombrePrenda": "CAMISETA RALLAS",
+        "categoria": "Dama",
+        "talla": "S-3",
+        "tallasDetalle": {
+          "S": 3
+        },
+        "cantidad": 3,
+        "precioUnitario": 33900,
+        "total": 101700
+      },
+      {
+        "id": "cart_1783686562956_6xkx",
+        "prendaRef": "13237",
+        "nombrePrenda": "CAMISETA 3 BOTONES",
+        "categoria": "Dama",
+        "talla": "M-6, L-10",
+        "tallasDetalle": {
+          "M": 6,
+          "L": 10
+        },
+        "novedad": "sin negro",
+        "cantidad": 16,
+        "precioUnitario": 37900,
+        "total": 606400
+      }
+    ],
+    "subtotal": 2509600,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 2509600,
+    "estado": "Pendiente",
+    "notas": "mitad un mes y mitad en agosto",
+    "fechaEntregaEstimada": "2026-07-10",
+    "fechaLimiteDespacho": "2026-08-31",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783692497058",
+    "numeroPedido": "01-002",
+    "fecha": "2026-07-10",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1
+  },
+  {
+    "clienteId": "cli_281",
+    "clienteNombre": "LA PORFIA AM SAS",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783692555366_kly7",
+        "prendaRef": "12640",
+        "nombrePrenda": "CAMISILLA APLIQUE PIEDRAS FTE",
+        "categoria": "Dama",
+        "talla": "S-1, M-1, L-1",
+        "tallasDetalle": {
+          "S": 1,
+          "M": 1,
+          "L": 1
+        },
+        "cantidad": 3,
+        "precioUnitario": 19900,
+        "total": 59700
+      },
+      {
+        "id": "cart_1783692557727_g97u",
+        "prendaRef": "12865",
+        "nombrePrenda": "TOP CARGADERA GRUESA BOTONES",
+        "categoria": "Dama",
+        "talla": "S-1, M-1, L-1",
+        "tallasDetalle": {
+          "S": 1,
+          "M": 1,
+          "L": 1
+        },
+        "cantidad": 3,
+        "precioUnitario": 16900,
+        "total": 50700
+      },
+      {
+        "id": "cart_1783692560287_v178",
+        "prendaRef": "12869",
+        "nombrePrenda": "BLS MAN BOLE",
+        "categoria": "Dama",
+        "talla": "S-1, M-1, L-1",
+        "tallasDetalle": {
+          "S": 1,
+          "M": 1,
+          "L": 1
+        },
+        "cantidad": 3,
+        "precioUnitario": 31900,
+        "total": 95700
+      },
+      {
+        "id": "cart_1783692563250_lwqn",
+        "prendaRef": "12931",
+        "nombrePrenda": "BLUSA DOBLE BOLERO AMARRE ESPALDA",
+        "categoria": "Dama",
+        "talla": "S-1, M-1, L-1",
+        "tallasDetalle": {
+          "S": 1,
+          "M": 1,
+          "L": 1
+        },
+        "cantidad": 3,
+        "precioUnitario": 29900,
+        "total": 89700
+      },
+      {
+        "id": "cart_1783692565679_je58",
+        "prendaRef": "12966",
+        "nombrePrenda": "BLUSA AMARRES MILAN VERAMIENTNIC",
+        "categoria": "Dama",
+        "talla": "M-1",
+        "tallasDetalle": {
+          "M": 1
+        },
+        "cantidad": 1,
+        "precioUnitario": 43900,
+        "total": 43900
+      },
+      {
+        "id": "cart_1783692569460_y04f",
+        "prendaRef": "12990",
+        "nombrePrenda": "BLUSA PLUSS",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 1
+        },
+        "cantidad": 1,
+        "precioUnitario": 32900,
+        "total": 32900
+      }
+    ],
+    "subtotal": 372600,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 372600,
+    "estado": "Pendiente",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-10",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783692572330",
+    "numeroPedido": "SOP-007",
+    "fecha": "2026-07-10",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1
+  },
+  {
+    "clienteId": "cli_017",
+    "clienteNombre": "ALIANZA ESTRENO SAS",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783453620261_lnyz",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "novedad": "solo beigs",
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
+      },
+      {
+        "id": "cart_1783453656341_0y6c",
+        "prendaRef": "13300",
+        "nombrePrenda": "CAMISETA COLOMBIA 10",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 29900,
+        "total": 717600
+      }
+    ],
+    "subtotal": 1435200,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 1435200,
+    "estado": "Completo",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-07",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 50,
+    "facturacionRM": 50,
+    "id": "ped_1783453670194",
+    "numeroPedido": "SOP-002",
+    "fecha": "2026-07-07",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1
   }
 ]

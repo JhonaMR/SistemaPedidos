@@ -24,7 +24,7 @@ export const exportOrderToPdf = async (
     const brandTextColor = isMelas ? '#9d174d' : '#6b2a35';
     const brandName = isMelas ? 'MELAS' : 'PLOW';
     const logoSrc = isMelas ? '/logos/melas-192x192.png' : '/logos/plow-192x192.png';
-    const sellerFull = (seller?.name || '').toUpperCase();
+    const sellerFull = (seller?.name || '').split(' ')[0].toUpperCase();
     const hasSizes = order.items.some((i: any) => i.sizes);
 
     const brandInfo = isMelas ? [

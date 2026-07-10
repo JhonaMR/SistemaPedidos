@@ -2,18 +2,19 @@ import { useState, useEffect } from 'react';
 import { Pedido, ItemPedido, Cliente, Prenda } from '../types';
 import { printOrderReceipt } from '../services/printService';
 import { exportOrderToExcel } from '../services/exportOrderExcelService';
-import { 
-  Search, 
-  Filter, 
-  Printer, 
-  ChevronDown, 
-  ChevronUp, 
-  TrendingUp, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
-  Truck, 
-  Scissors, 
+import { getSortedTallasStr } from '../utils/sizeHelper';
+import {
+  Search,
+  Filter,
+  Printer,
+  ChevronDown,
+  ChevronUp,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Truck,
+  Scissors,
   FileText,
   Copy,
   X,
@@ -31,7 +32,7 @@ interface OrderHistoryProps {
   pedidos: Pedido[];
   clientes: Cliente[];
   catalogGarments?: Prenda[];
-  onUpdateStatus: (orderId: string, status: Pedido['estado'], fechaCancelado?: string) => void;
+  onUpdateStatus: (orderId: string, status: Pedido['estado'], fechaCancelado?: string, motivoCancelado?: string) => void;
   onDuplicatePedido: (pedido: Pedido, targetClienteId: string) => void;
   currentUser?: { rol: 'general' | 'soporte' } | null;
   deletedPedidos?: Pedido[];
@@ -43,11 +44,11 @@ interface OrderHistoryProps {
   onEmptyTrash?: () => void;
 }
 
-export default function OrderHistory({ 
-  pedidos, 
-  clientes, 
+export default function OrderHistory({
+  pedidos,
+  clientes,
   catalogGarments = [],
-  onUpdateStatus, 
+  onUpdateStatus,
   onDuplicatePedido,
   currentUser,
   deletedPedidos = [],
@@ -77,6 +78,7 @@ export default function OrderHistory({
   // Custom dialog/modal states
   const [cancelModalPedido, setCancelModalPedido] = useState<Pedido | null>(null);
   const [cancelDate, setCancelDate] = useState('');
+  const [cancelReason, setCancelReason] = useState('');
   const [deleteConfirmPedido, setDeleteConfirmPedido] = useState<Pedido | null>(null);
   const [permDeleteConfirmPedido, setPermDeleteConfirmPedido] = useState<Pedido | null>(null);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
@@ -89,21 +91,30 @@ export default function OrderHistory({
     }, 4000);
   };
 
-  const activePedidosList = showBackupsOnly 
-    ? backups 
+  const activePedidosList = showBackupsOnly
+    ? backups
     : (showDeletedOnly ? deletedPedidos : pedidos);
 
   // Filter logic
-  const filteredOrders = activePedidosList.filter(p => {
-    const matchesSearch = 
-      p.clienteNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.clienteId.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredOrders = activePedidosList
+    .filter(p => {
+      const matchesSearch =
+        p.clienteNombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.clienteId.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = statusFilter === 'Todos' || p.estado === statusFilter;
-    const matchesVendedor = vendedorFilter === 'Todos' || p.vendedorNombre === vendedorFilter;
+      const matchesStatus = statusFilter === 'Todos' || p.estado === statusFilter;
+      const matchesVendedor = vendedorFilter === 'Todos' || p.vendedorNombre === vendedorFilter;
 
-    return matchesSearch && matchesStatus && matchesVendedor;
-  });
+      return matchesSearch && matchesStatus && matchesVendedor;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.fecha).getTime();
+      const dateB = new Date(b.fecha).getTime();
+      if (!isNaN(dateA) && !isNaN(dateB) && dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return b.id.localeCompare(a.id);
+    });
 
   // Reset page when filtering or items per page change
   useEffect(() => {
@@ -137,10 +148,10 @@ export default function OrderHistory({
 
   return (
     <div id="order-history-container" className="space-y-6">
-      
+
       {/* Search and Filters row */}
       <div id="history-filter-bar" className="bg-white border border-[#E2E8F0] rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 justify-between shadow-sm">
-        
+
         {/* Search Input */}
         <div id="search-history-wrapper" className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-[#8C877D]" />
@@ -182,11 +193,10 @@ export default function OrderHistory({
                     key={status}
                     type="button"
                     onClick={() => setStatusFilter(status)}
-                    className={`py-1 px-2.5 text-xs font-semibold rounded-md transition-all ${
-                      statusFilter === status
-                        ? 'bg-[#1E293B] text-white'
-                        : 'bg-[#F1F5F9] text-[#475569] hover:bg-slate-200'
-                    }`}
+                    className={`py-1 px-2.5 text-xs font-semibold rounded-md transition-all ${statusFilter === status
+                      ? 'bg-[#1E293B] text-white'
+                      : 'bg-[#F1F5F9] text-[#475569] hover:bg-slate-200'
+                      }`}
                   >
                     {status}
                   </button>
@@ -207,11 +217,10 @@ export default function OrderHistory({
               }
               setStatusFilter('Todos');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border transition-all shrink-0 ${
-              showBackupsOnly
-                ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
-                : 'bg-white border-amber-200 text-amber-600 hover:bg-amber-50 shadow-xs'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border transition-all shrink-0 ${showBackupsOnly
+              ? 'bg-amber-500 border-amber-500 text-white shadow-sm'
+              : 'bg-white border-amber-200 text-amber-600 hover:bg-amber-50 shadow-xs'
+              }`}
             title={showBackupsOnly ? "Ver Pedidos Activos" : "Ver Cambios / Historial de versiones"}
           >
             <RotateCcw className="h-4 w-4" />
@@ -230,11 +239,10 @@ export default function OrderHistory({
               }
               setStatusFilter('Todos');
             }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border transition-all shrink-0 ${
-              showDeletedOnly
-                ? 'bg-rose-600 border-rose-600 text-white shadow-sm'
-                : 'bg-white border-slate-200 text-rose-600 hover:bg-rose-50 shadow-xs'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border transition-all shrink-0 ${showDeletedOnly
+              ? 'bg-rose-600 border-rose-600 text-white shadow-sm'
+              : 'bg-white border-slate-200 text-rose-600 hover:bg-rose-50 shadow-xs'
+              }`}
             title={showDeletedOnly ? "Ver Pedidos Activos" : "Ver Papelera de Pedidos"}
           >
             <Trash2 className="h-4 w-4" />
@@ -270,23 +278,23 @@ export default function OrderHistory({
         ) : (
           paginatedOrders.map((pedido) => {
             const isExpanded = expandedOrderId === pedido.id;
-            
+
             // Logistical state badges
             let stBadge = 'bg-amber-50 text-amber-800 border-amber-200';
             let stIcon = <Clock className="h-4 w-4 text-amber-600" />;
-            
-            if (pedido.estado === 'Procesado') { 
-              stBadge = 'bg-blue-50 text-blue-800 border-blue-200'; 
-              stIcon = <Package className="h-4 w-4 text-blue-600" />; 
-            } else if (pedido.estado === 'Activo') { 
-              stBadge = 'bg-purple-50 text-purple-800 border-purple-200'; 
-              stIcon = <Truck className="h-4 w-4 text-purple-600" />; 
-            } else if (pedido.estado === 'Completo') { 
-              stBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200'; 
-              stIcon = <CheckCircle className="h-4 w-4 text-emerald-600" />; 
-            } else if (pedido.estado === 'Cancelado') { 
-              stBadge = 'bg-rose-50 text-rose-800 border-rose-200'; 
-              stIcon = <AlertTriangle className="h-4 w-4 text-rose-600" />; 
+
+            if (pedido.estado === 'Procesado') {
+              stBadge = 'bg-blue-50 text-blue-800 border-blue-200';
+              stIcon = <Package className="h-4 w-4 text-blue-600" />;
+            } else if (pedido.estado === 'Activo') {
+              stBadge = 'bg-purple-50 text-purple-800 border-purple-200';
+              stIcon = <Truck className="h-4 w-4 text-purple-600" />;
+            } else if (pedido.estado === 'Completo') {
+              stBadge = 'bg-emerald-50 text-emerald-800 border-emerald-200';
+              stIcon = <CheckCircle className="h-4 w-4 text-emerald-600" />;
+            } else if (pedido.estado === 'Cancelado') {
+              stBadge = 'bg-rose-50 text-rose-800 border-rose-200';
+              stIcon = <AlertTriangle className="h-4 w-4 text-rose-600" />;
             }
 
             if (pedido.esBackup) {
@@ -295,13 +303,13 @@ export default function OrderHistory({
             }
 
             return (
-              <div 
+              <div
                 id={`order-block-${pedido.id}`}
                 key={pedido.id}
                 className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden transition-all shadow-sm hover:shadow-md"
               >
                 {/* Header Row */}
-                <div 
+                <div
                   id={`order-header-${pedido.id}`}
                   onClick={() => setExpandedOrderId(isExpanded ? null : pedido.id)}
                   className="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 cursor-pointer hover:bg-[#FAF9F6] transition-colors"
@@ -313,7 +321,7 @@ export default function OrderHistory({
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         {pedido.numeroPedido.startsWith('ASYNC-') ? (
-                          <span 
+                          <span
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 shadow-3xs animate-pulse"
                             title="El pedido fue tomado offline y está pendiente de sincronización para obtener su consecutivo final."
                           >
@@ -330,12 +338,11 @@ export default function OrderHistory({
                           const rm = pedido.facturacionRM !== undefined ? pedido.facturacionRM : 0;
                           const isDivided = fe !== 100 || rm !== 0;
                           return (
-                            <span 
-                              className={`px-1.5 py-0.5 text-[9px] rounded-md font-black font-mono flex items-center gap-0.5 shadow-3xs border ${
-                                isDivided 
-                                  ? 'bg-amber-50 border-amber-200 text-amber-800' 
-                                  : 'bg-slate-100 border-slate-200 text-slate-700'
-                              }`} 
+                            <span
+                              className={`px-1.5 py-0.5 text-[9px] rounded-md font-black font-mono flex items-center gap-0.5 shadow-3xs border ${isDivided
+                                ? 'bg-amber-50 border-amber-200 text-amber-800'
+                                : 'bg-slate-100 border-slate-200 text-slate-700'
+                                }`}
                               title={`Facturación: FE ${fe}% / RM ${rm}%`}
                             >
                               <span>{fe}</span>
@@ -411,7 +418,34 @@ export default function OrderHistory({
                 {/* Expanded details container */}
                 {isExpanded && (
                   <div id={`order-body-${pedido.id}`} className="px-5 pb-5 border-t border-slate-100 bg-[#FCFDFD] space-y-5 pt-4">
-                    
+
+                    {/* Client Info Section */}
+                    {(() => {
+                      const clientInfo = clientes.find(c => c.id === pedido.clienteId);
+                      return clientInfo ? (
+                        <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-xs space-y-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div>
+                              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-0.5">Código / ID Cliente</span>
+                              <span className="font-semibold text-slate-700">{clientInfo.codigoCliente || clientInfo.id}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-0.5">NIT / Cédula</span>
+                              <span className="font-semibold text-slate-700">{clientInfo.documentoIdentidad}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-0.5">Ciudad</span>
+                              <span className="font-semibold text-slate-700">{clientInfo.ciudad}</span>
+                            </div>
+                            <div>
+                              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-0.5">Dirección</span>
+                              <span className="font-semibold text-slate-700">{clientInfo.direccion}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null;
+                    })()}
+
                     {/* Status updater and action bar */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#ECEFF1] p-3.5 rounded-xl">
                       <div className="flex items-center gap-2">
@@ -438,17 +472,17 @@ export default function OrderHistory({
                                 if (newStatus === 'Cancelado') {
                                   const today = new Date().toISOString().split('T')[0];
                                   setCancelDate(today);
+                                  setCancelReason('');
                                   setCancelModalPedido(pedido);
                                 } else {
                                   onUpdateStatus(pedido.id, newStatus);
                                   showFeedback(`Estado de pedido actualizado a ${newStatus}.`);
                                 }
                               }}
-                              className={`p-1.5 border border-slate-200 rounded text-xs text-slate-700 font-semibold focus:outline-none transition-colors ${
-                                currentUser?.rol === 'soporte'
-                                  ? 'bg-white cursor-pointer hover:border-slate-300'
-                                  : 'bg-slate-50 cursor-not-allowed opacity-75'
-                              }`}
+                              className={`p-1.5 border border-slate-200 rounded text-xs text-slate-700 font-semibold focus:outline-none transition-colors ${currentUser?.rol === 'soporte'
+                                ? 'bg-white cursor-pointer hover:border-slate-300'
+                                : 'bg-slate-50 cursor-not-allowed opacity-75'
+                                }`}
                             >
                               <option value="Pendiente">Pendiente</option>
                               <option value="Procesado">Procesado</option>
@@ -528,9 +562,9 @@ export default function OrderHistory({
                             <button
                               id={`btn-duplicate-order-${pedido.id}`}
                               onClick={() => {
-                                  setDuplicatingPedido(pedido);
-                                  setTargetClienteId('');
-                                  setClientSearch('');
+                                setDuplicatingPedido(pedido);
+                                setTargetClienteId('');
+                                setClientSearch('');
                               }}
                               className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold rounded-lg transition-colors"
                               title="Volver a pedir"
@@ -557,25 +591,25 @@ export default function OrderHistory({
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
                           <tr className="bg-slate-50 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                            <th className="p-3">Prenda de Vestir</th>
-                            <th className="p-3 text-center">Talla</th>
-                            <th className="p-3 text-center">Requerimiento / Novedad</th>
-                            <th className="p-3 text-center">Cant.</th>
-                            <th className="p-3 text-right">Precio Un.</th>
-                            <th className="p-3 text-right">Subtotal</th>
+                            <th className="py-1.5 px-3">Referencia</th>
+                            <th className="py-1.5 px-3 text-center">Talla</th>
+                            <th className="py-1.5 px-3 text-center">Requerimiento / Novedad</th>
+                            <th className="py-1.5 px-3 text-center">Cant.</th>
+                            <th className="py-1.5 px-3 text-right">Precio Un.</th>
+                            <th className="py-1.5 px-3 text-right">Subtotal</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                           {pedido.items.map((item, idx) => (
                             <tr key={idx} className="hover:bg-slate-50">
-                              <td className="p-3">
+                              <td className="py-1.5 px-3">
                                 <span className="font-semibold text-slate-800 font-mono">
                                   {catalogGarments.find(g => g.ref === item.prendaRef)?.ref || item.prendaRef}
                                 </span>
                                 <span className="text-[10px] text-slate-400 block">{item.categoria}</span>
                               </td>
-                              <td className="p-3 text-center font-bold text-slate-700">{item.talla.replace(/\s*\((\d+)\)/g, '-$1')}</td>
-                              <td className="p-3 text-center">
+                              <td className="py-1.5 px-3 text-center font-bold text-slate-700">{getSortedTallasStr(item.tallasDetalle, item.talla)}</td>
+                              <td className="py-1.5 px-3 text-center">
                                 {item.novedad ? (
                                   <span className="inline-block px-2 py-1 bg-amber-50 border border-amber-100 rounded text-[10px] text-amber-800 font-medium italic">
                                     {item.novedad}
@@ -584,9 +618,9 @@ export default function OrderHistory({
                                   <span className="text-slate-400 italic">-</span>
                                 )}
                               </td>
-                              <td className="p-3 text-center font-bold text-slate-800">{item.cantidad}</td>
-                              <td className="p-3 text-right font-mono text-slate-600">{formatCOP(item.precioUnitario)}</td>
-                              <td className="p-3 text-right font-mono font-bold text-slate-800">{formatCOP(item.total)}</td>
+                              <td className="py-1.5 px-3 text-center font-bold text-slate-800">{item.cantidad}</td>
+                              <td className="py-1.5 px-3 text-right font-mono text-slate-600">{formatCOP(item.precioUnitario)}</td>
+                              <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-800">{formatCOP(item.total)}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -595,7 +629,7 @@ export default function OrderHistory({
 
                     {/* Metadata summary columns */}
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-                      
+
                       {/* Left: Notes & specifics */}
                       <div className="md:col-span-8 bg-white border border-slate-100 p-4 rounded-xl text-xs space-y-3.5">
                         {pedido.notas && (
@@ -604,7 +638,14 @@ export default function OrderHistory({
                             <p className="text-slate-600 italic bg-[#FAF9F5] p-3 border border-[#E9E4D4] rounded-lg">"{pedido.notas}"</p>
                           </div>
                         )}
-                        
+
+                        {pedido.estado === 'Cancelado' && pedido.motivoCancelado && (
+                          <div>
+                            <span className="text-[10px] uppercase font-bold tracking-widest text-rose-600 block mb-1 font-mono">Motivo de Cancelación</span>
+                            <p className="text-slate-700 bg-rose-50/30 p-3 border border-rose-100 rounded-lg italic">"{pedido.motivoCancelado}"</p>
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                           <div>
                             <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block mb-0.5">Vendedor</span>
@@ -704,11 +745,11 @@ export default function OrderHistory({
 
       {/* Duplication Client Selection Modal */}
       {duplicatingPedido && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
           onClick={() => setDuplicatingPedido(null)}
         >
-          <div 
+          <div
             className="bg-white rounded-2xl border border-slate-200 shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in-95 duration-150"
             onClick={(e) => e.stopPropagation()}
           >
@@ -721,8 +762,8 @@ export default function OrderHistory({
                   <p className="text-[10px] text-emerald-100">Selecciona el cliente destino para este nuevo pedido</p>
                 </div>
               </div>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setDuplicatingPedido(null)}
                 className="p-1 hover:bg-white/10 rounded-full transition-colors text-white"
               >
@@ -761,11 +802,10 @@ export default function OrderHistory({
                     <div
                       key={c.id}
                       onClick={() => setTargetClienteId(c.id)}
-                      className={`p-3 border rounded-xl cursor-pointer transition-all flex items-center justify-between ${
-                        isSelected
-                          ? 'border-indigo-500 bg-indigo-50/70 ring-1 ring-indigo-500'
-                          : 'border-slate-100 bg-slate-50/50 hover:bg-slate-100/50'
-                      }`}
+                      className={`p-3 border rounded-xl cursor-pointer transition-all flex items-center justify-between ${isSelected
+                        ? 'border-indigo-500 bg-indigo-50/70 ring-1 ring-indigo-500'
+                        : 'border-slate-100 bg-slate-50/50 hover:bg-slate-100/50'
+                        }`}
                     >
                       <div className="flex items-center gap-2.5">
                         <div className="p-1.5 bg-white border border-slate-100 rounded-md">
@@ -776,9 +816,8 @@ export default function OrderHistory({
                           <span className="text-[10px] text-slate-400">CC/NIT: {c.documentoIdentidad} • Tel: {c.telefono}</span>
                         </div>
                       </div>
-                      <div className={`h-4 w-4 rounded-full border flex items-center justify-center transition-all ${
-                        isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white'
-                      }`}>
+                      <div className={`h-4 w-4 rounded-full border flex items-center justify-center transition-all ${isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300 bg-white'
+                        }`}>
                         {isSelected && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
                       </div>
                     </div>
@@ -805,11 +844,10 @@ export default function OrderHistory({
                     setDuplicatingPedido(null);
                   }
                 }}
-                className={`px-4 py-1.5 text-white text-xs font-bold rounded-lg transition-colors shadow-xs ${
-                  targetClienteId
-                    ? 'bg-[#4A5D4E] hover:bg-[#3D4C3F]'
-                    : 'bg-slate-300 cursor-not-allowed'
-                }`}
+                className={`px-4 py-1.5 text-white text-xs font-bold rounded-lg transition-colors shadow-xs ${targetClienteId
+                  ? 'bg-[#4A5D4E] hover:bg-[#3D4C3F]'
+                  : 'bg-slate-300 cursor-not-allowed'
+                  }`}
               >
                 Duplicar Ahora
               </button>
@@ -825,17 +863,37 @@ export default function OrderHistory({
             <div className="space-y-1">
               <h4 className="text-sm font-extrabold text-slate-950 uppercase tracking-wide">Confirmar Cancelación</h4>
               <p className="text-xs text-slate-500">
-                Por favor, ingresa la fecha de cancelación para el pedido <strong>{cancelModalPedido.numeroPedido}</strong>:
+                Por favor, ingresa los detalles de cancelación para el pedido <strong>{cancelModalPedido.numeroPedido}</strong>:
               </p>
             </div>
-            <div>
-              <input
-                type="date"
-                value={cancelDate}
-                onChange={(e) => setCancelDate(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                  Fecha de Cancelación
+                </label>
+                <input
+                  type="date"
+                  value={cancelDate}
+                  onChange={(e) => setCancelDate(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                  Motivo de Cancelación <span className="text-rose-500">*</span>
+                </label>
+                <textarea
+                  value={cancelReason}
+                  onChange={(e) => setCancelReason(e.target.value)}
+                  placeholder="Indique la razón de la cancelación (obligatorio)"
+                  required
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-rose-500 h-20 resize-none"
+                />
+              </div>
             </div>
+
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
@@ -850,12 +908,16 @@ export default function OrderHistory({
               </button>
               <button
                 type="button"
+                disabled={!cancelDate || !cancelReason.trim()}
                 onClick={() => {
-                  onUpdateStatus(cancelModalPedido.id, 'Cancelado', cancelDate);
+                  onUpdateStatus(cancelModalPedido.id, 'Cancelado', cancelDate, cancelReason.trim());
                   setCancelModalPedido(null);
                   showFeedback('Pedido cancelado correctamente.');
                 }}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition-colors shadow-xs"
+                className={`px-4 py-2 text-white text-xs font-bold rounded-lg transition-colors shadow-xs ${cancelDate && cancelReason.trim()
+                  ? 'bg-rose-600 hover:bg-rose-700 cursor-pointer'
+                  : 'bg-slate-300 cursor-not-allowed'
+                  }`}
               >
                 Confirmar Cancelación
               </button>
@@ -954,7 +1016,7 @@ export default function OrderHistory({
                 Selecciona el formato de comprobante para el pedido <strong>{printModalOrder.numeroPedido}</strong>:
               </p>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
                 type="button"

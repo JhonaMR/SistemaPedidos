@@ -10,15 +10,16 @@ interface DashboardProps {
   activeCampana?: string;
 }
 
-export default function Dashboard({ 
-  pedidos, 
+export default function Dashboard({
+  pedidos,
   todosLosPedidos,
-  vendedor, 
-  onNavigateToRegister, 
-  currentUser, 
-  activeCampana = 'Campaña General' 
+  vendedor,
+  onNavigateToRegister,
+  currentUser,
+  activeCampana = 'Campaña General'
 }: DashboardProps) {
-  const totalOrders = pedidos.length;
+  const pedidosCampaña = pedidos.filter(p => p.campana === activeCampana);
+  const totalOrders = pedidosCampaña.length;
   const nombreVendedor = currentUser?.nombre || vendedor.nombre;
   const codigoVendedor = currentUser?.usuario || vendedor.codigo;
 
@@ -40,8 +41,8 @@ export default function Dashboard({
     { key: 'Cancelado', label: 'Cancelado', color: 'bg-rose-500', bg: 'bg-rose-50', text: 'text-rose-800', border: 'border-rose-200', icon: AlertTriangle }
   ];
 
-  const successRate = totalOrders > 0 
-    ? Math.round((pedidos.filter(p => p.estado === 'Completo').length / totalOrders) * 100) 
+  const successRate = totalOrders > 0
+    ? Math.round((pedidosCampaña.filter(p => p.estado === 'Completo').length / totalOrders) * 100)
     : 0;
 
   return (
@@ -50,7 +51,7 @@ export default function Dashboard({
       <div id="vendedor-hero" className="bg-[#1E293B] text-white rounded-2xl p-6 shadow-sm relative overflow-hidden">
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#334155] rounded-full filter blur-xl opacity-40 -mr-8 -mt-8" />
         <div className="absolute bottom-0 left-1/3 w-24 h-24 bg-[#475569] rounded-full filter blur-lg opacity-20 -ml-8 -mb-8" />
-        
+
         <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
@@ -63,7 +64,7 @@ export default function Dashboard({
               ¡Hola, {nombreVendedor}!
             </h2>
           </div>
-          
+
           {onNavigateToRegister && (
             <button
               onClick={onNavigateToRegister}
@@ -93,8 +94,8 @@ export default function Dashboard({
           {/* Main List & Progress Bars */}
           <div className="lg:col-span-8 space-y-5">
             {statusList.map((status) => {
-              const count = pedidos.filter(p => p.estado === status.key).length;
-              const totalVal = pedidos.filter(p => p.estado === status.key).reduce((sum, p) => sum + p.total, 0);
+              const count = pedidosCampaña.filter(p => p.estado === status.key).length;
+              const totalVal = pedidosCampaña.filter(p => p.estado === status.key).reduce((sum, p) => sum + p.total, 0);
               const percentage = totalOrders > 0 ? Math.round((count / totalOrders) * 100) : 0;
               const StatusIcon = status.icon;
 
@@ -113,7 +114,7 @@ export default function Dashboard({
                     </div>
                   </div>
                   <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                    <div 
+                    <div
                       className={`h-full ${status.color} transition-all duration-500 ease-out`}
                       style={{ width: `${percentage}%` }}
                     />
@@ -127,9 +128,9 @@ export default function Dashboard({
             // Calcular referencias más vendidas de todos los pedidos activos de la campaña actual (sin importar el usuario, excluyendo Cancelado)
             const listaPedidosParaTop = todosLosPedidos || pedidos;
             const pedidosActivosCampaña = listaPedidosParaTop.filter(p => p.estado !== 'Cancelado' && p.campana === activeCampana);
-            
+
             const refMap: Record<string, { ref: string; nombre: string; cantidad: number; totalVendido: number }> = {};
-            
+
             pedidosActivosCampaña.forEach(p => {
               (p.items || []).forEach(item => {
                 const ref = item.prendaRef;
@@ -161,30 +162,29 @@ export default function Dashboard({
                       <span>Top 5 Referencias Más Vendidas</span>
                     </h4>
                   </div>
-                  
+
                   {topReferences.length === 0 ? (
                     <div className="text-center py-12 text-slate-400 text-xs">
                       No hay ventas registradas aún.
                     </div>
                   ) : (
-                    <div className="space-y-3.5 max-h-[380px] overflow-y-auto pr-1">
+                    <div className="space-y-1 max-h-[380px] overflow-y-auto pr-1">
                       {topReferences.map((refData, index) => {
                         const percentage = Math.round((refData.cantidad / maxQty) * 100);
                         return (
                           <div key={refData.ref} className="relative group">
                             {/* Background Bar */}
-                            <div 
+                            <div
                               className="absolute inset-0 bg-indigo-50/20 rounded-lg -z-10 group-hover:bg-indigo-50/40 transition-colors"
                               style={{ width: `${percentage}%` }}
                             />
                             <div className="flex items-center justify-between p-2 rounded-lg text-xs">
                               <div className="flex items-center gap-2.5 min-w-0">
-                                <span className={`h-5 w-5 rounded-md flex items-center justify-center font-bold text-[10px] ${
-                                  index === 0 ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                                <span className={`h-5 w-5 rounded-md flex items-center justify-center font-bold text-[10px] ${index === 0 ? 'bg-amber-100 text-amber-800 border border-amber-200' :
                                   index === 1 ? 'bg-slate-100 text-slate-700 border border-slate-200' :
-                                  index === 2 ? 'bg-orange-100 text-orange-800 border border-orange-200' :
-                                  'bg-slate-50 text-slate-500 border border-slate-100'
-                                }`}>
+                                    index === 2 ? 'bg-orange-100 text-orange-800 border border-orange-200' :
+                                      'bg-slate-50 text-slate-500 border border-slate-100'
+                                  }`}>
                                   {index + 1}
                                 </span>
                                 <div className="min-w-0">

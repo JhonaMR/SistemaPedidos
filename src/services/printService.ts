@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Pedido, Cliente, Prenda } from '../types';
+import { getSortedTallasStr } from '../utils/sizeHelper';
 
 const formatDate = (dateStr?: string | null) => {
   if (!dateStr) return '—';
@@ -30,7 +31,7 @@ export const printOrderReceipt = async (
   const brandColor = '#f2bfbe';
   const brandTextColor = '#6b2a35';
   const logoSrc = '/logos/plow-192x192.png';
-  const sellerFull = (order.vendedorNombre || '').toUpperCase();
+  const sellerFull = (order.vendedorNombre || '').split(' ')[0].toUpperCase();
 
   const brandInfo = [
     'ARARE S.A.S.',
@@ -286,7 +287,7 @@ export const printOrderReceipt = async (
       item.description,
       String(item.cantidad),
       [
-        item.talla !== 'N/A' && item.talla ? `Talla: ${item.talla}` : '',
+        item.talla !== 'N/A' && item.talla ? `Talla: ${getSortedTallasStr(item.tallasDetalle, item.talla)}` : '',
         item.novedad || ''
       ].filter(Boolean).join(' | '),
       formatCOP(item.precioUnitario),
@@ -361,7 +362,7 @@ export const printOrderReceipt = async (
   pdf.setFontSize(7);
   pdf.setTextColor(148, 163, 184);
   pdf.text(`Hoja ${currentPage}`, PW / 2, PH - 4, { align: 'center' });
-  pdf.text(`Generado por: ${order.vendedorNombre || '—'}`, margin + 4, PH - 4);
+  pdf.text(`Generado por: ${sellerFull || '—'}`, margin + 4, PH - 4);
   pdf.text(new Date().toLocaleString('es-CO'), PW - margin - 4, PH - 4, { align: 'right' });
 
   pdf.save(`${order.numeroPedido}_${clientName.replace(/\s+/g, '_')}.pdf`);

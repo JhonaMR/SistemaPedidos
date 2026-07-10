@@ -4,7 +4,7 @@
     "nombre": "Jhon Montoya",
     "usuario": "JAM",
     "clave": "1421",
-    "rol": "general",
+    "rol": "soporte",
     "esPrimeraVez": false,
     "activo": true,
     "idVendedor": "01"
@@ -17,5 +17,45 @@
     "rol": "soporte",
     "esPrimeraVez": false,
     "activo": true
+  },
+  {
+    "id": "usr_1783687018637",
+    "nombre": "John Efrain Bolivar",
+    "usuario": "JEB",
+    "clave": "1234",
+    "rol": "general",
+    "esPrimeraVez": true,
+    "activo": true,
+    "idVendedor": "02"
+  },
+  {
+    "id": "usr_1783687063997",
+    "nombre": "Lina Pulgarin",
+    "usuario": "LMP",
+    "clave": "1234",
+    "rol": "general",
+    "esPrimeraVez": true,
+    "activo": true,
+    "idVendedor": "03"
+  },
+  {
+    "id": "usr_1783687102054",
+    "nombre": "Raul Gonzalez",
+    "usuario": "RGS",
+    "clave": "1234",
+    "rol": "general",
+    "esPrimeraVez": true,
+    "activo": true,
+    "idVendedor": "04"
+  },
+  {
+    "id": "usr_1783687118278",
+    "nombre": "Maria Mercedes",
+    "usuario": "MMB",
+    "clave": "1234",
+    "rol": "soporte",
+    "esPrimeraVez": true,
+    "activo": true,
+    "idVendedor": "05"
   }
 ]

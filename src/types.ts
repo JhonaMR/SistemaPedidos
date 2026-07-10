@@ -57,6 +57,7 @@ export interface Pedido {
   facturacionFE?: number; // e.g. 100 for 100% FE
   facturacionRM?: number; // e.g. 0 for 0% RM
   fechaCancelado?: string; // Date when order was cancelled
+  motivoCancelado?: string; // Cancellation reason
   fechaEliminacion?: string; // Date when order was moved to trash
   editado?: boolean; // True if this order was modified
   backupOf?: string; // ID of the original order this is a backup of

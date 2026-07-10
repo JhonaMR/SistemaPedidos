@@ -426,8 +426,56 @@ async function safeWriteFile(filePath, data) {
 }
 async function getAllData() {
   const clientes = await safeReadFile(DB_PATHS.clientes, "[]");
-  const pedidos = await safeReadFile(DB_PATHS.pedidos, "[]");
+  let pedidos = await safeReadFile(DB_PATHS.pedidos, "[]");
   const deletedPedidos = await safeReadFile(DB_PATHS.deletedPedidos, "[]");
+  let shouldSavePedidos = false;
+  if (Array.isArray(pedidos)) {
+    pedidos = pedidos.map((p) => {
+      if (p.idLocal !== void 0) {
+        delete p.idLocal;
+        shouldSavePedidos = true;
+      }
+      return p;
+    });
+  }
+  let hasAsyncOrders = false;
+  if (Array.isArray(pedidos)) {
+    hasAsyncOrders = pedidos.some((p) => p.numeroPedido && p.numeroPedido.startsWith("ASYNC-"));
+  }
+  if (hasAsyncOrders) {
+    shouldSavePedidos = true;
+    const maxCorrelativos = /* @__PURE__ */ new Map();
+    pedidos.forEach((p) => {
+      if (p.numeroPedido && !p.numeroPedido.startsWith("ASYNC-")) {
+        const parts = p.numeroPedido.split("-");
+        const prefijo = parts[0] || "01";
+        const corr = parseInt(parts[1], 10);
+        if (!isNaN(corr)) {
+          const maxVal = maxCorrelativos.get(prefijo) || 0;
+          if (corr > maxVal) {
+            maxCorrelativos.set(prefijo, corr);
+          }
+        }
+      }
+    });
+    pedidos = pedidos.map((p) => {
+      if (p.numeroPedido && p.numeroPedido.startsWith("ASYNC-")) {
+        const parts = p.numeroPedido.split("-");
+        const prefijoVendedor = parts[1] || "01";
+        const nextCorr = (maxCorrelativos.get(prefijoVendedor) || 0) + 1;
+        maxCorrelativos.set(prefijoVendedor, nextCorr);
+        const paddedNum = String(nextCorr).padStart(3, "0");
+        return {
+          ...p,
+          numeroPedido: `${prefijoVendedor}-${paddedNum}`
+        };
+      }
+      return p;
+    });
+  }
+  if (shouldSavePedidos) {
+    await safeWriteFile(DB_PATHS.pedidos, pedidos);
+  }
   const backups = await safeReadFile(DB_PATHS.backups, "[]");
   const vendedor = await safeReadFile(DB_PATHS.vendedor, '{"nombre": "Lina Pulgarin", "codigo": "V-102"}');
   const prendas = await safeReadFile(DB_PATHS.prendas, "[]");
@@ -514,6 +562,28 @@ router.post("/clientes", async (req, res) => {
     res.status(500).json({ error: "Error al guardar clientes", details: err.message });
   }
 });
+function getSiguienteCorrelativo(prefijoVendedor, pedidosConsolidados, maxCorrelativosPorVendedor) {
+  if (maxCorrelativosPorVendedor.has(prefijoVendedor)) {
+    const next2 = maxCorrelativosPorVendedor.get(prefijoVendedor) + 1;
+    maxCorrelativosPorVendedor.set(prefijoVendedor, next2);
+    return next2;
+  }
+  const pedidosVendedor = pedidosConsolidados.filter(
+    (p) => p.numeroPedido && p.numeroPedido.startsWith(`${prefijoVendedor}-`) && !p.numeroPedido.startsWith("ASYNC-")
+  );
+  let maxCorr = 0;
+  if (pedidosVendedor.length > 0) {
+    const correlativos = pedidosVendedor.map((p) => {
+      const parts = p.numeroPedido.split("-");
+      const corr = parseInt(parts[1], 10);
+      return isNaN(corr) ? 0 : corr;
+    });
+    maxCorr = Math.max(...correlativos);
+  }
+  const next = maxCorr + 1;
+  maxCorrelativosPorVendedor.set(prefijoVendedor, next);
+  return next;
+}
 router.post("/pedidos", async (req, res) => {
   try {
     const { pedidos } = req.body;
@@ -522,10 +592,32 @@ router.post("/pedidos", async (req, res) => {
     }
     const data = await getAllData();
     const existingMap = new Map(data.pedidos.map((p) => [p.id, p]));
+    const maxCorrelativosPorVendedor = /* @__PURE__ */ new Map();
     pedidos.forEach((p) => {
-      existingMap.set(p.id, p);
+      const isNew = !existingMap.has(p.id);
+      const pedidoParaGuardar = { ...p };
+      if (isNew) {
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith("ASYNC-")) {
+          const parts = pedidoParaGuardar.numeroPedido.split("-");
+          const prefijoVendedor = parts[1] || "01";
+          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(existingMap.values()), maxCorrelativosPorVendedor);
+          const paddedNum = String(siguienteCorr).padStart(3, "0");
+          pedidoParaGuardar.numeroPedido = `${prefijoVendedor}-${paddedNum}`;
+        }
+        existingMap.set(p.id, pedidoParaGuardar);
+      } else {
+        const existingPedido = existingMap.get(p.id);
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith("ASYNC-") && existingPedido && existingPedido.numeroPedido && !existingPedido.numeroPedido.startsWith("ASYNC-")) {
+          pedidoParaGuardar.numeroPedido = existingPedido.numeroPedido;
+        }
+        existingMap.set(p.id, { ...existingPedido, ...pedidoParaGuardar });
+      }
     });
-    const deletedIds = new Set((data.deletedPedidos || []).map((p) => p.id));
+    const activeIds = new Set(Array.from(existingMap.keys()));
+    const serverDeletedPedidos = data.deletedPedidos || [];
+    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIds.has(p.id));
+    await saveDeletedPedidos(finalDeleted);
+    const deletedIds = new Set(finalDeleted.map((p) => p.id));
     const merged = Array.from(existingMap.values()).filter((p) => !deletedIds.has(p.id));
     await savePedidos(merged);
     res.json({ success: true, count: merged.length });
@@ -535,21 +627,33 @@ router.post("/pedidos", async (req, res) => {
 });
 router.post("/deleted-pedidos", async (req, res) => {
   try {
-    const { deletedPedidos } = req.body;
+    const { deletedPedidos, user } = req.body;
     if (!Array.isArray(deletedPedidos)) {
       return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de pedidos eliminados." });
     }
     const data = await getAllData();
-    const existingMap = new Map(data.deletedPedidos.map((p) => [p.id, p]));
-    deletedPedidos.forEach((p) => {
-      existingMap.set(p.id, p);
-    });
-    const merged = Array.from(existingMap.values());
-    await saveDeletedPedidos(merged);
-    const deletedIds = new Set(merged.map((p) => p.id));
+    let serverDeletedPedidos = data.deletedPedidos || [];
+    if (user) {
+      if (user.rol === "soporte") {
+        serverDeletedPedidos = deletedPedidos;
+      } else {
+        const otherSellersDeleted = serverDeletedPedidos.filter((p) => p.vendedorNombre !== user.nombre);
+        serverDeletedPedidos = [...otherSellersDeleted, ...deletedPedidos];
+      }
+    } else {
+      const existingMap = new Map(serverDeletedPedidos.map((p) => [p.id, p]));
+      deletedPedidos.forEach((p) => {
+        existingMap.set(p.id, p);
+      });
+      serverDeletedPedidos = Array.from(existingMap.values());
+    }
+    const activeIds = new Set((data.pedidos || []).map((p) => p.id));
+    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIds.has(p.id));
+    await saveDeletedPedidos(finalDeleted);
+    const deletedIds = new Set(finalDeleted.map((p) => p.id));
     const activePedidos = data.pedidos.filter((p) => !deletedIds.has(p.id));
     await savePedidos(activePedidos);
-    res.json({ success: true, count: merged.length });
+    res.json({ success: true, count: finalDeleted.length });
   } catch (err) {
     res.status(500).json({ error: "Error al guardar pedidos eliminados", details: err.message });
   }
@@ -646,7 +750,7 @@ router.post("/campanas-referencias", async (req, res) => {
 });
 router.post("/pedidos/sync-batch", async (req, res) => {
   try {
-    const { pedidos, clientes } = req.body;
+    const { pedidos, clientes, deletedPedidos, user } = req.body;
     if (!Array.isArray(pedidos) || !Array.isArray(clientes)) {
       return res.status(400).json({ error: "Formato incorrecto. Se requieren arrays de pedidos y clientes." });
     }
@@ -668,43 +772,41 @@ router.post("/pedidos/sync-batch", async (req, res) => {
     const pedidosMap = new Map(pedidosActuales.map((p) => [p.id, p]));
     const nuevosPedidosIds = [];
     const maxCorrelativosPorVendedor = /* @__PURE__ */ new Map();
-    const getSiguienteCorrelativo = (prefijoVendedor, pedidosConsolidados) => {
-      if (maxCorrelativosPorVendedor.has(prefijoVendedor)) {
-        const next2 = maxCorrelativosPorVendedor.get(prefijoVendedor) + 1;
-        maxCorrelativosPorVendedor.set(prefijoVendedor, next2);
-        return next2;
-      }
-      const pedidosVendedor = pedidosConsolidados.filter(
-        (p) => p.numeroPedido && p.numeroPedido.startsWith(`${prefijoVendedor}-`) && !p.numeroPedido.startsWith("ASYNC-")
-      );
-      let maxCorr = 0;
-      if (pedidosVendedor.length > 0) {
-        const correlativos = pedidosVendedor.map((p) => {
-          const parts = p.numeroPedido.split("-");
-          const corr = parseInt(parts[1], 10);
-          return isNaN(corr) ? 0 : corr;
-        });
-        maxCorr = Math.max(...correlativos);
-      }
-      const next = maxCorr + 1;
-      maxCorrelativosPorVendedor.set(prefijoVendedor, next);
-      return next;
-    };
     pedidos.forEach((p) => {
-      if (!pedidosMap.has(p.id)) {
-        const pedidoParaGuardar = { ...p };
+      const isNew = !pedidosMap.has(p.id);
+      const pedidoParaGuardar = { ...p };
+      if (isNew) {
         if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith("ASYNC-")) {
           const parts = pedidoParaGuardar.numeroPedido.split("-");
           const prefijoVendedor = parts[1] || "01";
-          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(pedidosMap.values()));
+          const siguienteCorr = getSiguienteCorrelativo(prefijoVendedor, Array.from(pedidosMap.values()), maxCorrelativosPorVendedor);
           const paddedNum = String(siguienteCorr).padStart(3, "0");
           pedidoParaGuardar.numeroPedido = `${prefijoVendedor}-${paddedNum}`;
         }
         pedidosMap.set(p.id, pedidoParaGuardar);
         nuevosPedidosIds.push(p.id);
+      } else {
+        const existingPedido = pedidosMap.get(p.id);
+        if (pedidoParaGuardar.numeroPedido && pedidoParaGuardar.numeroPedido.startsWith("ASYNC-") && existingPedido && existingPedido.numeroPedido && !existingPedido.numeroPedido.startsWith("ASYNC-")) {
+          pedidoParaGuardar.numeroPedido = existingPedido.numeroPedido;
+        }
+        pedidosMap.set(p.id, { ...existingPedido, ...pedidoParaGuardar });
+        nuevosPedidosIds.push(p.id);
       }
     });
-    const deletedIds = new Set((data.deletedPedidos || []).map((p) => p.id));
+    let serverDeletedPedidos = data.deletedPedidos || [];
+    if (Array.isArray(deletedPedidos) && user) {
+      if (user.rol === "soporte") {
+        serverDeletedPedidos = deletedPedidos;
+      } else {
+        const otherSellersDeleted = serverDeletedPedidos.filter((p) => p.vendedorNombre !== user.nombre);
+        serverDeletedPedidos = [...otherSellersDeleted, ...deletedPedidos];
+      }
+    }
+    const activeIds = new Set(Array.from(pedidosMap.keys()));
+    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIds.has(p.id));
+    await saveDeletedPedidos(finalDeleted);
+    const deletedIds = new Set(finalDeleted.map((p) => p.id));
     const mergedPedidos = Array.from(pedidosMap.values()).filter((p) => !deletedIds.has(p.id));
     await savePedidos(mergedPedidos);
     const freshData = await getAllData();

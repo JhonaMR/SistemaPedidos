@@ -1,1 +1,114 @@
-[]
+[
+  {
+    "clienteId": "cli_292",
+    "clienteNombre": "CLASIC AM S.A.S.",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Usuario Soporte",
+    "items": [
+      {
+        "id": "cart_1783686342940_7swn",
+        "prendaRef": "12865",
+        "nombrePrenda": "TOP CARGADERA GRUESA BOTONES",
+        "categoria": "Dama",
+        "talla": "S-5, M-5, L-5",
+        "tallasDetalle": {
+          "S": 5,
+          "M": 5,
+          "L": 5
+        },
+        "cantidad": 15,
+        "precioUnitario": 16900,
+        "total": 253500
+      },
+      {
+        "id": "cart_1783686377117_5d94",
+        "prendaRef": "13109",
+        "nombrePrenda": "BLUSA PLUSS MANGA SISA RAYAS",
+        "categoria": "Dama",
+        "talla": "S-6, M-10",
+        "tallasDetalle": {
+          "S": 6,
+          "M": 10
+        },
+        "cantidad": 16,
+        "precioUnitario": 29900,
+        "total": 478400
+      },
+      {
+        "id": "cart_1783686398197_im1x",
+        "prendaRef": "13012",
+        "nombrePrenda": "BLUS CUELL NERU PLUSS",
+        "categoria": "Dama",
+        "talla": "S-4",
+        "tallasDetalle": {
+          "S": 4
+        },
+        "cantidad": 4,
+        "precioUnitario": 39900,
+        "total": 159600
+      },
+      {
+        "id": "cart_1783686414587_sjhg",
+        "prendaRef": "13175",
+        "nombrePrenda": "BODY MAYATEX FRANJA ANAGAELITA",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "novedad": "Blanco",
+        "cantidad": 24,
+        "precioUnitario": 24900,
+        "total": 597600
+      },
+      {
+        "id": "cart_1783686426300_4u7y",
+        "prendaRef": "13263",
+        "nombrePrenda": "CAMISETA CORTE LATERAL",
+        "categoria": "Dama",
+        "talla": "L-7, M-10",
+        "tallasDetalle": {
+          "L": 7,
+          "M": 10
+        },
+        "cantidad": 17,
+        "precioUnitario": 23900,
+        "total": 406300
+      },
+      {
+        "id": "cart_1783686443686_ygy2",
+        "prendaRef": "13279",
+        "nombrePrenda": "CAMISETA FONDEO DE BOLAS",
+        "categoria": "Dama",
+        "talla": "S-4, M-6, L-6",
+        "tallasDetalle": {
+          "S": 4,
+          "M": 6,
+          "L": 6
+        },
+        "novedad": "Sin aplique",
+        "cantidad": 16,
+        "precioUnitario": 24900,
+        "total": 398400
+      }
+    ],
+    "subtotal": 2293800,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 2293800,
+    "estado": "Procesado",
+    "notas": "Mandar por terminal",
+    "fechaEntregaEstimada": "2026-07-10",
+    "fechaLimiteDespacho": "2026-07-31",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783686467403",
+    "numeroPedido": "SOP-005",
+    "fecha": "2026-07-10",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 1,
+    "backupOf": "ped_1783686467403",
+    "backupFecha": "10/7/2026, 9:56:56 a. m.",
+    "esBackup": true
+  }
+]

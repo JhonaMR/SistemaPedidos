@@ -18,6 +18,7 @@ import {
   Edit3
 } from 'lucide-react';
 import { ViewFotoModal } from './ViewFotoModal';
+import { getSortedTallasStr } from '../utils/sizeHelper';
 
 interface OrderFormProps {
   clientes: Cliente[];
@@ -238,9 +239,7 @@ export default function OrderForm({
       });
 
       const totalQty = Object.values(mergedTallasDetalle).reduce((sum, q) => sum + q, 0);
-      const formattedTallaStr = Object.entries(mergedTallasDetalle)
-        .map(([t, q]) => t === 'N/A' ? 'N/A' : `${t}-${q}`)
-        .join(', ');
+      const formattedTallaStr = getSortedTallasStr(mergedTallasDetalle);
 
       const updated = [...cart];
       updated[existingIndex] = {
@@ -254,9 +253,7 @@ export default function OrderForm({
     } else {
       // Add a new row
       const totalQty = activeTallas.reduce((sum, [_, q]) => sum + q, 0);
-      const formattedTallaStr = activeTallas
-        .map(([t, q]) => t === 'N/A' ? 'N/A' : `${t}-${q}`)
-        .join(', ');
+      const formattedTallaStr = getSortedTallasStr(newTallasDetalle);
 
       const newItem: ItemPedido = {
         id: `cart_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
@@ -308,9 +305,7 @@ export default function OrderForm({
     const noveltyText = noveltyTrim ? noveltyTrim : undefined;
 
     const totalQty = activeTallas.reduce((sum, [_, q]) => sum + q, 0);
-    const formattedTallaStr = activeTallas
-      .map(([t, q]) => t === 'N/A' ? 'N/A' : `${t}-${q}`)
-      .join(', ');
+    const formattedTallaStr = getSortedTallasStr(editTallasCantidades as Record<string, number>);
 
     const updatedCart = cart.map(item => {
       if (item.id === editingCartItem.id) {
