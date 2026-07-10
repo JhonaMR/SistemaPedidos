@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { Shirt, Lock, User, AlertCircle, KeyRound, ShieldAlert } from 'lucide-react';
+import { Lock, User, AlertCircle, KeyRound, ShieldAlert } from 'lucide-react';
 import { UsuarioApp } from '../types';
 import { apiLogin } from '../services/apiService';
 
@@ -146,7 +146,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
     });
 
     onUpdateUsuarios(updatedUsers);
-    
+
     // Log in the user
     const updatedLoggedInUser = {
       ...tempUser,
@@ -240,10 +240,10 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
       <div className="max-w-md w-full bg-white border border-[#E2E8F0] rounded-2xl p-8 shadow-md space-y-6 relative overflow-hidden">
         {/* Background accent */}
         <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-600" />
-        
+
         <div className="text-center space-y-2">
-          <div className="inline-flex p-3.5 bg-indigo-50 text-indigo-600 rounded-2xl mx-auto">
-            <Shirt className="h-7 w-7" />
+          <div className="inline-flex p-1 bg-white rounded-2xl mx-auto">
+            <img src="/logos/plow-192x192.png" className="h-14 w-14 object-contain" alt="Plow Logo" />
           </div>
           <h2 className="text-2xl font-black text-slate-900 tracking-tight">ARARE S.A.S</h2>
           <p className="text-xs text-slate-500 font-medium">Ingresa a tu cuenta</p>
@@ -299,7 +299,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
 
         <div className="pt-2 text-center">
           <p className="text-[10px] text-slate-400">
-            ARARE S.A.S. • Toma de pedidos.
+            ARARE S.A.S. • Toma de pedidos 1.0.2 • Crado por Yersi. 2026.
           </p>
         </div>
       </div>
