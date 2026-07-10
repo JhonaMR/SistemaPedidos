@@ -45,6 +45,11 @@ import OrderHistory from './components/OrderHistory';
 import ClientSection from './components/ClientSection';
 import Login from './components/Login';
 import ReferenciasCatalog from './components/ReferenciasCatalog';
+import CampanaSelectModal from './components/modals/CampanaSelectModal';
+import EditUserModal from './components/modals/EditUserModal';
+import CampanaRefsConfigModal from './components/modals/CampanaRefsConfigModal';
+import ExcelTemplatesModal from './components/modals/ExcelTemplatesModal';
+import NewCampanaModal from './components/modals/NewCampanaModal';
 
 export function parseCampana(nombreCompleto: string): Campana {
   const match = nombreCompleto.match(/\d{4}/);
@@ -110,16 +115,9 @@ export default function App() {
   const [showEditUserModal, setShowEditUserModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [clientToEditOnRedirect, setClientToEditOnRedirect] = useState<Cliente | null>(null);
-  const [selectedUserToEdit, setSelectedUserToEdit] = useState<UsuarioApp | null>(null);
-  const [editUserRol, setEditUserRol] = useState<'general' | 'soporte'>('general');
-  const [editUserResetStatus, setEditUserResetStatus] = useState(false);
   const [selectedCampanaConfig, setSelectedCampanaConfig] = useState<string | null>(null);
-  const [campanaRefSearch, setCampanaRefSearch] = useState('');
   const [selectedCampanaYear, setSelectedCampanaYear] = useState<string>('Todas');
   const [showNewCampanaModal, setShowNewCampanaModal] = useState(false);
-  const [newCampanaName, setNewCampanaName] = useState('');
-  const [newCampanaYear, setNewCampanaYear] = useState('');
-  const [newCampanaNumber, setNewCampanaNumber] = useState('');
   const [selectedHeaderYear, setSelectedHeaderYear] = useState<number>(() => {
     const savedActive = localStorage.getItem('prenda_campana');
     if (savedActive) {
@@ -158,9 +156,12 @@ export default function App() {
   const [mappingCampaign, setMappingCampaign] = useState('');
   const [showTemplateModal, setShowTemplateModal] = useState(false);
 
-  const handleLogin = (user: UsuarioApp) => {
+  const handleLogin = (user: UsuarioApp, token?: string) => {
     setCurrentUser(user);
     localStorage.setItem('prenda_current_user', JSON.stringify(user));
+    if (token) {
+      localStorage.setItem('prenda_jwt_token', token);
+    }
 
     const updatedVendedor = {
       ...vendedor,
@@ -197,6 +198,7 @@ export default function App() {
     setCurrentUser(null);
     localStorage.removeItem('prenda_is_logged_in');
     localStorage.removeItem('prenda_current_user');
+    localStorage.removeItem('prenda_jwt_token');
     setActiveTab('dashboard');
   };
 
@@ -313,23 +315,8 @@ export default function App() {
     }
   };
 
-  const handleCreateCampana = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!newCampanaName.trim() || !newCampanaYear.trim() || !newCampanaNumber.trim()) {
-      alert("Por favor rellene todos los campos.");
-      return;
-    }
-
-    const cleanName = newCampanaName.trim();
-    const yearVal = parseInt(newCampanaYear, 10);
-    const numVal = parseInt(newCampanaNumber, 10);
-
-    if (isNaN(yearVal) || isNaN(numVal)) {
-      alert("Año y Número de orden deben ser valores numéricos.");
-      return;
-    }
-
-    const fullName = `${cleanName} ${yearVal}`;
+  const handleCreateCampana = async (nombre: string, anio: number, numero: number) => {
+    const fullName = `${nombre} ${anio}`;
 
     // Verify if name already exists in campaign list
     const exists = campanasDisponibles.some(
@@ -342,9 +329,9 @@ export default function App() {
     }
 
     const newCampanaObj: Campana = {
-      nombre: cleanName,
-      anio: yearVal,
-      numero: numVal
+      nombre,
+      anio,
+      numero
     };
 
     const updatedCampanas = [...campanasDisponibles, newCampanaObj];
@@ -375,10 +362,6 @@ export default function App() {
       updatedRefs
     );
 
-    // Reset fields and close modal
-    setNewCampanaName('');
-    setNewCampanaYear('');
-    setNewCampanaNumber('');
     setShowNewCampanaModal(false);
     alert(`Campaña "${fullName}" creada con éxito.`);
   };
@@ -489,6 +472,9 @@ export default function App() {
       setSyncStatus('synced');
     } catch (err: any) {
       console.error("Error al descargar datos de inicialización:", err);
+      if (err.message.includes('iniciar sesión') || err.message.includes('401') || err.message.includes('unauthorized')) {
+        handleLogout();
+      }
       setSyncStatus('local');
       setErrorMessage("Trabajando en modo local desconectado.");
     }
@@ -508,17 +494,26 @@ export default function App() {
       const allClients = await db.clientes.toArray();
       const pendingClients = allClients.filter(c => c.id.startsWith('cli_off_'));
 
+      const token = localStorage.getItem('prenda_jwt_token');
       // Llamar al endpoint del backend
       const response = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/pedidos/sync-batch`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({
           pedidos: pendingOrders,
           clientes: pendingClients,
-          deletedPedidos: deletedPedidos,
-          user: currentUser ? { rol: currentUser.rol, nombre: currentUser.nombre } : undefined
+          deletedPedidos: deletedPedidos
         })
       });
+
+      if (response.status === 401) {
+        alert("La sesión ha expirado o es inválida. Por favor inicia sesión nuevamente.");
+        handleLogout();
+        return;
+      }
 
       if (!response.ok) {
         throw new Error('Error al sincronizar con el servidor');
@@ -797,6 +792,12 @@ export default function App() {
       syncWithServer(clientes, pedidos, null, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, copy);
       return copy;
     });
+  };
+
+  const handleUpdateCampanaReferencias = (updated: Record<string, string[]>) => {
+    setCampanasReferencias(updated);
+    localStorage.setItem('prenda_campanas_referencias', JSON.stringify(updated));
+    syncWithServer(clientes, pedidos, null, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, updated);
   };
 
   const handleImportPrendasExcel = (file: File, selectedCampanaImport: string) => {
@@ -1226,328 +1227,36 @@ export default function App() {
   return (
     <div id="app-root-layout" className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans antialiased relative">
       {/* Campaign Selector Modal overlay */}
-      {showCampanaModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-6 relative overflow-hidden text-left">
-            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600" />
-
-            <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                <Package className="h-5 w-5 text-indigo-600" />
-                <span>Seleccionar Campaña Activa</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                Selecciona la campaña comercial en la que registrarás los próximos pedidos de prendas de vestir.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              {[...campanasDisponibles].sort((a, b) => a.numero - b.numero).map((campana) => {
-                const fullName = `${campana.nombre} ${campana.anio}`;
-                const isSelected = activeCampana === fullName;
-                return (
-                  <button
-                    key={fullName}
-                    type="button"
-                    onClick={() => {
-                      setActiveCampana(fullName);
-                      localStorage.setItem('prenda_campana', fullName);
-                    }}
-                    className={`w-full p-3.5 text-left rounded-xl text-xs font-bold transition-all border flex items-center justify-between ${isSelected
-                        ? 'bg-indigo-50 border-indigo-500 text-indigo-900 ring-1 ring-indigo-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
-                      }`}
-                  >
-                    <span>{fullName}</span>
-                    {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-indigo-600" />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowCampanaModal(false)}
-              className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all text-center"
-            >
-              Confirmar Campaña y Entrar
-            </button>
-          </div>
-        </div>
-      )}
+      <CampanaSelectModal
+        isOpen={showCampanaModal}
+        campanasDisponibles={campanasDisponibles}
+        activeCampana={activeCampana}
+        onSelectCampana={(fullName) => {
+          setActiveCampana(fullName);
+          localStorage.setItem('prenda_campana', fullName);
+        }}
+        onConfirm={() => setShowCampanaModal(false)}
+      />
 
       {/* Edit User Modal overlay */}
-      {showEditUserModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-md w-full p-6 shadow-xl space-y-6 relative overflow-hidden text-left">
-            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600" />
-
-            <div className="space-y-1">
-              <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                <UserCog className="h-5 w-5 text-indigo-600" />
-                <span>Modificar Usuario</span>
-              </h3>
-              <p className="text-xs text-slate-500">
-                Selecciona un usuario para cambiar su rol o restablecer su estado a Pendiente de Primer Ingreso.
-              </p>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!selectedUserToEdit) {
-                  alert('Por favor selecciona un usuario.');
-                  return;
-                }
-
-                const updatedList = usuarios.map(u => {
-                  if (u.id === selectedUserToEdit.id) {
-                    const updated = {
-                      ...u,
-                      rol: editUserRol,
-                    };
-                    if (editUserResetStatus) {
-                      updated.esPrimeraVez = true;
-                      updated.clave = '1234';
-                    }
-                    return updated;
-                  }
-                  return u;
-                });
-
-                handleUpdateUsuarios(updatedList);
-                alert(`Usuario ${selectedUserToEdit.usuario} modificado con éxito.`);
-                setShowEditUserModal(false);
-              }}
-              className="space-y-4"
-            >
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Seleccionar Usuario</label>
-                <select
-                  value={selectedUserToEdit?.id || ''}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    const found = usuarios.find(u => u.id === val);
-                    setSelectedUserToEdit(found || null);
-                    if (found) {
-                      setEditUserRol(found.rol);
-                    }
-                  }}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                  required
-                >
-                  <option value="" disabled>-- Selecciona un usuario --</option>
-                  {usuarios.filter(u => u.id !== currentUser?.id).map(u => (
-                    <option key={u.id} value={u.id}>
-                      {u.nombre} ({u.usuario}) - Rol: {u.rol}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {selectedUserToEdit && (
-                <>
-                  <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Rol</label>
-                    <select
-                      value={editUserRol}
-                      onChange={(e) => setEditUserRol(e.target.value as 'general' | 'soporte')}
-                      className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs"
-                    >
-                      <option value="general">General (Vendedor)</option>
-                      <option value="soporte">Soporte (Administrador)</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-start gap-2 bg-amber-50/50 border border-amber-100 rounded-lg p-3 text-xs">
-                    <input
-                      type="checkbox"
-                      id="reset-status-checkbox"
-                      checked={editUserResetStatus}
-                      onChange={(e) => setEditUserResetStatus(e.target.checked)}
-                      className="mt-0.5"
-                    />
-                    <label htmlFor="reset-status-checkbox" className="text-slate-700 leading-normal cursor-pointer select-none">
-                      <span className="font-bold text-slate-800">Devolver a Pendiente Primer Ingreso</span>
-                      <p className="text-[10px] text-slate-500 mt-0.5">
-                        Si se activa, el usuario volverá a tener la clave inicial <strong>1234</strong> y se le obligará a cambiar su clave al ingresar la próxima vez.
-                      </p>
-                    </label>
-                  </div>
-                </>
-              )}
-
-              <div className="flex items-center gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowEditUserModal(false)}
-                  className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase rounded-lg transition-colors border border-slate-200"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={!selectedUserToEdit}
-                  className={`w-1/2 py-2.5 text-white text-xs font-bold uppercase rounded-lg shadow-sm transition-colors ${selectedUserToEdit
-                      ? 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer'
-                      : 'bg-slate-300 cursor-not-allowed'
-                    }`}
-                >
-                  Guardar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <EditUserModal
+        isOpen={showEditUserModal}
+        usuarios={usuarios}
+        currentUser={currentUser}
+        onUpdateUsuarios={handleUpdateUsuarios}
+        onClose={() => setShowEditUserModal(false)}
+      />
 
       {/* Campaign References configuration modal */}
-      {selectedCampanaConfig && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-[#E2E8F0] rounded-2xl max-w-2xl w-full p-6 shadow-xl space-y-4 relative flex flex-col max-h-[90vh] text-left">
-            <div className="absolute top-0 left-0 w-full h-1 bg-indigo-600" />
-
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 shrink-0">
-              <div>
-                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                  <Package className="h-5 w-5 text-indigo-600" />
-                  <span>Referencias - {selectedCampanaConfig}</span>
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">
-                  Selecciona qué prendas están cargadas como activas para la toma de pedidos en esta campaña.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedCampanaConfig(null)}
-                className="text-slate-400 hover:text-slate-600 font-bold text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Quick action buttons & search */}
-            <div className="flex flex-col sm:flex-row gap-2.5 items-center shrink-0">
-              <input
-                type="text"
-                placeholder="Buscar por referencia o nombre..."
-                value={campanaRefSearch}
-                onChange={(e) => setCampanaRefSearch(e.target.value)}
-                className="w-full sm:flex-1 p-2 bg-[#FAFBFD] border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none"
-              />
-              {currentUser?.rol === 'soporte' && (
-                <div className="flex gap-2 w-full sm:w-auto shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = { ...campanasReferencias };
-                      updated[selectedCampanaConfig] = catalogGarments.map(p => p.ref);
-                      setCampanasReferencias(updated);
-                      syncWithServer(clientes, pedidos, null, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, updated);
-                    }}
-                    className="flex-1 sm:flex-initial px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-extrabold uppercase rounded-lg text-center"
-                  >
-                    Habilitar Todas
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = { ...campanasReferencias };
-                      updated[selectedCampanaConfig] = [];
-                      setCampanasReferencias(updated);
-                      syncWithServer(clientes, pedidos, null, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, updated);
-                    }}
-                    className="flex-1 sm:flex-initial px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-extrabold uppercase rounded-lg text-center"
-                  >
-                    Deshabilitar Todas
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* References Table Scroll Container */}
-            <div className="overflow-y-auto flex-1 border border-slate-100 rounded-xl divide-y divide-slate-50">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="bg-slate-50/70 border-b border-slate-100 text-[9px] uppercase tracking-wider text-slate-400 font-extrabold sticky top-0">
-                    <th className="p-3">Referencia y Nombre</th>
-                    <th className="p-3 text-right">Precio de lista</th>
-                    <th className="p-3 text-center w-28">Estado</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {catalogGarments.filter(p => {
-                    const query = campanaRefSearch.trim().toLowerCase();
-                    if (!query) return true;
-                    return p.ref.toLowerCase().includes(query) || p.nombre.toLowerCase().includes(query);
-                  }).map((prenda) => {
-                    const isEnabled = (campanasReferencias[selectedCampanaConfig] || []).includes(prenda.ref);
-
-                    const handleToggle = () => {
-                      if (currentUser?.rol !== 'soporte') return;
-                      const updated = { ...campanasReferencias };
-                      const currentRefs = updated[selectedCampanaConfig] || [];
-                      if (isEnabled) {
-                        updated[selectedCampanaConfig] = currentRefs.filter(ref => ref !== prenda.ref);
-                      } else {
-                        updated[selectedCampanaConfig] = [...currentRefs, prenda.ref];
-                      }
-                      setCampanasReferencias(updated);
-                      syncWithServer(clientes, pedidos, null, deletedPedidos, pedidoBackups, usuarios, campanasDisponibles, updated);
-                    };
-
-                    const isSoporte = currentUser?.rol === 'soporte';
-
-                    return (
-                      <tr key={prenda.ref} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="p-3 font-semibold text-slate-800">
-                          <span className="font-mono bg-slate-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-slate-600 mr-2">
-                            {prenda.ref}
-                          </span>
-                          <span>{prenda.nombre}</span>
-                          <span className="block text-[9px] text-slate-400 font-normal mt-0.5">{Array.isArray(prenda.categoria) ? prenda.categoria.join(' / ') : prenda.categoria}</span>
-                        </td>
-                        <td className="p-3 text-right font-bold text-indigo-600">
-                          {new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(prenda.precioBase)}
-                        </td>
-                        <td className="p-3 text-center">
-                          <button
-                            type="button"
-                            onClick={handleToggle}
-                            disabled={!isSoporte}
-                            className={`px-3 py-1.5 rounded-lg text-[9px] font-extrabold uppercase tracking-wider transition-all border ${!isSoporte
-                                ? isEnabled
-                                  ? 'bg-emerald-50/60 border-emerald-200 text-emerald-600 cursor-not-allowed'
-                                  : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'
-                                : isEnabled
-                                  ? 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
-                                  : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100'
-                              }`}
-                          >
-                            {isEnabled ? 'Habilitada' : 'Desactivada'}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="pt-3 border-t border-slate-100 flex justify-end shrink-0">
-              <button
-                type="button"
-                onClick={() => setSelectedCampanaConfig(null)}
-                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all"
-              >
-                Aceptar y Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CampanaRefsConfigModal
+        isOpen={!!selectedCampanaConfig}
+        campanaNombre={selectedCampanaConfig || ''}
+        campanasReferencias={campanasReferencias}
+        catalogGarments={catalogGarments}
+        currentUser={currentUser}
+        onUpdateReferencias={handleUpdateCampanaReferencias}
+        onClose={() => setSelectedCampanaConfig(null)}
+      />
 
       {/* Top Header Design Line */}
       <div className="h-1 bg-indigo-600 w-full" />
@@ -2125,12 +1834,7 @@ export default function App() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => {
-                        setShowEditUserModal(true);
-                        setSelectedUserToEdit(null);
-                        setEditUserRol('general');
-                        setEditUserResetStatus(false);
-                      }}
+                      onClick={() => setShowEditUserModal(true)}
                       className="flex items-center gap-1.5 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold uppercase rounded-lg transition-colors border border-indigo-200 cursor-pointer shadow-3xs shrink-0 self-start sm:self-auto"
                     >
                       <UserCog className="h-4 w-4" />
@@ -2309,14 +2013,7 @@ export default function App() {
 
                     <button
                       type="button"
-                      onClick={() => {
-                        setNewCampanaName('');
-                        setNewCampanaYear(String(new Date().getFullYear()));
-                        // Auto calculate next number
-                        const maxNum = campanasDisponibles.reduce((max, c) => Math.max(max, c.numero || 0), 0);
-                        setNewCampanaNumber(String(maxNum + 1));
-                        setShowNewCampanaModal(true);
-                      }}
+                      onClick={() => setShowNewCampanaModal(true)}
                       className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-3xs"
                     >
                       <span>Crear Campaña</span>
@@ -2359,10 +2056,7 @@ export default function App() {
 
                         <button
                           type="button"
-                          onClick={() => {
-                            setSelectedCampanaConfig(fullName);
-                            setCampanaRefSearch('');
-                          }}
+                          onClick={() => setSelectedCampanaConfig(fullName)}
                           className="w-full py-2 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-[10px] uppercase tracking-wider rounded-lg shadow-xs transition-all text-center"
                         >
                           Gestionar Referencias
@@ -2385,178 +2079,18 @@ export default function App() {
       </div>
 
       {/* Plantillas de Ejemplo Modal */}
-      {showTemplateModal && (
-        <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4"
-          onClick={() => setShowTemplateModal(false)}
-        >
-          <div
-            className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in duration-150 text-left"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900 leading-snug flex items-center gap-2">
-                  <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
-                  <span>Plantillas de Excel para Carga</span>
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Descarga ejemplos oficiales de archivos para importar al taller.</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowTemplateModal(false)}
-                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-2.5">
-              <a
-                href="/plantillas/plantilla_referencias.xlsx"
-                download="plantilla_referencias.xlsx"
-                className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 rounded-xl transition-all group text-left"
-              >
-                <div className="text-xs">
-                  <span className="font-bold text-slate-800 block group-hover:text-indigo-700 transition-colors">Plantilla de Referencias</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Para importar catálogo general de prendas.</span>
-                </div>
-                <Download className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-              </a>
-
-              <a
-                href="/plantillas/plantilla_clientes.xlsx"
-                download="plantilla_clientes.xlsx"
-                className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 rounded-xl transition-all group text-left"
-              >
-                <div className="text-xs">
-                  <span className="font-bold text-slate-800 block group-hover:text-indigo-700 transition-colors">Plantilla de Clientes</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Para cargar datos básicos de clientes y plazos.</span>
-                </div>
-                <Download className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-              </a>
-
-              <a
-                href="/plantillas/plantilla_campana_mapeo.xlsx"
-                download="plantilla_campana_mapeo.xlsx"
-                className="flex items-center justify-between p-3.5 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 rounded-xl transition-all group text-left"
-              >
-                <div className="text-xs">
-                  <span className="font-bold text-slate-800 block group-hover:text-indigo-700 transition-colors">Plantilla de Mapeo de Campaña</span>
-                  <span className="text-[10px] text-slate-400 block mt-0.5">Para asociar referencias existentes a una campaña.</span>
-                </div>
-                <Download className="h-4 w-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-              </a>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowTemplateModal(false)}
-              className="w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      )}
+      <ExcelTemplatesModal
+        isOpen={showTemplateModal}
+        onClose={() => setShowTemplateModal(false)}
+      />
 
       {/* Crear Nueva Campaña Modal */}
-      {showNewCampanaModal && (
-        <div
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4"
-          onClick={() => setShowNewCampanaModal(false)}
-        >
-          <form
-            onSubmit={handleCreateCampana}
-            className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-4 animate-in fade-in zoom-in duration-150 text-left"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900 leading-snug flex items-center gap-2">
-                  <Package className="h-5 w-5 text-indigo-600" />
-                  <span>Crear Nueva Campaña</span>
-                </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">Registre una nueva campaña comercial.</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowNewCampanaModal(false)}
-                className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="space-y-3.5">
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Nombre de la Campaña *</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Ej. Vacaciones, Madres, Inicio de año"
-                  value={newCampanaName}
-                  onChange={(e) => setNewCampanaName(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Año *</label>
-                  <input
-                    type="number"
-                    required
-                    min={2026}
-                    max={2035}
-                    placeholder="Ej. 2026"
-                    value={newCampanaYear}
-                    onChange={(e) => {
-                      const yr = e.target.value;
-                      setNewCampanaYear(yr);
-                      if (yr.trim() !== '') {
-                        // When year changes, auto calculate next order number
-                        const maxNum = campanasDisponibles.reduce((max, c) => Math.max(max, c.numero || 0), 0);
-                        setNewCampanaNumber(String(maxNum + 1));
-                      }
-                    }}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Número de Orden *</label>
-                  <input
-                    type="number"
-                    required
-                    min={1}
-                    placeholder="Ej. 5"
-                    value={newCampanaNumber}
-                    onChange={(e) => setNewCampanaNumber(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-3 border-t border-slate-100 flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setShowNewCampanaModal(false)}
-                className="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center"
-              >
-                Cancelar
-              </button>
-              <button
-                type="submit"
-                className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-sm transition-colors text-center"
-              >
-                Crear Campaña
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <NewCampanaModal
+        isOpen={showNewCampanaModal}
+        campanasDisponibles={campanasDisponibles}
+        onCreateCampana={handleCreateCampana}
+        onClose={() => setShowNewCampanaModal(false)}
+      />
     </div>
   );
 }

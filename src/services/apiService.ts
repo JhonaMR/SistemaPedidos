@@ -1,7 +1,5 @@
 import { Cliente, Pedido, Prenda, UsuarioApp, Campana } from '../types';
 
-// URL base de la API dinámica. Si está definida en las variables de entorno, la usa.
-// Si no, usa ruta relativa por defecto (ideal para localhost).
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export interface ServerData {
@@ -19,8 +17,37 @@ export interface ServerData {
   campanasReferencias: Record<string, string[]>;
 }
 
+export interface LoginResponse {
+  success: boolean;
+  token: string;
+  user: UsuarioApp;
+}
+
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem('prenda_jwt_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+  };
+}
+
+export async function apiLogin(usuario: string, clave: string): Promise<LoginResponse> {
+  const response = await fetch(`${API_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usuario, clave }),
+  });
+  if (!response.ok) {
+    const errBody = await response.json().catch(() => ({}));
+    throw new Error(errBody.error || 'Error al iniciar sesión.');
+  }
+  return response.json();
+}
+
 export async function fetchServerData(): Promise<ServerData> {
-  const response = await fetch(`${API_BASE}/api/data`);
+  const response = await fetch(`${API_BASE}/api/data`, {
+    headers: getAuthHeaders()
+  });
   if (!response.ok) {
     throw new Error('Error al obtener datos del servidor local.');
   }
@@ -30,7 +57,7 @@ export async function fetchServerData(): Promise<ServerData> {
 export async function apiSaveClientes(clientes: Cliente[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/clientes`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ clientes }),
   });
   return response.ok;
@@ -39,7 +66,7 @@ export async function apiSaveClientes(clientes: Cliente[]): Promise<boolean> {
 export async function apiSavePedidos(pedidos: Pedido[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/pedidos`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ pedidos }),
   });
   return response.ok;
@@ -51,7 +78,7 @@ export async function apiSaveDeletedPedidos(
 ): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/deleted-pedidos`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ deletedPedidos, user }),
   });
   return response.ok;
@@ -60,7 +87,7 @@ export async function apiSaveDeletedPedidos(
 export async function apiSaveBackups(backups: Pedido[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/backups`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ backups }),
   });
   return response.ok;
@@ -69,7 +96,7 @@ export async function apiSaveBackups(backups: Pedido[]): Promise<boolean> {
 export async function apiSaveVendedor(vendedor: { nombre: string; codigo: string }): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/vendedor`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(vendedor),
   });
   return response.ok;
@@ -78,7 +105,7 @@ export async function apiSaveVendedor(vendedor: { nombre: string; codigo: string
 export async function apiSavePrendas(prendas: Prenda[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/prendas`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ prendas }),
   });
   return response.ok;
@@ -87,7 +114,7 @@ export async function apiSavePrendas(prendas: Prenda[]): Promise<boolean> {
 export async function apiSaveUsuarios(usuarios: UsuarioApp[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/usuarios`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ usuarios }),
   });
   return response.ok;
@@ -96,7 +123,7 @@ export async function apiSaveUsuarios(usuarios: UsuarioApp[]): Promise<boolean> 
 export async function apiSaveCampanas(campanas: Campana[]): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/campanas`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ campanas }),
   });
   return response.ok;
@@ -105,7 +132,7 @@ export async function apiSaveCampanas(campanas: Campana[]): Promise<boolean> {
 export async function apiSaveCampanasReferencias(campanasReferencias: Record<string, string[]>): Promise<boolean> {
   const response = await fetch(`${API_BASE}/api/campanas-referencias`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ campanasReferencias }),
   });
   return response.ok;

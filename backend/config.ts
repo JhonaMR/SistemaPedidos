@@ -18,3 +18,6 @@ export const DB_PATHS = {
 };
 
 export const FOTOS_REFERENCIAS_DIR = path.join(process.cwd(), 'public', 'fotos_referencias');
+
+export const JWT_SECRET = process.env.JWT_SECRET || 'arare_secreto_super_seguro_2026';
+

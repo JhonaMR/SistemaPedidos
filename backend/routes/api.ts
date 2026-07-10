@@ -1,4 +1,16 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
+import { rateLimit } from 'express-rate-limit';
+import { z } from 'zod';
+import { JWT_SECRET } from '../config';
+import { authMiddleware } from '../middleware/authMiddleware';
+import {
+  ClienteSchema,
+  PedidoSchema,
+  UsuarioSchema,
+  CampanaSchema
+} from '../schemas/validationSchemas';
 import {
   getAllData,
   saveClientes,
@@ -14,27 +26,92 @@ import {
 
 const router = Router();
 
+// Limit login attempts
+const loginLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5, // Limit each IP to 5 requests per minute
+  message: { error: 'Demasiados intentos de inicio de sesión. Por favor, intente de nuevo en un minuto.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // API Health Check
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', serverTime: new Date().toISOString() });
 });
 
+// Authenticate user
+router.post('/auth/login', loginLimiter, async (req, res) => {
+  try {
+    const { usuario, clave } = req.body;
+    if (!usuario || !clave) {
+      return res.status(400).json({ error: 'Usuario y clave son requeridos.' });
+    }
+
+    const cleanUser = String(usuario).trim().toUpperCase();
+    const cleanPin = String(clave).trim();
+
+    const data = await getAllData();
+    const foundUser = data.usuarios.find((u: any) => u.usuario.toUpperCase() === cleanUser);
+
+    if (!foundUser) {
+      return res.status(401).json({ error: 'Usuario o clave incorrectos.' });
+    }
+
+    if (foundUser.activo === false) {
+      return res.status(403).json({ error: 'Este usuario se encuentra inhabilitado. Contacte a Soporte.' });
+    }
+
+    const match = await bcrypt.compare(cleanPin, foundUser.clave);
+    if (!match) {
+      return res.status(401).json({ error: 'Usuario o clave incorrectos.' });
+    }
+
+    const token = jwt.sign(
+      {
+        id: foundUser.id,
+        usuario: foundUser.usuario,
+        nombre: foundUser.nombre,
+        rol: foundUser.rol,
+        idVendedor: foundUser.idVendedor
+      },
+      JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    const { clave: _, ...userWithoutPassword } = foundUser;
+    res.json({
+      success: true,
+      token,
+      user: userWithoutPassword
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Error al iniciar sesión', details: err.message });
+  }
+});
+
 // Load all data
-router.get('/data', async (req, res) => {
+router.get('/data', authMiddleware, async (req, res) => {
   try {
     const data = await getAllData();
-    res.json(data);
+    // Exclude password hashes from response
+    const safeUsuarios = data.usuarios.map(({ clave, ...u }: any) => u);
+    res.json({
+      ...data,
+      usuarios: safeUsuarios
+    });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al leer los datos de los JSON locales', details: err.message });
   }
 });
 
 // Save Clientes
-router.post('/clientes', async (req, res) => {
+router.post('/clientes', authMiddleware, async (req, res) => {
   try {
     const { clientes } = req.body;
-    if (!Array.isArray(clientes)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de clientes.' });
+    const parsed = z.array(ClienteSchema).safeParse(clientes);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de clientes inválida', details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.clientes.map(c => [c.id, c]));
@@ -83,11 +160,12 @@ function getSiguienteCorrelativo(
 }
 
 // Save Pedidos
-router.post('/pedidos', async (req, res) => {
+router.post('/pedidos', authMiddleware, async (req, res) => {
   try {
     const { pedidos } = req.body;
-    if (!Array.isArray(pedidos)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos.' });
+    const parsed = z.array(PedidoSchema).safeParse(pedidos);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de pedidos inválida', details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map((data.pedidos as any[]).map(p => [p.id, p]));
@@ -135,11 +213,13 @@ router.post('/pedidos', async (req, res) => {
 });
 
 // Save Deleted Pedidos
-router.post('/deleted-pedidos', async (req, res) => {
+router.post('/deleted-pedidos', authMiddleware, async (req, res) => {
   try {
-    const { deletedPedidos, user } = req.body;
-    if (!Array.isArray(deletedPedidos)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de pedidos eliminados.' });
+    const { deletedPedidos } = req.body;
+    const user = (req as any).user;
+    const parsed = z.array(PedidoSchema).safeParse(deletedPedidos);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de pedidos eliminados inválida', details: parsed.error.format() });
     }
     const data = await getAllData();
     let serverDeletedPedidos = data.deletedPedidos || [];
@@ -178,11 +258,12 @@ router.post('/deleted-pedidos', async (req, res) => {
 });
 
 // Save Backups
-router.post('/backups', async (req, res) => {
+router.post('/backups', authMiddleware, async (req, res) => {
   try {
     const { backups } = req.body;
-    if (!Array.isArray(backups)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de backups.' });
+    const parsed = z.array(PedidoSchema).safeParse(backups);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de backups inválida', details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.backups.map(p => [p.id, p]));
@@ -198,7 +279,7 @@ router.post('/backups', async (req, res) => {
 });
 
 // Save Vendedor Config
-router.post('/vendedor', async (req, res) => {
+router.post('/vendedor', authMiddleware, async (req, res) => {
   try {
     const vendedor = req.body;
     if (!vendedor || typeof vendedor.nombre !== 'string') {
@@ -212,7 +293,7 @@ router.post('/vendedor', async (req, res) => {
 });
 
 // Save Prenda Catalog References
-router.post('/prendas', async (req, res) => {
+router.post('/prendas', authMiddleware, async (req, res) => {
   try {
     const { prendas } = req.body;
     if (!Array.isArray(prendas)) {
@@ -226,17 +307,57 @@ router.post('/prendas', async (req, res) => {
 });
 
 // Save Usuarios
-router.post('/usuarios', async (req, res) => {
+router.post('/usuarios', authMiddleware, async (req, res) => {
   try {
     const { usuarios } = req.body;
-    if (!Array.isArray(usuarios)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de usuarios.' });
+    const parsed = z.array(UsuarioSchema).safeParse(usuarios);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de usuarios inválida', details: parsed.error.format() });
     }
+
+    const currentUser = (req as any).user;
     const data = await getAllData();
-    const existingMap = new Map(data.usuarios.map(u => [u.id, u]));
-    usuarios.forEach(u => {
+    const existingMap = new Map<string, any>(data.usuarios.map((u: any) => [u.id, u]));
+    const isSupport = currentUser.rol === 'soporte';
+
+    for (const u of usuarios) {
+      const existing = existingMap.get(u.id);
+      if (!existing) {
+        if (!isSupport) {
+          return res.status(403).json({ error: 'Acceso denegado. Solo soporte puede crear usuarios.' });
+        }
+      } else {
+        if (!isSupport) {
+          if (u.id !== currentUser.id) {
+            if (JSON.stringify(u) !== JSON.stringify(existing)) {
+              return res.status(403).json({ error: 'Acceso denegado. No puedes modificar la cuenta de otros usuarios.' });
+            }
+          } else {
+            if (u.rol !== existing.rol || u.activo !== existing.activo || u.usuario !== existing.usuario) {
+              return res.status(403).json({ error: 'Acceso denegado. No puedes modificar tu propio rol o estado activo.' });
+            }
+          }
+        }
+      }
+    }
+
+    const hashedUsuarios = await Promise.all(
+      usuarios.map(async (u: any) => {
+        const existing = existingMap.get(u.id);
+        let clave = u.clave;
+        if (clave && /^\d{4}$/.test(clave)) {
+          clave = await bcrypt.hash(clave, 10);
+        } else if (!clave && existing) {
+          clave = existing.clave;
+        }
+        return { ...u, clave };
+      })
+    );
+
+    hashedUsuarios.forEach(u => {
       existingMap.set(u.id, u);
     });
+
     const merged = Array.from(existingMap.values());
     await saveUsuarios(merged);
     res.json({ success: true, count: merged.length });
@@ -246,11 +367,12 @@ router.post('/usuarios', async (req, res) => {
 });
 
 // Save Campanas
-router.post('/campanas', async (req, res) => {
+router.post('/campanas', authMiddleware, async (req, res) => {
   try {
     const { campanas } = req.body;
-    if (!Array.isArray(campanas)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un array de campañas.' });
+    const parsed = z.array(CampanaSchema).safeParse(campanas);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de campañas inválida', details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.campanas.map(c => [`${c.nombre} ${c.anio}`, c]));
@@ -266,11 +388,12 @@ router.post('/campanas', async (req, res) => {
 });
 
 // Save Campanas Referencias Mapping
-router.post('/campanas-referencias', async (req, res) => {
+router.post('/campanas-referencias', authMiddleware, async (req, res) => {
   try {
     const { campanasReferencias } = req.body;
-    if (!campanasReferencias || typeof campanasReferencias !== 'object') {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requiere un mapa de campañas y referencias.' });
+    const parsed = z.record(z.string(), z.array(z.string())).safeParse(campanasReferencias);
+    if (!parsed.success) {
+      return res.status(400).json({ error: 'Estructura de mapeo de campañas inválida', details: parsed.error.format() });
     }
     await saveCampanasReferencias(campanasReferencias);
     res.json({ success: true });
@@ -280,12 +403,22 @@ router.post('/campanas-referencias', async (req, res) => {
 });
 
 // Sincronización en lote desde móviles (Offline-First)
-router.post('/pedidos/sync-batch', async (req, res) => {
+router.post('/pedidos/sync-batch', authMiddleware, async (req, res) => {
   try {
-    const { pedidos, clientes, deletedPedidos, user } = req.body;
+    const { pedidos, clientes, deletedPedidos } = req.body;
+    const user = (req as any).user;
     
-    if (!Array.isArray(pedidos) || !Array.isArray(clientes)) {
-      return res.status(400).json({ error: 'Formato incorrecto. Se requieren arrays de pedidos y clientes.' });
+    const parsedPedidos = z.array(PedidoSchema).safeParse(pedidos);
+    const parsedClientes = z.array(ClienteSchema).safeParse(clientes);
+    const parsedDeleted = deletedPedidos ? z.array(PedidoSchema).safeParse(deletedPedidos) : { success: true };
+
+    if (!parsedPedidos.success || !parsedClientes.success || !parsedDeleted.success) {
+      const details = {
+        pedidos: parsedPedidos.success ? null : parsedPedidos.error.format(),
+        clientes: parsedClientes.success ? null : parsedClientes.error.format(),
+        deletedPedidos: parsedDeleted.success ? null : (parsedDeleted as any).error?.format()
+      };
+      return res.status(400).json({ error: 'Estructura de datos de sincronización inválida', details });
     }
 
     const data = await getAllData();

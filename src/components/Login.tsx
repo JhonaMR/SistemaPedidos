@@ -1,11 +1,21 @@
 import { useState, FormEvent } from 'react';
 import { Shirt, Lock, User, AlertCircle, KeyRound, ShieldAlert } from 'lucide-react';
 import { UsuarioApp } from '../types';
+import { apiLogin } from '../services/apiService';
 
 interface LoginProps {
   usuarios: UsuarioApp[];
-  onLogin: (usuario: UsuarioApp) => void;
+  onLogin: (usuario: UsuarioApp, token?: string) => void;
   onUpdateUsuarios: (updated: UsuarioApp[]) => void;
+}
+
+// Compute secure SHA-256 hash locally for offline login validation
+async function computeLocalHash(username: string, pin: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(username.trim().toUpperCase() + ':' + pin.trim());
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProps) {
@@ -20,7 +30,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
   const [confirmPin, setConfirmPin] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleLoginSubmit = (e: FormEvent) => {
+  const handleLoginSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
 
@@ -37,13 +47,45 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
       return;
     }
 
-    // Find user
-    const foundUser = usuarios.find(
-      (u) => u.usuario.toUpperCase() === cleanUser && u.clave === cleanPin
-    );
+    const isOnline = navigator.onLine;
+
+    if (isOnline) {
+      try {
+        const response = await apiLogin(cleanUser, cleanPin);
+        if (response.success) {
+          const localPinHash = await computeLocalHash(cleanUser, cleanPin);
+          const loggedUser = {
+            ...response.user,
+            localPinHash
+          };
+
+          if (loggedUser.esPrimeraVez) {
+            setTempUser(loggedUser);
+            setIsChangingPassword(true);
+          } else {
+            onLogin(loggedUser, response.token);
+          }
+        } else {
+          setError('Usuario o clave incorrectos.');
+        }
+      } catch (err: any) {
+        // Fallback to offline validation if network request fails
+        if (err.message.includes('Failed to fetch') || err.message.includes('Error al iniciar') || err.message.includes('NetworkError')) {
+          await handleOfflineLogin(cleanUser, cleanPin);
+        } else {
+          setError(err.message || 'Usuario o clave incorrectos.');
+        }
+      }
+    } else {
+      await handleOfflineLogin(cleanUser, cleanPin);
+    }
+  };
+
+  const handleOfflineLogin = async (cleanUser: string, cleanPin: string) => {
+    const foundUser = usuarios.find((u) => u.usuario.toUpperCase() === cleanUser);
 
     if (!foundUser) {
-      setError('Usuario o clave incorrectos.');
+      setError('Usuario no encontrado localmente. Conéctate a internet para iniciar sesión.');
       return;
     }
 
@@ -52,15 +94,22 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
       return;
     }
 
-    if (foundUser.esPrimeraVez) {
-      setTempUser(foundUser);
-      setIsChangingPassword(true);
+    const localPinHash = await computeLocalHash(cleanUser, cleanPin);
+    const storedHash = (foundUser as any).localPinHash;
+
+    if (!storedHash) {
+      setError('No puedes iniciar sesión sin conexión por primera vez en este dispositivo. Conéctate a internet.');
+      return;
+    }
+
+    if (storedHash === localPinHash) {
+      onLogin(foundUser); // Offline session restore (no new token)
     } else {
-      onLogin(foundUser);
+      setError('Usuario o clave incorrectos.');
     }
   };
 
-  const handlePasswordChangeSubmit = (e: FormEvent) => {
+  const handlePasswordChangeSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setPasswordError(null);
 
@@ -81,12 +130,15 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
 
     if (!tempUser) return;
 
+    const newLocalPinHash = await computeLocalHash(tempUser.usuario, newPin);
+
     // Save updated password
     const updatedUsers = usuarios.map((u) => {
       if (u.id === tempUser.id) {
         return {
           ...u,
           clave: newPin,
+          localPinHash: newLocalPinHash,
           esPrimeraVez: false,
         };
       }
@@ -99,6 +151,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
     const updatedLoggedInUser = {
       ...tempUser,
       clave: newPin,
+      localPinHash: newLocalPinHash,
       esPrimeraVez: false,
     };
     onLogin(updatedLoggedInUser);

@@ -686,5 +686,56 @@
     "fecha": "2026-07-07",
     "campana": "Vacaciones 2026",
     "sincronizado": 1
+  },
+  {
+    "clienteId": "cli_300",
+    "clienteNombre": "MEDIA NARANJA",
+    "clienteTelefono": "N/A",
+    "vendedorNombre": "Maria Mercedes",
+    "items": [
+      {
+        "id": "cart_1783706989997_eiup",
+        "prendaRef": "12473",
+        "nombrePrenda": "TOP CON AMARRE Y BRILLOS",
+        "categoria": "Dama",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 30
+        },
+        "cantidad": 30,
+        "precioUnitario": 29900,
+        "total": 897000
+      },
+      {
+        "id": "cart_1783707002941_xh77",
+        "prendaRef": "12931",
+        "nombrePrenda": "BLUSA DOBLE BOLERO AMARRE ESPALDA",
+        "categoria": "Dama",
+        "talla": "S-6, M-6, L-6",
+        "tallasDetalle": {
+          "S": 6,
+          "M": 6,
+          "L": 6
+        },
+        "cantidad": 18,
+        "precioUnitario": 29900,
+        "total": 538200
+      }
+    ],
+    "subtotal": 1435200,
+    "porcentajeDescuento": 0,
+    "montoDescuento": 0,
+    "total": 1435200,
+    "estado": "Pendiente",
+    "notas": "",
+    "fechaEntregaEstimada": "2026-07-10",
+    "fechaLimiteDespacho": "",
+    "facturacionFE": 100,
+    "facturacionRM": 0,
+    "id": "ped_1783707004661",
+    "numeroPedido": "05-001",
+    "fecha": "2026-07-10",
+    "campana": "Vacaciones 2026",
+    "sincronizado": 0
   }
 ]

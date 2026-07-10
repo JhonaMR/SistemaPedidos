@@ -1,27 +1,33 @@
 import fs from 'fs/promises';
+import bcrypt from 'bcryptjs';
 import { DB_PATHS } from '../config';
+import { lockManager } from './lockService';
 
 // Helper to safely read file or return default
 async function safeReadFile(filePath: string, defaultContent: string) {
-  try {
-    await fs.access(filePath);
-    const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data);
-  } catch (err) {
-    // If file does not exist, return default parsed
-    return JSON.parse(defaultContent);
-  }
+  return lockManager.runExclusive(filePath, async () => {
+    try {
+      await fs.access(filePath);
+      const data = await fs.readFile(filePath, 'utf-8');
+      return JSON.parse(data);
+    } catch (err) {
+      // If file does not exist, return default parsed
+      return JSON.parse(defaultContent);
+    }
+  });
 }
 
 // Helper to safely write file
 async function safeWriteFile(filePath: string, data: any) {
-  try {
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-    return true;
-  } catch (err) {
-    console.error(`Error writing to ${filePath}:`, err);
-    throw err;
-  }
+  return lockManager.runExclusive(filePath, async () => {
+    try {
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
+      return true;
+    } catch (err) {
+      console.error(`Error writing to ${filePath}:`, err);
+      throw err;
+    }
+  });
 }
 
 export async function getAllData() {
@@ -90,7 +96,26 @@ export async function getAllData() {
   const vendedor = await safeReadFile(DB_PATHS.vendedor, '{"nombre": "Lina Pulgarin", "codigo": "V-102"}');
   const prendas = await safeReadFile(DB_PATHS.prendas, '[]');
   const defaultUsuarios = '[{"id":"usr_sop","nombre":"Usuario Soporte","usuario":"SOP","clave":"9999","rol":"soporte","esPrimeraVez":false,"activo":true},{"id":"usr_gen","nombre":"Usuario General","usuario":"GEN","clave":"1234","rol":"general","esPrimeraVez":true,"activo":true}]';
-  const usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
+  let usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
+
+  // Auto-encrypt plaintext passwords
+  let hasPlaintextPINs = false;
+  if (Array.isArray(usuarios)) {
+    usuarios = await Promise.all(
+      usuarios.map(async (u: any) => {
+        if (u.clave && /^\d{4}$/.test(u.clave)) {
+          const hash = await bcrypt.hash(u.clave, 10);
+          hasPlaintextPINs = true;
+          return { ...u, clave: hash };
+        }
+        return u;
+      })
+    );
+    if (hasPlaintextPINs) {
+      console.log('[Security Auto-Heal] Plaintext PINs detected in database. Encrypting with bcrypt...');
+      await safeWriteFile(DB_PATHS.usuarios, usuarios);
+    }
+  }
 
   const defaultCampanas = '[{"nombre":"Inicio de año","anio":2026,"numero":1},{"nombre":"Madres","anio":2026,"numero":2},{"nombre":"Vacaciones","anio":2026,"numero":3},{"nombre":"Temporada","anio":2026,"numero":4}]';
   const defaultCampanasRefs = '{"Inicio de año 2026":["p1","p2","p3","p4","p5","p6","p7"],"Madres 2026":["p1","p2","p3","p4","p5","p6","p7"],"Vacaciones 2026":["p1","p2","p3","p4","p5","p6","p7"],"Temporada 2026":["p1","p2","p3","p4","p5","p6","p7"]}';

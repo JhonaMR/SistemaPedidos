@@ -1,391 +1,15 @@
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-
-// node_modules/object-assign/index.js
-var require_object_assign = __commonJS({
-  "node_modules/object-assign/index.js"(exports, module) {
-    "use strict";
-    var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-    var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-    function toObject(val) {
-      if (val === null || val === void 0) {
-        throw new TypeError("Object.assign cannot be called with null or undefined");
-      }
-      return Object(val);
-    }
-    function shouldUseNative() {
-      try {
-        if (!Object.assign) {
-          return false;
-        }
-        var test1 = new String("abc");
-        test1[5] = "de";
-        if (Object.getOwnPropertyNames(test1)[0] === "5") {
-          return false;
-        }
-        var test2 = {};
-        for (var i = 0; i < 10; i++) {
-          test2["_" + String.fromCharCode(i)] = i;
-        }
-        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
-          return test2[n];
-        });
-        if (order2.join("") !== "0123456789") {
-          return false;
-        }
-        var test3 = {};
-        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
-          test3[letter] = letter;
-        });
-        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") {
-          return false;
-        }
-        return true;
-      } catch (err) {
-        return false;
-      }
-    }
-    module.exports = shouldUseNative() ? Object.assign : function(target, source) {
-      var from;
-      var to = toObject(target);
-      var symbols;
-      for (var s = 1; s < arguments.length; s++) {
-        from = Object(arguments[s]);
-        for (var key in from) {
-          if (hasOwnProperty.call(from, key)) {
-            to[key] = from[key];
-          }
-        }
-        if (getOwnPropertySymbols) {
-          symbols = getOwnPropertySymbols(from);
-          for (var i = 0; i < symbols.length; i++) {
-            if (propIsEnumerable.call(from, symbols[i])) {
-              to[symbols[i]] = from[symbols[i]];
-            }
-          }
-        }
-      }
-      return to;
-    };
-  }
-});
-
-// node_modules/vary/index.js
-var require_vary = __commonJS({
-  "node_modules/vary/index.js"(exports, module) {
-    "use strict";
-    module.exports = vary;
-    module.exports.append = append;
-    var FIELD_NAME_REGEXP = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
-    function append(header, field) {
-      if (typeof header !== "string") {
-        throw new TypeError("header argument is required");
-      }
-      if (!field) {
-        throw new TypeError("field argument is required");
-      }
-      var fields = !Array.isArray(field) ? parse(String(field)) : field;
-      for (var j = 0; j < fields.length; j++) {
-        if (!FIELD_NAME_REGEXP.test(fields[j])) {
-          throw new TypeError("field argument contains an invalid header name");
-        }
-      }
-      if (header === "*") {
-        return header;
-      }
-      var val = header;
-      var vals = parse(header.toLowerCase());
-      if (fields.indexOf("*") !== -1 || vals.indexOf("*") !== -1) {
-        return "*";
-      }
-      for (var i = 0; i < fields.length; i++) {
-        var fld = fields[i].toLowerCase();
-        if (vals.indexOf(fld) === -1) {
-          vals.push(fld);
-          val = val ? val + ", " + fields[i] : fields[i];
-        }
-      }
-      return val;
-    }
-    function parse(header) {
-      var end = 0;
-      var list = [];
-      var start = 0;
-      for (var i = 0, len = header.length; i < len; i++) {
-        switch (header.charCodeAt(i)) {
-          case 32:
-            if (start === end) {
-              start = end = i + 1;
-            }
-            break;
-          case 44:
-            list.push(header.substring(start, end));
-            start = end = i + 1;
-            break;
-          default:
-            end = i + 1;
-            break;
-        }
-      }
-      list.push(header.substring(start, end));
-      return list;
-    }
-    function vary(res, field) {
-      if (!res || !res.getHeader || !res.setHeader) {
-        throw new TypeError("res argument is required");
-      }
-      var val = res.getHeader("Vary") || "";
-      var header = Array.isArray(val) ? val.join(", ") : String(val);
-      if (val = append(header, field)) {
-        res.setHeader("Vary", val);
-      }
-    }
-  }
-});
-
-// node_modules/cors/lib/index.js
-var require_lib = __commonJS({
-  "node_modules/cors/lib/index.js"(exports, module) {
-    (function() {
-      "use strict";
-      var assign = require_object_assign();
-      var vary = require_vary();
-      var defaults = {
-        origin: "*",
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        preflightContinue: false,
-        optionsSuccessStatus: 204
-      };
-      function isString(s) {
-        return typeof s === "string" || s instanceof String;
-      }
-      function isOriginAllowed(origin, allowedOrigin) {
-        if (Array.isArray(allowedOrigin)) {
-          for (var i = 0; i < allowedOrigin.length; ++i) {
-            if (isOriginAllowed(origin, allowedOrigin[i])) {
-              return true;
-            }
-          }
-          return false;
-        } else if (isString(allowedOrigin)) {
-          return origin === allowedOrigin;
-        } else if (allowedOrigin instanceof RegExp) {
-          return allowedOrigin.test(origin);
-        } else {
-          return !!allowedOrigin;
-        }
-      }
-      function configureOrigin(options, req) {
-        var requestOrigin = req.headers.origin, headers = [], isAllowed;
-        if (!options.origin || options.origin === "*") {
-          headers.push([{
-            key: "Access-Control-Allow-Origin",
-            value: "*"
-          }]);
-        } else if (isString(options.origin)) {
-          headers.push([{
-            key: "Access-Control-Allow-Origin",
-            value: options.origin
-          }]);
-          headers.push([{
-            key: "Vary",
-            value: "Origin"
-          }]);
-        } else {
-          isAllowed = isOriginAllowed(requestOrigin, options.origin);
-          headers.push([{
-            key: "Access-Control-Allow-Origin",
-            value: isAllowed ? requestOrigin : false
-          }]);
-          headers.push([{
-            key: "Vary",
-            value: "Origin"
-          }]);
-        }
-        return headers;
-      }
-      function configureMethods(options) {
-        var methods = options.methods;
-        if (methods.join) {
-          methods = options.methods.join(",");
-        }
-        return {
-          key: "Access-Control-Allow-Methods",
-          value: methods
-        };
-      }
-      function configureCredentials(options) {
-        if (options.credentials === true) {
-          return {
-            key: "Access-Control-Allow-Credentials",
-            value: "true"
-          };
-        }
-        return null;
-      }
-      function configureAllowedHeaders(options, req) {
-        var allowedHeaders = options.allowedHeaders || options.headers;
-        var headers = [];
-        if (!allowedHeaders) {
-          allowedHeaders = req.headers["access-control-request-headers"];
-          headers.push([{
-            key: "Vary",
-            value: "Access-Control-Request-Headers"
-          }]);
-        } else if (allowedHeaders.join) {
-          allowedHeaders = allowedHeaders.join(",");
-        }
-        if (allowedHeaders && allowedHeaders.length) {
-          headers.push([{
-            key: "Access-Control-Allow-Headers",
-            value: allowedHeaders
-          }]);
-        }
-        return headers;
-      }
-      function configureExposedHeaders(options) {
-        var headers = options.exposedHeaders;
-        if (!headers) {
-          return null;
-        } else if (headers.join) {
-          headers = headers.join(",");
-        }
-        if (headers && headers.length) {
-          return {
-            key: "Access-Control-Expose-Headers",
-            value: headers
-          };
-        }
-        return null;
-      }
-      function configureMaxAge(options) {
-        var maxAge = (typeof options.maxAge === "number" || options.maxAge) && options.maxAge.toString();
-        if (maxAge && maxAge.length) {
-          return {
-            key: "Access-Control-Max-Age",
-            value: maxAge
-          };
-        }
-        return null;
-      }
-      function applyHeaders(headers, res) {
-        for (var i = 0, n = headers.length; i < n; i++) {
-          var header = headers[i];
-          if (header) {
-            if (Array.isArray(header)) {
-              applyHeaders(header, res);
-            } else if (header.key === "Vary" && header.value) {
-              vary(res, header.value);
-            } else if (header.value) {
-              res.setHeader(header.key, header.value);
-            }
-          }
-        }
-      }
-      function cors2(options, req, res, next) {
-        var headers = [], method = req.method && req.method.toUpperCase && req.method.toUpperCase();
-        if (method === "OPTIONS") {
-          headers.push(configureOrigin(options, req));
-          headers.push(configureCredentials(options));
-          headers.push(configureMethods(options));
-          headers.push(configureAllowedHeaders(options, req));
-          headers.push(configureMaxAge(options));
-          headers.push(configureExposedHeaders(options));
-          applyHeaders(headers, res);
-          if (options.preflightContinue) {
-            next();
-          } else {
-            res.statusCode = options.optionsSuccessStatus;
-            res.setHeader("Content-Length", "0");
-            res.end();
-          }
-        } else {
-          headers.push(configureOrigin(options, req));
-          headers.push(configureCredentials(options));
-          headers.push(configureExposedHeaders(options));
-          applyHeaders(headers, res);
-          next();
-        }
-      }
-      function middlewareWrapper(o) {
-        var optionsCallback = null;
-        if (typeof o === "function") {
-          optionsCallback = o;
-        } else {
-          optionsCallback = function(req, cb) {
-            cb(null, o);
-          };
-        }
-        return function corsMiddleware(req, res, next) {
-          optionsCallback(req, function(err, options) {
-            if (err) {
-              next(err);
-            } else {
-              var corsOptions = assign({}, defaults, options);
-              var originCallback = null;
-              if (corsOptions.origin && typeof corsOptions.origin === "function") {
-                originCallback = corsOptions.origin;
-              } else if (corsOptions.origin) {
-                originCallback = function(origin, cb) {
-                  cb(null, corsOptions.origin);
-                };
-              }
-              if (originCallback) {
-                originCallback(req.headers.origin, function(err2, origin) {
-                  if (err2 || !origin) {
-                    next(err2);
-                  } else {
-                    corsOptions.origin = origin;
-                    cors2(corsOptions, req, res, next);
-                  }
-                });
-              } else {
-                next();
-              }
-            }
-          });
-        };
-      }
-      module.exports = middlewareWrapper;
-    })();
-  }
-});
-
 // backend/server.ts
-var import_cors = __toESM(require_lib(), 1);
 import express from "express";
+import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import path2 from "path";
 
 // backend/routes/api.ts
 import { Router } from "express";
-
-// backend/services/dbService.ts
-import fs from "fs/promises";
+import jwt2 from "jsonwebtoken";
+import bcrypt2 from "bcryptjs";
+import { rateLimit } from "express-rate-limit";
+import { z as z2 } from "zod";
 
 // backend/config.ts
 import path from "path";
@@ -404,25 +28,167 @@ var DB_PATHS = {
   campanasReferencias: path.join(DB_DIR, "campanas_referencias.json")
 };
 var FOTOS_REFERENCIAS_DIR = path.join(process.cwd(), "public", "fotos_referencias");
+var JWT_SECRET = process.env.JWT_SECRET || "arare_secreto_super_seguro_2026";
+
+// backend/middleware/authMiddleware.ts
+import jwt from "jsonwebtoken";
+function authMiddleware(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Acceso no autorizado. Se requiere token de sesi\xF3n." });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Token inv\xE1lido o expirado." });
+  }
+}
+
+// backend/schemas/validationSchemas.ts
+import { z } from "zod";
+var ClienteSchema = z.object({
+  id: z.string(),
+  codigoCliente: z.string().min(1, "El c\xF3digo del cliente es requerido"),
+  nombre: z.string().min(1, "El nombre es requerido"),
+  documentoIdentidad: z.string().min(1, "El documento de identidad es requerido"),
+  telefono: z.string(),
+  correo: z.string(),
+  direccion: z.string(),
+  ciudad: z.string(),
+  notas: z.string().optional().nullable(),
+  fechaRegistro: z.string(),
+  limiteFacturacion: z.string().optional().nullable()
+});
+var ItemPedidoSchema = z.object({
+  id: z.string(),
+  prendaRef: z.string(),
+  nombrePrenda: z.string(),
+  categoria: z.string(),
+  talla: z.string(),
+  novedad: z.string().optional().nullable(),
+  cantidad: z.number().int().positive("La cantidad debe ser mayor que 0"),
+  precioUnitario: z.number().nonnegative(),
+  total: z.number().nonnegative(),
+  tallasDetalle: z.record(z.string(), z.number().int().nonnegative()).optional().nullable()
+});
+var PedidoSchema = z.object({
+  id: z.string(),
+  numeroPedido: z.string(),
+  clienteId: z.string(),
+  clienteNombre: z.string(),
+  clienteTelefono: z.string(),
+  vendedorNombre: z.string(),
+  items: z.array(ItemPedidoSchema),
+  subtotal: z.number().nonnegative(),
+  porcentajeDescuento: z.number().nonnegative(),
+  montoDescuento: z.number().nonnegative(),
+  total: z.number().nonnegative(),
+  estado: z.enum(["Pendiente", "Procesado", "Activo", "Completo", "Cancelado"]),
+  notas: z.string().optional().nullable(),
+  fecha: z.string(),
+  fechaEntregaEstimada: z.string(),
+  fechaLimiteDespacho: z.string().optional().nullable(),
+  campana: z.string().optional().nullable(),
+  facturacionFE: z.number().nonnegative().optional().nullable(),
+  facturacionRM: z.number().nonnegative().optional().nullable(),
+  fechaCancelado: z.string().optional().nullable(),
+  motivoCancelado: z.string().optional().nullable(),
+  fechaEliminacion: z.string().optional().nullable(),
+  editado: z.boolean().optional().nullable(),
+  backupOf: z.string().optional().nullable(),
+  backupFecha: z.string().optional().nullable(),
+  esBackup: z.boolean().optional().nullable()
+});
+var UsuarioSchema = z.object({
+  id: z.string(),
+  nombre: z.string().min(1, "El nombre es requerido"),
+  usuario: z.string().length(3, "El usuario debe tener exactamente 3 letras"),
+  clave: z.string(),
+  rol: z.enum(["general", "soporte"]),
+  esPrimeraVez: z.boolean(),
+  activo: z.boolean().optional().nullable(),
+  idVendedor: z.string().optional().nullable()
+});
+var CampanaSchema = z.object({
+  nombre: z.string().min(1, "El nombre de la campa\xF1a es requerido"),
+  anio: z.number().int().positive(),
+  numero: z.number().int().positive()
+});
+
+// backend/services/dbService.ts
+import fs from "fs/promises";
+import bcrypt from "bcryptjs";
+
+// backend/services/lockService.ts
+var Mutex = class {
+  constructor() {
+    this.queue = Promise.resolve();
+  }
+  async acquire() {
+    let release = () => {
+    };
+    const nextPromise = new Promise((resolve) => {
+      release = resolve;
+    });
+    const currentQueue = this.queue;
+    this.queue = this.queue.then(() => nextPromise);
+    await currentQueue;
+    return release;
+  }
+};
+var FileLockManager = class {
+  constructor() {
+    this.locks = /* @__PURE__ */ new Map();
+  }
+  getMutex(filePath) {
+    let mutex = this.locks.get(filePath);
+    if (!mutex) {
+      mutex = new Mutex();
+      this.locks.set(filePath, mutex);
+    }
+    return mutex;
+  }
+  /**
+   * Ejecuta una función asíncrona de manera exclusiva para una ruta de archivo.
+   * Garantiza que no haya lecturas/escrituras simultáneas en el mismo archivo.
+   */
+  async runExclusive(filePath, callback) {
+    const mutex = this.getMutex(filePath);
+    const release = await mutex.acquire();
+    try {
+      return await callback();
+    } finally {
+      release();
+    }
+  }
+};
+var lockManager = new FileLockManager();
 
 // backend/services/dbService.ts
 async function safeReadFile(filePath, defaultContent) {
-  try {
-    await fs.access(filePath);
-    const data = await fs.readFile(filePath, "utf-8");
-    return JSON.parse(data);
-  } catch (err) {
-    return JSON.parse(defaultContent);
-  }
+  return lockManager.runExclusive(filePath, async () => {
+    try {
+      await fs.access(filePath);
+      const data = await fs.readFile(filePath, "utf-8");
+      return JSON.parse(data);
+    } catch (err) {
+      return JSON.parse(defaultContent);
+    }
+  });
 }
 async function safeWriteFile(filePath, data) {
-  try {
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
-    return true;
-  } catch (err) {
-    console.error(`Error writing to ${filePath}:`, err);
-    throw err;
-  }
+  return lockManager.runExclusive(filePath, async () => {
+    try {
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
+      return true;
+    } catch (err) {
+      console.error(`Error writing to ${filePath}:`, err);
+      throw err;
+    }
+  });
 }
 async function getAllData() {
   const clientes = await safeReadFile(DB_PATHS.clientes, "[]");
@@ -480,7 +246,24 @@ async function getAllData() {
   const vendedor = await safeReadFile(DB_PATHS.vendedor, '{"nombre": "Lina Pulgarin", "codigo": "V-102"}');
   const prendas = await safeReadFile(DB_PATHS.prendas, "[]");
   const defaultUsuarios = '[{"id":"usr_sop","nombre":"Usuario Soporte","usuario":"SOP","clave":"9999","rol":"soporte","esPrimeraVez":false,"activo":true},{"id":"usr_gen","nombre":"Usuario General","usuario":"GEN","clave":"1234","rol":"general","esPrimeraVez":true,"activo":true}]';
-  const usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
+  let usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
+  let hasPlaintextPINs = false;
+  if (Array.isArray(usuarios)) {
+    usuarios = await Promise.all(
+      usuarios.map(async (u) => {
+        if (u.clave && /^\d{4}$/.test(u.clave)) {
+          const hash = await bcrypt.hash(u.clave, 10);
+          hasPlaintextPINs = true;
+          return { ...u, clave: hash };
+        }
+        return u;
+      })
+    );
+    if (hasPlaintextPINs) {
+      console.log("[Security Auto-Heal] Plaintext PINs detected in database. Encrypting with bcrypt...");
+      await safeWriteFile(DB_PATHS.usuarios, usuarios);
+    }
+  }
   const defaultCampanas = '[{"nombre":"Inicio de a\xF1o","anio":2026,"numero":1},{"nombre":"Madres","anio":2026,"numero":2},{"nombre":"Vacaciones","anio":2026,"numero":3},{"nombre":"Temporada","anio":2026,"numero":4}]';
   const defaultCampanasRefs = '{"Inicio de a\xF1o 2026":["p1","p2","p3","p4","p5","p6","p7"],"Madres 2026":["p1","p2","p3","p4","p5","p6","p7"],"Vacaciones 2026":["p1","p2","p3","p4","p5","p6","p7"],"Temporada 2026":["p1","p2","p3","p4","p5","p6","p7"]}';
   let campanas = await safeReadFile(DB_PATHS.campanas, defaultCampanas);
@@ -533,22 +316,77 @@ async function saveCampanasReferencias(campanasReferencias) {
 
 // backend/routes/api.ts
 var router = Router();
+var loginLimiter = rateLimit({
+  windowMs: 60 * 1e3,
+  // 1 minute
+  max: 5,
+  // Limit each IP to 5 requests per minute
+  message: { error: "Demasiados intentos de inicio de sesi\xF3n. Por favor, intente de nuevo en un minuto." },
+  standardHeaders: true,
+  legacyHeaders: false
+});
 router.get("/health", (req, res) => {
   res.json({ status: "ok", serverTime: (/* @__PURE__ */ new Date()).toISOString() });
 });
-router.get("/data", async (req, res) => {
+router.post("/auth/login", loginLimiter, async (req, res) => {
+  try {
+    const { usuario, clave } = req.body;
+    if (!usuario || !clave) {
+      return res.status(400).json({ error: "Usuario y clave son requeridos." });
+    }
+    const cleanUser = String(usuario).trim().toUpperCase();
+    const cleanPin = String(clave).trim();
+    const data = await getAllData();
+    const foundUser = data.usuarios.find((u) => u.usuario.toUpperCase() === cleanUser);
+    if (!foundUser) {
+      return res.status(401).json({ error: "Usuario o clave incorrectos." });
+    }
+    if (foundUser.activo === false) {
+      return res.status(403).json({ error: "Este usuario se encuentra inhabilitado. Contacte a Soporte." });
+    }
+    const match = await bcrypt2.compare(cleanPin, foundUser.clave);
+    if (!match) {
+      return res.status(401).json({ error: "Usuario o clave incorrectos." });
+    }
+    const token = jwt2.sign(
+      {
+        id: foundUser.id,
+        usuario: foundUser.usuario,
+        nombre: foundUser.nombre,
+        rol: foundUser.rol,
+        idVendedor: foundUser.idVendedor
+      },
+      JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+    const { clave: _, ...userWithoutPassword } = foundUser;
+    res.json({
+      success: true,
+      token,
+      user: userWithoutPassword
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error al iniciar sesi\xF3n", details: err.message });
+  }
+});
+router.get("/data", authMiddleware, async (req, res) => {
   try {
     const data = await getAllData();
-    res.json(data);
+    const safeUsuarios = data.usuarios.map(({ clave, ...u }) => u);
+    res.json({
+      ...data,
+      usuarios: safeUsuarios
+    });
   } catch (err) {
     res.status(500).json({ error: "Error al leer los datos de los JSON locales", details: err.message });
   }
 });
-router.post("/clientes", async (req, res) => {
+router.post("/clientes", authMiddleware, async (req, res) => {
   try {
     const { clientes } = req.body;
-    if (!Array.isArray(clientes)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de clientes." });
+    const parsed = z2.array(ClienteSchema).safeParse(clientes);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de clientes inv\xE1lida", details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.clientes.map((c) => [c.id, c]));
@@ -584,11 +422,12 @@ function getSiguienteCorrelativo(prefijoVendedor, pedidosConsolidados, maxCorrel
   maxCorrelativosPorVendedor.set(prefijoVendedor, next);
   return next;
 }
-router.post("/pedidos", async (req, res) => {
+router.post("/pedidos", authMiddleware, async (req, res) => {
   try {
     const { pedidos } = req.body;
-    if (!Array.isArray(pedidos)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de pedidos." });
+    const parsed = z2.array(PedidoSchema).safeParse(pedidos);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de pedidos inv\xE1lida", details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.pedidos.map((p) => [p.id, p]));
@@ -625,11 +464,13 @@ router.post("/pedidos", async (req, res) => {
     res.status(500).json({ error: "Error al guardar pedidos", details: err.message });
   }
 });
-router.post("/deleted-pedidos", async (req, res) => {
+router.post("/deleted-pedidos", authMiddleware, async (req, res) => {
   try {
-    const { deletedPedidos, user } = req.body;
-    if (!Array.isArray(deletedPedidos)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de pedidos eliminados." });
+    const { deletedPedidos } = req.body;
+    const user = req.user;
+    const parsed = z2.array(PedidoSchema).safeParse(deletedPedidos);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de pedidos eliminados inv\xE1lida", details: parsed.error.format() });
     }
     const data = await getAllData();
     let serverDeletedPedidos = data.deletedPedidos || [];
@@ -658,11 +499,12 @@ router.post("/deleted-pedidos", async (req, res) => {
     res.status(500).json({ error: "Error al guardar pedidos eliminados", details: err.message });
   }
 });
-router.post("/backups", async (req, res) => {
+router.post("/backups", authMiddleware, async (req, res) => {
   try {
     const { backups } = req.body;
-    if (!Array.isArray(backups)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de backups." });
+    const parsed = z2.array(PedidoSchema).safeParse(backups);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de backups inv\xE1lida", details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.backups.map((p) => [p.id, p]));
@@ -676,7 +518,7 @@ router.post("/backups", async (req, res) => {
     res.status(500).json({ error: "Error al guardar backups de pedidos", details: err.message });
   }
 });
-router.post("/vendedor", async (req, res) => {
+router.post("/vendedor", authMiddleware, async (req, res) => {
   try {
     const vendedor = req.body;
     if (!vendedor || typeof vendedor.nombre !== "string") {
@@ -688,7 +530,7 @@ router.post("/vendedor", async (req, res) => {
     res.status(500).json({ error: "Error al guardar configuraci\xF3n del vendedor", details: err.message });
   }
 });
-router.post("/prendas", async (req, res) => {
+router.post("/prendas", authMiddleware, async (req, res) => {
   try {
     const { prendas } = req.body;
     if (!Array.isArray(prendas)) {
@@ -700,15 +542,50 @@ router.post("/prendas", async (req, res) => {
     res.status(500).json({ error: "Error al guardar prendas del cat\xE1logo", details: err.message });
   }
 });
-router.post("/usuarios", async (req, res) => {
+router.post("/usuarios", authMiddleware, async (req, res) => {
   try {
     const { usuarios } = req.body;
-    if (!Array.isArray(usuarios)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de usuarios." });
+    const parsed = z2.array(UsuarioSchema).safeParse(usuarios);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de usuarios inv\xE1lida", details: parsed.error.format() });
     }
+    const currentUser = req.user;
     const data = await getAllData();
     const existingMap = new Map(data.usuarios.map((u) => [u.id, u]));
-    usuarios.forEach((u) => {
+    const isSupport = currentUser.rol === "soporte";
+    for (const u of usuarios) {
+      const existing = existingMap.get(u.id);
+      if (!existing) {
+        if (!isSupport) {
+          return res.status(403).json({ error: "Acceso denegado. Solo soporte puede crear usuarios." });
+        }
+      } else {
+        if (!isSupport) {
+          if (u.id !== currentUser.id) {
+            if (JSON.stringify(u) !== JSON.stringify(existing)) {
+              return res.status(403).json({ error: "Acceso denegado. No puedes modificar la cuenta de otros usuarios." });
+            }
+          } else {
+            if (u.rol !== existing.rol || u.activo !== existing.activo || u.usuario !== existing.usuario) {
+              return res.status(403).json({ error: "Acceso denegado. No puedes modificar tu propio rol o estado activo." });
+            }
+          }
+        }
+      }
+    }
+    const hashedUsuarios = await Promise.all(
+      usuarios.map(async (u) => {
+        const existing = existingMap.get(u.id);
+        let clave = u.clave;
+        if (clave && /^\d{4}$/.test(clave)) {
+          clave = await bcrypt2.hash(clave, 10);
+        } else if (!clave && existing) {
+          clave = existing.clave;
+        }
+        return { ...u, clave };
+      })
+    );
+    hashedUsuarios.forEach((u) => {
       existingMap.set(u.id, u);
     });
     const merged = Array.from(existingMap.values());
@@ -718,11 +595,12 @@ router.post("/usuarios", async (req, res) => {
     res.status(500).json({ error: "Error al guardar usuarios", details: err.message });
   }
 });
-router.post("/campanas", async (req, res) => {
+router.post("/campanas", authMiddleware, async (req, res) => {
   try {
     const { campanas } = req.body;
-    if (!Array.isArray(campanas)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un array de campa\xF1as." });
+    const parsed = z2.array(CampanaSchema).safeParse(campanas);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de campa\xF1as inv\xE1lida", details: parsed.error.format() });
     }
     const data = await getAllData();
     const existingMap = new Map(data.campanas.map((c) => [`${c.nombre} ${c.anio}`, c]));
@@ -736,11 +614,12 @@ router.post("/campanas", async (req, res) => {
     res.status(500).json({ error: "Error al guardar campa\xF1as", details: err.message });
   }
 });
-router.post("/campanas-referencias", async (req, res) => {
+router.post("/campanas-referencias", authMiddleware, async (req, res) => {
   try {
     const { campanasReferencias } = req.body;
-    if (!campanasReferencias || typeof campanasReferencias !== "object") {
-      return res.status(400).json({ error: "Formato incorrecto. Se requiere un mapa de campa\xF1as y referencias." });
+    const parsed = z2.record(z2.string(), z2.array(z2.string())).safeParse(campanasReferencias);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Estructura de mapeo de campa\xF1as inv\xE1lida", details: parsed.error.format() });
     }
     await saveCampanasReferencias(campanasReferencias);
     res.json({ success: true });
@@ -748,11 +627,20 @@ router.post("/campanas-referencias", async (req, res) => {
     res.status(500).json({ error: "Error al guardar referencias de campa\xF1a", details: err.message });
   }
 });
-router.post("/pedidos/sync-batch", async (req, res) => {
+router.post("/pedidos/sync-batch", authMiddleware, async (req, res) => {
   try {
-    const { pedidos, clientes, deletedPedidos, user } = req.body;
-    if (!Array.isArray(pedidos) || !Array.isArray(clientes)) {
-      return res.status(400).json({ error: "Formato incorrecto. Se requieren arrays de pedidos y clientes." });
+    const { pedidos, clientes, deletedPedidos } = req.body;
+    const user = req.user;
+    const parsedPedidos = z2.array(PedidoSchema).safeParse(pedidos);
+    const parsedClientes = z2.array(ClienteSchema).safeParse(clientes);
+    const parsedDeleted = deletedPedidos ? z2.array(PedidoSchema).safeParse(deletedPedidos) : { success: true };
+    if (!parsedPedidos.success || !parsedClientes.success || !parsedDeleted.success) {
+      const details = {
+        pedidos: parsedPedidos.success ? null : parsedPedidos.error.format(),
+        clientes: parsedClientes.success ? null : parsedClientes.error.format(),
+        deletedPedidos: parsedDeleted.success ? null : parsedDeleted.error?.format()
+      };
+      return res.status(400).json({ error: "Estructura de datos de sincronizaci\xF3n inv\xE1lida", details });
     }
     const data = await getAllData();
     const clientesActuales = data.clientes || [];
@@ -826,7 +714,7 @@ var api_default = router;
 var isProd = NODE_ENV === "production";
 async function startServer() {
   const app = express();
-  app.use((0, import_cors.default)());
+  app.use(cors());
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ extended: true, limit: "50mb" }));
   app.use("/fotos_referencias", express.static(FOTOS_REFERENCIAS_DIR));
@@ -865,19 +753,3 @@ async function startServer() {
 startServer().catch((err) => {
   console.error("[Toma Pedido Backend] Failed to start server:", err);
 });
-/*! Bundled license information:
-
-object-assign/index.js:
-  (*
-  object-assign
-  (c) Sindre Sorhus
-  @license MIT
-  *)
-
-vary/index.js:
-  (*!
-   * vary
-   * Copyright(c) 2014-2017 Douglas Christopher Wilson
-   * MIT Licensed
-   *)
-*/
