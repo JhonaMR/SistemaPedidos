@@ -58,5 +58,14 @@
     "activo": true,
     "idVendedor": "05",
     "clave": "$2b$10$Zqysu6gJ1S8N4WQhFLON9.eDrV.tA6JTXPHsxgcZwL2YlVf3vMJgu"
+  },
+  {
+    "id": "usr_n8n_integration",
+    "nombre": "n8n Integration Bot",
+    "usuario": "N8N",
+    "rol": "soporte",
+    "esPrimeraVez": false,
+    "activo": true,
+    "clave": "$2b$10$ZfvUYvBLEPJIsa7ZbLzLtetYjlvX8ZGwuA8mLLL9jlffczl5XWYQS"
   }
 ]

@@ -512,4 +512,61 @@ router.post('/pedidos/sync-batch', authMiddleware, async (req, res) => {
   }
 });
 
+// GET nuevos pedidos (para integraciones como n8n)
+router.get('/pedidos/nuevos', authMiddleware, async (req, res) => {
+  try {
+    const { desde } = req.query;
+    const data = await getAllData();
+    const pedidos = data.pedidos || [];
+
+    let desdeMs: number;
+
+    if (desde) {
+      const numerico = Number(desde);
+      if (!isNaN(numerico)) {
+        desdeMs = numerico;
+      } else {
+        const parsedDate = Date.parse(desde as string);
+        if (isNaN(parsedDate)) {
+          return res.status(400).json({ error: 'El parámetro "desde" tiene un formato inválido (debe ser un timestamp o fecha válida).' });
+        }
+        desdeMs = parsedDate;
+      }
+    } else {
+      // Por defecto, últimas 24 horas
+      desdeMs = Date.now() - 24 * 60 * 60 * 1000;
+    }
+
+    const nuevosPedidos = pedidos.filter((p: any) => {
+      if (p.esBackup) return false;
+
+      let pedidoMs: number | null = null;
+      if (typeof p.id === 'string') {
+        const parts = p.id.split('_');
+        if (parts.length >= 2) {
+          const ts = parseInt(parts[1], 10);
+          if (!isNaN(ts)) {
+            pedidoMs = ts;
+          }
+        }
+      }
+
+      if (!pedidoMs && p.fecha) {
+        pedidoMs = new Date(p.fecha).getTime();
+      }
+
+      return pedidoMs && pedidoMs > desdeMs;
+    });
+
+    res.json({
+      success: true,
+      count: nuevosPedidos.length,
+      pedidos: nuevosPedidos
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Error al consultar nuevos pedidos', details: err.message });
+  }
+});
+
 export default router;
+
