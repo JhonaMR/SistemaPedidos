@@ -1086,7 +1086,16 @@ export default function OrderForm({
       )}
 
       {/* Step 3: Shopping Cart List & Checkout Configuration */}
-      <div id="order-cart-panel" className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
+      {!selectedClientId ? (
+        <div id="order-cart-locked" className="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-10 text-center text-slate-500 space-y-3">
+          <ShoppingBag className="h-10 w-10 text-slate-300 mx-auto" />
+          <p className="text-sm font-bold text-slate-700">Lista de prendas bloqueada</p>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            Por favor selecciona o registra un cliente en el paso anterior para habilitar la lista de prendas del pedido.
+          </p>
+        </div>
+      ) : (
+        <div id="order-cart-panel" className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
         <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] mb-4 flex items-center justify-between">
           <span>3. Lista de Prendas en el Pedido Actual</span>
           {cart.length > 0 && (
@@ -1263,7 +1272,8 @@ export default function OrderForm({
             </div>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
       {showBillingErrorModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">

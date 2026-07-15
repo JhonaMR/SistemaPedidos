@@ -1275,15 +1275,21 @@ export default function App() {
             >
               <Menu className="h-5.5 w-5.5" />
             </button>
-            <div className="p-1 bg-white border border-indigo-100 rounded-xl overflow-hidden shadow-3xs flex items-center justify-center">
-              <img src="/logos/plow-192x192.png" className="h-10 w-10 object-contain" alt="Plow Logo" />
-            </div>
-            <div>
-              <h1 className="text-xl font-extrabold text-slate-950 flex flex-col sm:flex-row sm:items-center gap-2">
-                <span>Arare S.A.S.</span>
-              </h1>
-              <p className="text-xs text-slate-500 font-medium">Gestión y Toma de Pedidos para Vendedores</p>
-            </div>
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              title="Ir al inicio"
+              className="flex items-center gap-3 hover:opacity-80 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer"
+            >
+              <div className="p-1 bg-white border border-indigo-100 rounded-xl overflow-hidden shadow-3xs flex items-center justify-center">
+                <img src="/logos/plow-192x192.png" className="h-10 w-10 object-contain" alt="Plow Logo" />
+              </div>
+              <div>
+                <h1 className="text-xl font-extrabold text-slate-950 flex flex-col sm:flex-row sm:items-center gap-2">
+                  <span>Arare S.A.S.</span>
+                </h1>
+                <p className="text-xs text-slate-500 font-medium">Gestión y Toma de Pedidos para Vendedores</p>
+              </div>
+            </button>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
