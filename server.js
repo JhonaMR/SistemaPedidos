@@ -106,7 +106,7 @@ var UsuarioSchema = z.object({
   id: z.string(),
   nombre: z.string().min(1, "El nombre es requerido"),
   usuario: z.string().length(3, "El usuario debe tener exactamente 3 letras"),
-  clave: z.string(),
+  clave: z.string().optional().nullable(),
   rol: z.enum(["general", "soporte"]),
   esPrimeraVez: z.boolean(),
   activo: z.boolean().optional().nullable(),
@@ -562,7 +562,7 @@ router.post("/usuarios", authMiddleware, async (req, res) => {
       } else {
         if (!isSupport) {
           if (u.id !== currentUser.id) {
-            if (JSON.stringify(u) !== JSON.stringify(existing)) {
+            if (u.nombre !== existing.nombre || u.usuario !== existing.usuario || u.rol !== existing.rol || u.esPrimeraVez !== existing.esPrimeraVez || (u.activo ?? null) !== (existing.activo ?? null) || (u.idVendedor ?? null) !== (existing.idVendedor ?? null)) {
               return res.status(403).json({ error: "Acceso denegado. No puedes modificar la cuenta de otros usuarios." });
             }
           } else {

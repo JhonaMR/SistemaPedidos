@@ -26,6 +26,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
   // First time password change state
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [tempUser, setTempUser] = useState<UsuarioApp | null>(null);
+  const [tempToken, setTempToken] = useState<string | null>(null);
   const [newPin, setNewPin] = useState('');
   const [confirmPin, setConfirmPin] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -61,6 +62,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
 
           if (loggedUser.esPrimeraVez) {
             setTempUser(loggedUser);
+            setTempToken(response.token);
             setIsChangingPassword(true);
           } else {
             onLogin(loggedUser, response.token);
@@ -145,6 +147,10 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
       return u;
     });
 
+    if (tempToken) {
+      localStorage.setItem('prenda_jwt_token', tempToken);
+    }
+
     onUpdateUsuarios(updatedUsers);
 
     // Log in the user
@@ -154,7 +160,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
       localPinHash: newLocalPinHash,
       esPrimeraVez: false,
     };
-    onLogin(updatedLoggedInUser);
+    onLogin(updatedLoggedInUser, tempToken || undefined);
   };
 
 

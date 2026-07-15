@@ -60,7 +60,7 @@ export const UsuarioSchema = z.object({
   id: z.string(),
   nombre: z.string().min(1, 'El nombre es requerido'),
   usuario: z.string().length(3, 'El usuario debe tener exactamente 3 letras'),
-  clave: z.string(),
+  clave: z.string().optional().nullable(),
   rol: z.enum(['general', 'soporte']),
   esPrimeraVez: z.boolean(),
   activo: z.boolean().optional().nullable(),
