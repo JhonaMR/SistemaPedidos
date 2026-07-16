@@ -603,10 +603,14 @@ export default function OrderHistory({
                           {pedido.items.map((item, idx) => (
                             <tr key={idx} className="hover:bg-slate-50">
                               <td className="py-1.5 px-3">
-                                <span className="font-semibold text-slate-800 font-mono">
-                                  {catalogGarments.find(g => g.ref === item.prendaRef)?.ref || item.prendaRef}
-                                </span>
-                                <span className="text-[10px] text-slate-400 block">{item.categoria}</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-semibold text-slate-800 font-mono">
+                                    {catalogGarments.find(g => g.ref === item.prendaRef)?.ref || item.prendaRef}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-normal">
+                                    - ({item.categoria})
+                                  </span>
+                                </div>
                               </td>
                               <td className="py-1.5 px-3 text-center font-bold text-slate-700">{getSortedTallasStr(item.tallasDetalle, item.talla)}</td>
                               <td className="py-1.5 px-3 text-center">

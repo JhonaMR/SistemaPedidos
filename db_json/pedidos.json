@@ -873,12 +873,77 @@
         "cantidad": 24,
         "precioUnitario": 19900,
         "total": 477600
+      },
+      {
+        "id": "extra_1784235762407",
+        "prendaRef": "639",
+        "nombrePrenda": "Prenda niña",
+        "categoria": "Niña",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 15900,
+        "total": 381600
+      },
+      {
+        "id": "extra_1784235772664",
+        "prendaRef": "635",
+        "nombrePrenda": "Prenda niña",
+        "categoria": "Niña",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 16900,
+        "total": 405600
+      },
+      {
+        "id": "extra_1784235787986",
+        "prendaRef": "556",
+        "nombrePrenda": "Prenda niña",
+        "categoria": "Niña",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 19900,
+        "total": 477600
+      },
+      {
+        "id": "extra_1784235798102",
+        "prendaRef": "595",
+        "nombrePrenda": "Prenda niña",
+        "categoria": "Niña",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 42900,
+        "total": 1029600
+      },
+      {
+        "id": "extra_1784235806197",
+        "prendaRef": "615",
+        "nombrePrenda": "Prenda niña",
+        "categoria": "Niña",
+        "talla": "N/A",
+        "tallasDetalle": {
+          "N/A": 24
+        },
+        "cantidad": 24,
+        "precioUnitario": 42900,
+        "total": 1029600
       }
     ],
-    "subtotal": 6192000,
+    "subtotal": 9516000,
     "porcentajeDescuento": 0,
     "montoDescuento": 0,
-    "total": 6192000,
+    "total": 9516000,
     "estado": "Pendiente",
     "notas": "",
     "fechaEntregaEstimada": "2026-07-15",
@@ -889,7 +954,7 @@
     "numeroPedido": "02-001",
     "fecha": "2026-07-15",
     "campana": "Vacaciones 2026",
-    "sincronizado": 1,
+    "sincronizado": 0,
     "editado": true
   },
   {
@@ -1043,7 +1108,7 @@
     "numeroPedido": "02-002",
     "fecha": "2026-07-16",
     "campana": "Vacaciones 2026",
-    "sincronizado": 0,
+    "sincronizado": 1,
     "editado": true
   }
 ]
