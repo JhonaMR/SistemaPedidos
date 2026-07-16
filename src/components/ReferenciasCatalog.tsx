@@ -63,7 +63,7 @@ export default function ReferenciasCatalog({
   const getAvailableSizesForCategories = (cats: string[]) => {
     let sizes: string[] = [];
     if (cats.includes('Colegial')) {
-      return ['2-4', '6-8', '10-12', '14-16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+      return ['2/4', '6/8', '10/12', '14/16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
     }
     if (cats.includes('Dama')) {
       sizes = [...sizes, 'S', 'M', 'L'];
@@ -72,9 +72,9 @@ export default function ReferenciasCatalog({
       sizes = [...sizes, 'XL', '2XL', '3XL'];
     }
     if (cats.includes('Niña') || cats.includes('Niño')) {
-      sizes = [...sizes, '2-4', '6-8', '10-12', '14-16'];
+      sizes = [...sizes, '2/4', '6/8', '10/12', '14/16'];
     }
-    const order = ['2-4', '6-8', '10-12', '14-16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+    const order = ['2/4', '6/8', '10/12', '14/16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
     return order.filter(s => sizes.includes(s));
   };
 
@@ -354,8 +354,8 @@ export default function ReferenciasCatalog({
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${selectedCategory === cat
-                  ? 'bg-indigo-600 text-white shadow-sm'
-                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
                 }`}
             >
               {cat}
@@ -573,8 +573,8 @@ export default function ReferenciasCatalog({
                             });
                           }}
                           className={`py-1.5 px-0.5 rounded-md border text-center font-bold text-[8px] sm:text-[9px] md:text-[10px] lg:text-[11px] truncate transition-all ${isSelected
-                              ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
-                              : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                             }`}
                         >
                           {cat}
@@ -633,8 +633,8 @@ export default function ReferenciasCatalog({
                           type="button"
                           onClick={() => toggleFormTalla(t)}
                           className={`py-1.5 px-1 rounded-md border text-center font-mono font-black text-[10px] transition-all ${isSelected
-                              ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
-                              : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
                             }`}
                         >
                           {t}

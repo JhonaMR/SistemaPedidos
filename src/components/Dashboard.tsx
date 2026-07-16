@@ -1,13 +1,17 @@
-import { Pedido } from '../types';
+import React, { useState } from 'react';
+import { Pedido, Prenda } from '../types';
 import { Clock, CheckCircle2, ChevronRight, ShoppingBag, Package, Truck, AlertTriangle, TrendingUp } from 'lucide-react';
+import { ViewFotoModal } from './ViewFotoModal';
 
 interface DashboardProps {
   pedidos: Pedido[];
   todosLosPedidos?: Pedido[];
   vendedor: { nombre: string; codigo: string };
   onNavigateToRegister?: () => void;
+  onNavigateToHistory?: () => void;
   currentUser?: any;
   activeCampana?: string;
+  catalogGarments?: Prenda[];
 }
 
 export default function Dashboard({
@@ -15,9 +19,12 @@ export default function Dashboard({
   todosLosPedidos,
   vendedor,
   onNavigateToRegister,
+  onNavigateToHistory,
   currentUser,
-  activeCampana = 'Campaña General'
+  activeCampana = 'Campaña General',
+  catalogGarments = []
 }: DashboardProps) {
+  const [viewFotoPrenda, setViewFotoPrenda] = useState<Prenda | null>(null);
   const pedidosCampaña = pedidos.filter(p => p.campana === activeCampana);
   const totalOrders = pedidosCampaña.length;
   const nombreVendedor = currentUser?.nombre || vendedor.nombre;
@@ -84,7 +91,10 @@ export default function Dashboard({
             <h3 className="text-md font-bold text-[#1E293B] uppercase tracking-wider">Estado de Pedidos</h3>
             <p className="text-xs text-[#64748B]">Distribución y progreso logístico en tiempo real de todas tus prendas pedidas.</p>
           </div>
-          <div className="bg-[#F8FAFC] border border-[#E2E8F0] px-4 py-2 rounded-lg flex items-center gap-2 shrink-0">
+          <div 
+            onClick={onNavigateToHistory}
+            className={`bg-[#F8FAFC] border border-[#E2E8F0] px-4 py-2 rounded-lg flex items-center gap-2 shrink-0 ${onNavigateToHistory ? 'cursor-pointer hover:bg-slate-100 hover:border-slate-300 transition-all' : ''}`}
+          >
             <ShoppingBag className="h-4 w-4 text-[#4F46E5]" />
             <span className="text-xs font-bold text-[#334155]">{totalOrders} Pedidos Registrados</span>
           </div>
@@ -172,7 +182,22 @@ export default function Dashboard({
                       {topReferences.map((refData, index) => {
                         const percentage = Math.round((refData.cantidad / maxQty) * 100);
                         return (
-                          <div key={refData.ref} className="relative group">
+                          <div 
+                            key={refData.ref} 
+                            className="relative group cursor-pointer"
+                            onClick={() => {
+                              const found = catalogGarments.find(g => g.ref === refData.ref);
+                              const prenda = found || {
+                                ref: refData.ref,
+                                nombre: refData.nombre,
+                                precioBase: refData.totalVendido / (refData.cantidad || 1),
+                                tallasDisponibles: ['N/A'],
+                                imagenUrl: '',
+                                stock: 0
+                              };
+                              setViewFotoPrenda(prenda as Prenda);
+                            }}
+                          >
                             {/* Background Bar */}
                             <div
                               className="absolute inset-0 bg-indigo-50/20 rounded-lg -z-10 group-hover:bg-indigo-50/40 transition-colors"
@@ -207,6 +232,13 @@ export default function Dashboard({
           })()}
         </div>
       </div>
+
+      {viewFotoPrenda && (
+        <ViewFotoModal
+          prenda={viewFotoPrenda}
+          onClose={() => setViewFotoPrenda(null)}
+        />
+      )}
     </div>
   );
 }

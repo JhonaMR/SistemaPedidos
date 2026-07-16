@@ -845,7 +845,7 @@ export default function App() {
           // Generate tallas automatic
           const sizesSet = new Set<string>();
           if (categories.includes('Colegial')) {
-            ['2-4', '6-8', '10-12', '14-16', 'S', 'M', 'L', 'XL', '2XL', '3XL'].forEach(s => sizesSet.add(s));
+            ['2/4', '6/8', '10/12', '14/16', 'S', 'M', 'L', 'XL', '2XL', '3XL'].forEach(s => sizesSet.add(s));
           }
           if (categories.includes('Dama')) {
             ['S', 'M', 'L'].forEach(s => sizesSet.add(s));
@@ -854,10 +854,10 @@ export default function App() {
             ['XL', '2XL', '3XL'].forEach(s => sizesSet.add(s));
           }
           if (categories.includes('Niña') || categories.includes('Niño')) {
-            ['2-4', '6-8', '10-12', '14-16'].forEach(s => sizesSet.add(s));
+            ['2/4', '6/8', '10/12', '14/16'].forEach(s => sizesSet.add(s));
           }
 
-          const order = ['2-4', '6-8', '10-12', '14-16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+          const order = ['2/4', '6/8', '10/12', '14/16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
           const tallasDisponibles = order.filter(s => sizesSet.has(s));
 
           newPrendas.push({
@@ -1423,8 +1423,8 @@ export default function App() {
                   setShowSidebar(false);
                 }}
                 className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'dashboard'
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
-                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                  : 'text-slate-600 hover:bg-slate-50 border-transparent'
                   }`}
               >
                 <TrendingUp className="h-4 w-4" />
@@ -1437,8 +1437,8 @@ export default function App() {
                   setShowSidebar(false);
                 }}
                 className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'nuevo-pedido'
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
-                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                  : 'text-slate-600 hover:bg-slate-50 border-transparent'
                   }`}
               >
                 <ShoppingBag className="h-4 w-4" />
@@ -1451,8 +1451,8 @@ export default function App() {
                   setShowSidebar(false);
                 }}
                 className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-all cursor-pointer border ${activeTab === 'pedidos'
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
-                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                  : 'text-slate-600 hover:bg-slate-50 border-transparent'
                   }`}
               >
                 <div className="flex items-center gap-3">
@@ -1472,8 +1472,8 @@ export default function App() {
                   setShowSidebar(false);
                 }}
                 className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'clientes'
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
-                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                  : 'text-slate-600 hover:bg-slate-50 border-transparent'
                   }`}
               >
                 <Users className="h-4 w-4" />
@@ -1486,8 +1486,8 @@ export default function App() {
                   setShowSidebar(false);
                 }}
                 className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'referencias'
-                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
-                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                  : 'text-slate-600 hover:bg-slate-50 border-transparent'
                   }`}
               >
                 <Package className="h-4 w-4" />
@@ -1501,8 +1501,8 @@ export default function App() {
                     setShowSidebar(false);
                   }}
                   className={`w-full py-3 px-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all cursor-pointer border ${activeTab === 'configuracion'
-                      ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
-                      : 'text-slate-600 hover:bg-slate-50 border-transparent'
+                    ? 'bg-indigo-50 border-indigo-200 text-indigo-700 font-black'
+                    : 'text-slate-600 hover:bg-slate-50 border-transparent'
                     }`}
                 >
                   <Settings className="h-4 w-4" />
@@ -1572,7 +1572,9 @@ export default function App() {
               vendedor={vendedor}
               currentUser={currentUser}
               activeCampana={activeCampana}
+              catalogGarments={catalogGarments}
               onNavigateToRegister={() => setActiveTab('nuevo-pedido')}
+              onNavigateToHistory={() => setActiveTab('pedidos')}
             />
           )}
 
@@ -1971,8 +1973,8 @@ export default function App() {
                                     alert(`Usuario ${u.usuario} ha sido ${!isCurrentlyActive ? 'habilitado' : 'inhabilitado'}.`);
                                   }}
                                   className={`px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide rounded-md transition-colors ${u.activo !== false
-                                      ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
-                                      : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
+                                    ? 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200'
+                                    : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200'
                                     }`}
                                 >
                                   {u.activo !== false ? 'Inhabilitar' : 'Habilitar'}
@@ -2040,8 +2042,8 @@ export default function App() {
                       <div
                         key={fullName}
                         className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 transition-all ${isActive
-                            ? 'bg-indigo-50/50 border-indigo-200 shadow-xs'
-                            : 'bg-slate-50/50 border-slate-200'
+                          ? 'bg-indigo-50/50 border-indigo-200 shadow-xs'
+                          : 'bg-slate-50/50 border-slate-200'
                           }`}
                       >
                         <div className="space-y-2">

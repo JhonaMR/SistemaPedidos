@@ -452,9 +452,9 @@ router.post("/pedidos", authMiddleware, async (req, res) => {
         existingMap.set(p.id, { ...existingPedido, ...pedidoParaGuardar });
       }
     });
-    const activeIds = new Set(Array.from(existingMap.keys()));
+    const activeIdsSent = new Set(pedidos.map((p) => p.id));
     const serverDeletedPedidos = data.deletedPedidos || [];
-    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIds.has(p.id));
+    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIdsSent.has(p.id));
     await saveDeletedPedidos(finalDeleted);
     const deletedIds = new Set(finalDeleted.map((p) => p.id));
     const merged = Array.from(existingMap.values()).filter((p) => !deletedIds.has(p.id));
@@ -488,13 +488,11 @@ router.post("/deleted-pedidos", authMiddleware, async (req, res) => {
       });
       serverDeletedPedidos = Array.from(existingMap.values());
     }
-    const activeIds = new Set((data.pedidos || []).map((p) => p.id));
-    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIds.has(p.id));
-    await saveDeletedPedidos(finalDeleted);
-    const deletedIds = new Set(finalDeleted.map((p) => p.id));
+    await saveDeletedPedidos(serverDeletedPedidos);
+    const deletedIds = new Set(serverDeletedPedidos.map((p) => p.id));
     const activePedidos = data.pedidos.filter((p) => !deletedIds.has(p.id));
     await savePedidos(activePedidos);
-    res.json({ success: true, count: finalDeleted.length });
+    res.json({ success: true, count: serverDeletedPedidos.length });
   } catch (err) {
     res.status(500).json({ error: "Error al guardar pedidos eliminados", details: err.message });
   }
@@ -691,8 +689,8 @@ router.post("/pedidos/sync-batch", authMiddleware, async (req, res) => {
         serverDeletedPedidos = [...otherSellersDeleted, ...deletedPedidos];
       }
     }
-    const activeIds = new Set(Array.from(pedidosMap.keys()));
-    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIds.has(p.id));
+    const activeIdsSent = new Set(pedidos.map((p) => p.id));
+    const finalDeleted = serverDeletedPedidos.filter((p) => !activeIdsSent.has(p.id));
     await saveDeletedPedidos(finalDeleted);
     const deletedIds = new Set(finalDeleted.map((p) => p.id));
     const mergedPedidos = Array.from(pedidosMap.values()).filter((p) => !deletedIds.has(p.id));
@@ -706,6 +704,52 @@ router.post("/pedidos/sync-batch", authMiddleware, async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: "Error durante la sincronizaci\xF3n en lote", details: err.message });
+  }
+});
+router.get("/pedidos/nuevos", authMiddleware, async (req, res) => {
+  try {
+    const { desde } = req.query;
+    const data = await getAllData();
+    const pedidos = data.pedidos || [];
+    let desdeMs;
+    if (desde) {
+      const numerico = Number(desde);
+      if (!isNaN(numerico)) {
+        desdeMs = numerico;
+      } else {
+        const parsedDate = Date.parse(desde);
+        if (isNaN(parsedDate)) {
+          return res.status(400).json({ error: 'El par\xE1metro "desde" tiene un formato inv\xE1lido (debe ser un timestamp o fecha v\xE1lida).' });
+        }
+        desdeMs = parsedDate;
+      }
+    } else {
+      desdeMs = Date.now() - 24 * 60 * 60 * 1e3;
+    }
+    const nuevosPedidos = pedidos.filter((p) => {
+      if (p.esBackup) return false;
+      let pedidoMs = null;
+      if (typeof p.id === "string") {
+        const parts = p.id.split("_");
+        if (parts.length >= 2) {
+          const ts = parseInt(parts[1], 10);
+          if (!isNaN(ts)) {
+            pedidoMs = ts;
+          }
+        }
+      }
+      if (!pedidoMs && p.fecha) {
+        pedidoMs = new Date(p.fecha).getTime();
+      }
+      return pedidoMs && pedidoMs > desdeMs;
+    });
+    res.json({
+      success: true,
+      count: nuevosPedidos.length,
+      pedidos: nuevosPedidos
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Error al consultar nuevos pedidos", details: err.message });
   }
 });
 var api_default = router;

@@ -74,6 +74,20 @@ export default function OrderForm({
   const [showBillingErrorModal, setShowBillingErrorModal] = useState(false);
   const [viewFotoPrenda, setViewFotoPrenda] = useState<Prenda | null>(null);
 
+  // Mass Edit Quantities states
+  const [showMassQtyModal, setShowMassQtyModal] = useState(false);
+  const [massQtyMode, setMassQtyMode] = useState<'flat' | 'sizes'>('flat');
+  const [massFlatQty, setMassFlatQty] = useState<number | ''>('');
+  const [massSizesQty, setMassSizesQty] = useState<Record<string, Record<string, number>>>({});
+
+  // Extra Reference modal states
+  const [showAddExtraModal, setShowAddExtraModal] = useState(false);
+  const [extraRef, setExtraRef] = useState('');
+  const [extraCategory, setExtraCategory] = useState<'Dama' | 'Plus' | 'Niña' | 'Niño' | 'Colegial'>('Dama');
+  const [extraUnitPrice, setExtraUnitPrice] = useState<number | ''>('');
+  const [extraNovedad, setExtraNovedad] = useState('');
+  const [extraTallasCantidades, setExtraTallasCantidades] = useState<Record<string, number>>({ 'N/A': 1 });
+
   // Client Quick Add states
   const [isQuickAdding, setIsQuickAdding] = useState(false);
   const [quickCodigo, setQuickCodigo] = useState('');
@@ -99,7 +113,7 @@ export default function OrderForm({
 
   // Active Catalog Item selection state
   const [selectedPrenda, setSelectedPrenda] = useState<Prenda | null>(null);
-  const [tallasCantidades, setTallasCantidades] = useState<Record<string, number>>({});
+  const [tallasCantidades, setTallasCantidades] = useState<Record<string, number>>({ 'N/A': 1 });
   const [novedad, setNovedad] = useState('');
   const [addFeedback, setAddFeedback] = useState<string | null>(null);
   const [customUnitPrice, setCustomUnitPrice] = useState<number>(0);
@@ -152,12 +166,12 @@ export default function OrderForm({
   if (activeCampana !== lastCampana) {
     setLastCampana(activeCampana);
     setSelectedPrenda(null);
-    setTallasCantidades({});
+    setTallasCantidades({ 'N/A': 1 });
   }
 
   if (selectedPrenda === null && campanaGarments.length > 0) {
     setSelectedPrenda(campanaGarments[0]);
-    setTallasCantidades({});
+    setTallasCantidades({ 'N/A': 1 });
   }
 
   // Formatting helpers
@@ -172,7 +186,7 @@ export default function OrderForm({
   // Select first talla when product changes
   const handleSelectPrenda = (prenda: Prenda) => {
     setSelectedPrenda(prenda);
-    setTallasCantidades({});
+    setTallasCantidades({ 'N/A': 1 });
     setNovedad('');
     setAddFeedback(null);
   };
@@ -276,7 +290,7 @@ export default function OrderForm({
     const sizeSummaryText = activeTallas.map(([t, q]) => `${t}-${q}`).join(', ');
     setAddFeedback(`Añadido: ${selectedPrenda.nombre} - Tallas: ${sizeSummaryText}`);
     setTimeout(() => setAddFeedback(null), 3550);
-    setTallasCantidades({});
+    setTallasCantidades({ 'N/A': 1 });
     setNovedad('');
   };
 
@@ -327,6 +341,165 @@ export default function OrderForm({
 
     setCart(updatedCart);
     setEditingCartItem(null);
+  };
+
+  // Mass Edit Handlers
+  const handleOpenMassQtyModal = () => {
+    setMassFlatQty('');
+
+    // Inicializar cantidades por talla de categoría a partir de las prendas en el carrito
+    const initSizesQty: Record<string, Record<string, number>> = {};
+    const categoriesInCart = Array.from(new Set(cart.map(item => item.categoria))) as string[];
+
+    categoriesInCart.forEach((cat: string) => {
+      initSizesQty[cat] = {};
+      const itemsInCat = cart.filter(item => item.categoria === cat);
+      const uniqueSizes = Array.from(new Set(
+        itemsInCat.flatMap(item => {
+          const prenda = catalogGarments.find(p => p.ref === item.prendaRef);
+          return prenda ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) : [];
+        })
+      )) as string[];
+
+      uniqueSizes.forEach((sz: string) => {
+        initSizesQty[cat][sz] = 0;
+      });
+    });
+
+    setMassSizesQty(initSizesQty);
+    setMassQtyMode('flat');
+    setShowMassQtyModal(true);
+  };
+
+  const handleApplyMassQty = () => {
+    if (massQtyMode === 'flat') {
+      const flatVal = parseInt(massFlatQty as any);
+      if (isNaN(flatVal) || flatVal <= 0) {
+        alert('Por favor ingresa una cantidad válida mayor a 0.');
+        return;
+      }
+
+      const updatedCart = cart.map(item => ({
+        ...item,
+        tallasDetalle: { 'N/A': flatVal },
+        talla: 'N/A',
+        cantidad: flatVal,
+        total: flatVal * item.precioUnitario
+      }));
+
+      setCart(updatedCart);
+    } else {
+      // Modo tallas
+      // Validar si al menos se ingresó alguna cantidad en el modal
+      let totalEntered = 0;
+      Object.values(massSizesQty).forEach((catSizes: any) => {
+        Object.values(catSizes).forEach((qty: any) => {
+          totalEntered += (qty as number);
+        });
+      });
+
+      if (totalEntered === 0) {
+        alert('Por favor ingresa al menos una cantidad mayor a 0 en alguna talla.');
+        return;
+      }
+
+      const updatedCart = cart.map(item => {
+        const catConfig = massSizesQty[item.categoria] || {};
+        const totalConfiguredForCat = Object.values(catConfig).reduce((sum: number, val: any) => sum + (val as number), 0);
+
+        // Si no se configuró nada para esta categoría, no la modificamos
+        if (totalConfiguredForCat === 0) {
+          return item;
+        }
+
+        const prenda = catalogGarments.find(p => p.ref === item.prendaRef);
+        const supportedSizes = prenda ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) : [];
+
+        const newTallasDetalle: Record<string, number> = {};
+        let newQty = 0;
+
+        supportedSizes.forEach(sz => {
+          const qty = catConfig[sz] || 0;
+          if (qty > 0) {
+            newTallasDetalle[sz] = qty;
+            newQty += qty;
+          }
+        });
+
+        const formattedTallaStr = getSortedTallasStr(newTallasDetalle);
+        return {
+          ...item,
+          tallasDetalle: newTallasDetalle,
+          talla: formattedTallaStr,
+          cantidad: newQty,
+          total: newQty * item.precioUnitario
+        };
+      });
+
+      setCart(updatedCart);
+    }
+
+    setShowMassQtyModal(false);
+  };
+
+  // Extra Reference Handlers & Helpers
+  const getAvailableSizesForCategory = (cat: string) => {
+    if (cat === 'Colegial') return ['2/4', '6/8', '10/12', '14/16', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+    if (cat === 'Dama') return ['S', 'M', 'L'];
+    if (cat === 'Plus') return ['XL', '2XL', '3XL'];
+    if (cat === 'Niña' || cat === 'Niño') return ['2/4', '6/8', '10/12', '14/16'];
+    return [];
+  };
+
+  const handleOpenAddExtraProductModal = () => {
+    setExtraRef('');
+    setExtraCategory('Dama');
+    setExtraUnitPrice('');
+    setExtraNovedad('');
+    setExtraTallasCantidades({ 'N/A': 1 });
+    setShowAddExtraModal(true);
+  };
+
+  const handleSaveExtraItem = () => {
+    const cleanRef = extraRef.trim().toUpperCase();
+    if (!cleanRef) {
+      alert('Por favor ingresa una referencia.');
+      return;
+    }
+
+    const unitPrice = parseFloat(extraUnitPrice as any);
+    if (isNaN(unitPrice) || unitPrice < 0) {
+      alert('Por favor ingresa un precio de venta válido.');
+      return;
+    }
+
+    const activeTallas = (Object.entries(extraTallasCantidades) as [string, number][]).filter(([_, qty]) => qty > 0);
+    if (activeTallas.length === 0) {
+      alert('Por favor selecciona al menos una talla y define su cantidad.');
+      return;
+    }
+
+    // Al imprimir el pedido, el nombre de la referencia debe ser "Prenda " + etiqueta.toLowerCase()
+    const label = extraCategory.toLowerCase();
+    const nombrePrenda = `Prenda ${label}`;
+    const totalQty = activeTallas.reduce((sum, [_, q]) => sum + q, 0);
+    const formattedTallaStr = getSortedTallasStr(extraTallasCantidades);
+
+    const newItem: ItemPedido = {
+      id: `extra_${Date.now()}`,
+      prendaRef: cleanRef,
+      nombrePrenda: nombrePrenda,
+      categoria: extraCategory,
+      talla: formattedTallaStr,
+      tallasDetalle: { ...extraTallasCantidades },
+      novedad: extraNovedad.trim() ? extraNovedad.trim() : undefined,
+      cantidad: totalQty,
+      precioUnitario: unitPrice,
+      total: totalQty * unitPrice
+    };
+
+    setCart(prev => [...prev, newItem]);
+    setShowAddExtraModal(false);
   };
 
   // Cart totals
@@ -991,50 +1164,61 @@ export default function OrderForm({
                         Cantidad por Talla
                       </span>
                       <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-0.5">
-                        {Object.keys(tallasCantidades).map((t) => (
-                          <div key={t} className="flex flex-col items-center gap-1.5 bg-white border border-slate-100 p-2 rounded-xl shadow-2xs min-w-[90px]">
-                            <span className="text-[10px] font-extrabold text-slate-800 font-mono">Talla {t}</span>
-                            <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTallasCantidades(prev => {
-                                    const copy = { ...prev };
-                                    if (copy[t] <= 1) {
-                                      delete copy[t];
-                                    } else {
-                                      copy[t] -= 1;
-                                    }
-                                    return copy;
-                                  });
-                                }}
-                                className="p-1 hover:bg-slate-50 text-slate-500"
-                              >
-                                <Minus className="h-3 w-3" />
-                              </button>
-                              <input
-                                type="number"
-                                min={1}
-                                value={tallasCantidades[t]}
-                                onChange={(e) => {
-                                  const val = Math.max(1, parseInt(e.target.value) || 1);
-                                  setTallasCantidades(prev => ({ ...prev, [t]: val }));
-                                }}
-                                onFocus={(e) => e.target.select()}
-                                className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTallasCantidades(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
-                                }}
-                                className="p-1 hover:bg-slate-50 text-slate-500"
-                              >
-                                <Plus className="h-3 w-3" />
-                              </button>
+                        {Object.keys(tallasCantidades).map((t) => {
+                          const isNA = t === 'N/A';
+                          return (
+                            <div
+                              key={t}
+                              className={`flex bg-white border border-slate-100 p-2.5 rounded-xl shadow-2xs ${isNA
+                                  ? 'w-full flex-row justify-between items-center px-4 py-3'
+                                  : 'flex-col items-center gap-1.5 min-w-[90px]'
+                                }`}
+                            >
+                              <span className="text-[10px] font-extrabold text-slate-800 font-mono">
+                                Talla {t}
+                              </span>
+                              <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTallasCantidades(prev => {
+                                      const copy = { ...prev };
+                                      if (copy[t] <= 1) {
+                                        delete copy[t];
+                                      } else {
+                                        copy[t] -= 1;
+                                      }
+                                      return copy;
+                                    });
+                                  }}
+                                  className="p-1 hover:bg-slate-50 text-slate-500"
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </button>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  value={tallasCantidades[t]}
+                                  onChange={(e) => {
+                                    const val = Math.max(1, parseInt(e.target.value) || 1);
+                                    setTallasCantidades(prev => ({ ...prev, [t]: val }));
+                                  }}
+                                  onFocus={(e) => e.target.select()}
+                                  className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTallasCantidades(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
+                                  }}
+                                  className="p-1 hover:bg-slate-50 text-slate-500"
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -1096,182 +1280,204 @@ export default function OrderForm({
         </div>
       ) : (
         <div id="order-cart-panel" className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] mb-4 flex items-center justify-between">
-          <span>3. Lista de Prendas en el Pedido Actual</span>
-          {cart.length > 0 && (
-            <button
-              id="btn-clear-order-cart"
-              type="button"
-              onClick={handleClearCart}
-              className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase tracking-wide flex items-center gap-1"
-            >
-              <Trash2 className="h-3 w-3" /> Vaciar Todo
-            </button>
-          )}
-        </h3>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] mb-4 flex items-center justify-between">
+            <span>3. Lista de Prendas en el Pedido Actual</span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenAddExtraProductModal}
+                className="text-[10px] text-emerald-600 hover:text-emerald-800 font-bold uppercase tracking-wide flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" /> Ref. Adicional
+              </button>
+              {cart.length > 0 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleOpenMassQtyModal}
+                    className="text-[10px] text-indigo-600 hover:text-indigo-800 font-bold uppercase tracking-wide flex items-center gap-1 cursor-pointer"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" /> Modificación de tallas
+                  </button>
+                  <button
+                    id="btn-clear-order-cart"
+                    type="button"
+                    onClick={handleClearCart}
+                    className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase tracking-wide flex items-center gap-1 cursor-pointer"
+                  >
+                    <Trash2 className="h-3 w-3" /> Vaciar Todo
+                  </button>
+                </>
+              )}
+            </div>
+          </h3>
 
-        {cart.length === 0 ? (
-          <div className="text-center p-8 border border-dashed border-slate-200 rounded-lg text-xs text-slate-400">
-            Aún no has agregado ninguna prenda de vestir a este pedido. Configura una prenda en el paso 2 para agregarla.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-400 font-bold">
-                    <th className="pb-2">Prenda</th>
-                    <th className="pb-2 text-center">Talla</th>
-                    <th className="pb-2 text-center">Requerimiento / Novedad</th>
-                    <th className="pb-2 text-center">Cant.</th>
-                    <th className="pb-2 text-right">Precio Un.</th>
-                    <th className="pb-2 text-right">Subtotal</th>
-                    <th className="pb-2"></th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50 text-xs">
-                  {cart.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50">
-                      <td className="py-2.5">
-                        <div className="font-semibold text-slate-800 font-mono">
-                          {listToUse.find(p => p.ref === item.prendaRef)?.ref || item.prendaRef}
-                        </div>
-                        <span className="text-[10px] text-slate-400">({item.categoria})</span>
-                      </td>
-                      <td className="py-2.5 text-center font-bold text-slate-700">{item.talla.replace(/\s*\((\d+)\)/g, '-$1')}</td>
-                      <td className="py-2.5 text-center">
-                        {item.novedad ? (
-                          <span className="inline-block px-2 py-1 bg-amber-50 border border-amber-100 rounded text-[10px] text-amber-800 font-medium italic max-w-[180px] truncate" title={item.novedad}>
-                            {item.novedad}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 font-normal italic">-</span>
-                        )}
-                      </td>
-                      <td className="py-2.5 text-center font-bold text-slate-800">{item.cantidad}</td>
-                      <td className="py-2.5 text-right font-mono text-slate-600">{formatCOP(item.precioUnitario)}</td>
-                      <td className="py-2.5 text-right font-mono font-bold text-slate-800">{formatCOP(item.total)}</td>
-                      <td className="py-2.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            id={`btn-edit-cart-${item.id}`}
-                            type="button"
-                            onClick={() => handleOpenEditCartModal(item)}
-                            className="p-1 text-slate-400 hover:text-indigo-650 rounded"
-                            title="Editar fila"
-                          >
-                            <Edit3 className="h-3.5 w-3.5" />
-                          </button>
-                          <button
-                            id={`btn-remove-cart-${item.id}`}
-                            type="button"
-                            onClick={() => handleRemoveFromCart(item.id)}
-                            className="p-1 text-slate-400 hover:text-red-500 rounded"
-                            title="Eliminar fila"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      </td>
+          {cart.length === 0 ? (
+            <div className="text-center p-8 border border-dashed border-slate-200 rounded-lg text-xs text-slate-400">
+              Aún no has agregado ninguna prenda de vestir a este pedido. Configura una prenda en el paso 2 para agregarla.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-400 font-bold">
+                      <th className="pb-2">Prenda</th>
+                      <th className="pb-2 text-center">Talla</th>
+                      <th className="pb-2 text-center">Requerimiento / Novedad</th>
+                      <th className="pb-2 text-center">Cant.</th>
+                      <th className="pb-2 text-right">Precio Un.</th>
+                      <th className="pb-2 text-right">Subtotal</th>
+                      <th className="pb-2"></th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50 text-xs">
+                    {cart.map((item) => (
+                      <tr key={item.id} className="hover:bg-slate-50">
+                        <td className="py-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-slate-800 font-mono">
+                              {listToUse.find(p => p.ref === item.prendaRef)?.ref || item.prendaRef}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-normal">
+                              - ({item.categoria})
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-1.5 text-center font-bold text-slate-700">{item.talla.replace(/\s*\((\d+)\)/g, '-$1')}</td>
+                        <td className="py-1.5 text-center">
+                          {item.novedad ? (
+                            <span className="inline-block px-2 py-1 bg-amber-50 border border-amber-100 rounded text-[10px] text-amber-800 font-medium italic max-w-[180px] truncate" title={item.novedad}>
+                              {item.novedad}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 font-normal italic">-</span>
+                          )}
+                        </td>
+                        <td className="py-1.5 text-center font-bold text-slate-800">{item.cantidad}</td>
+                        <td className="py-1.5 text-right font-mono text-slate-600">{formatCOP(item.precioUnitario)}</td>
+                        <td className="py-1.5 text-right font-mono font-bold text-slate-800">{formatCOP(item.total)}</td>
+                        <td className="py-1.5 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              id={`btn-edit-cart-${item.id}`}
+                              type="button"
+                              onClick={() => handleOpenEditCartModal(item)}
+                              className="p-1 text-slate-400 hover:text-indigo-650 rounded"
+                              title="Editar fila"
+                            >
+                              <Edit3 className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              id={`btn-remove-cart-${item.id}`}
+                              type="button"
+                              onClick={() => handleRemoveFromCart(item.id)}
+                              className="p-1 text-slate-400 hover:text-red-500 rounded"
+                              title="Eliminar fila"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Extra order settings: Payments, Delivery & Dates */}
-            <div className="space-y-4 pt-4 border-t border-slate-100">
+              {/* Extra order settings: Payments, Delivery & Dates */}
+              <div className="space-y-4 pt-4 border-t border-slate-100">
 
-              {/* Row 1: Dates (left) & Total Pedido (right) */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Estimate Delivery date (Inicio) */}
-                  <div>
-                    <label htmlFor="input-order-delivery" className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
-                      <Calendar className="h-3 w-3" /> Fecha de inicio de despacho
+                {/* Row 1: Dates (left) & Total Pedido (right) */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Estimate Delivery date (Inicio) */}
+                    <div>
+                      <label htmlFor="input-order-delivery" className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
+                        <Calendar className="h-3 w-3" /> Fecha de inicio de despacho
+                      </label>
+                      <input
+                        id="input-order-delivery"
+                        type="date"
+                        required
+                        value={fechaEntrega}
+                        onChange={(e) => setFechaEntrega(e.target.value)}
+                        className="w-full p-2 border border-slate-200 bg-white rounded-md text-xs text-slate-700 focus:outline-none"
+                      />
+                    </div>
+
+                    {/* Dispatch Deadline date (Fin) */}
+                    <div>
+                      <label htmlFor="input-order-deadline" className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
+                        <Calendar className="h-3 w-3" /> Fecha de fin de despacho
+                      </label>
+                      <input
+                        id="input-order-deadline"
+                        type="date"
+                        value={fechaLimiteDespacho}
+                        onChange={(e) => setFechaLimiteDespacho(e.target.value)}
+                        className="w-full p-2 border border-slate-200 bg-white rounded-md text-xs text-slate-700 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Total Pedido: on the same row! */}
+                  <div className="md:col-span-4 bg-[#FAF9F5] border border-[#E9E4D4] p-3 rounded-xl flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Pedido:</span>
+                    <span className="font-mono text-[#1E293B] font-extrabold text-sm">{formatCOP(total)}</span>
+                  </div>
+                </div>
+
+                {/* Row 2: Notes (left) & Action buttons (right, below the Total Pedido) */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                  {/* Notas adicionales del pedido - wide stretch */}
+                  <div className="md:col-span-8">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                      Notas adicionales del pedido
                     </label>
-                    <input
-                      id="input-order-delivery"
-                      type="date"
-                      required
-                      value={fechaEntrega}
-                      onChange={(e) => setFechaEntrega(e.target.value)}
-                      className="w-full p-2 border border-slate-200 bg-white rounded-md text-xs text-slate-700 focus:outline-none"
+                    <textarea
+                      value={notas}
+                      onChange={(e) => setNotas(e.target.value)}
+                      placeholder="Ej. Manga acortada 2cm. Empacar por separado."
+                      rows={2}
+                      className="w-full p-2 bg-white border border-slate-200 rounded text-xs resize-none placeholder-slate-400 focus:outline-none"
                     />
                   </div>
 
-                  {/* Dispatch Deadline date (Fin) */}
-                  <div>
-                    <label htmlFor="input-order-deadline" className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1 flex items-center gap-1">
-                      <Calendar className="h-3 w-3" /> Fecha de fin de despacho
-                    </label>
-                    <input
-                      id="input-order-deadline"
-                      type="date"
-                      value={fechaLimiteDespacho}
-                      onChange={(e) => setFechaLimiteDespacho(e.target.value)}
-                      className="w-full p-2 border border-slate-200 bg-white rounded-md text-xs text-slate-700 focus:outline-none"
-                    />
+                  {/* Action buttons directly below Total Pedido */}
+                  <div className="md:col-span-4 flex items-end gap-3 pb-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (editingPedido) {
+                          onCancel();
+                        } else {
+                          setSelectedClientId('');
+                          setClientSearchQuery('');
+                          setCart([]);
+                          setNotas('');
+                          onCancel();
+                        }
+                      }}
+                      className="h-[42px] px-4 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex-1 flex items-center justify-center"
+                    >
+                      <span>Cancelar</span>
+                    </button>
+                    <button
+                      id="btn-submit-order-record"
+                      type="button"
+                      onClick={handleSubmitOrder}
+                      className="h-[42px] px-4 bg-[#4A5D4E] hover:bg-[#3C4D3F] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-colors flex-1 flex items-center justify-center gap-1.5"
+                    >
+                      <CheckCircle className="h-4 w-4 shrink-0" />
+                      <span>{editingPedido ? 'Grabar Cambios' : 'Grabar Pedido'}</span>
+                    </button>
                   </div>
                 </div>
 
-                {/* Total Pedido: on the same row! */}
-                <div className="md:col-span-4 bg-[#FAF9F5] border border-[#E9E4D4] p-3 rounded-xl flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Pedido:</span>
-                  <span className="font-mono text-[#1E293B] font-extrabold text-sm">{formatCOP(total)}</span>
-                </div>
               </div>
-
-              {/* Row 2: Notes (left) & Action buttons (right, below the Total Pedido) */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                {/* Notas adicionales del pedido - wide stretch */}
-                <div className="md:col-span-8">
-                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
-                    Notas adicionales del pedido
-                  </label>
-                  <textarea
-                    value={notas}
-                    onChange={(e) => setNotas(e.target.value)}
-                    placeholder="Ej. Manga acortada 2cm. Empacar por separado."
-                    rows={2}
-                    className="w-full p-2 bg-white border border-slate-200 rounded text-xs resize-none placeholder-slate-400 focus:outline-none"
-                  />
-                </div>
-
-                {/* Action buttons directly below Total Pedido */}
-                <div className="md:col-span-4 flex items-end gap-3 pb-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (editingPedido) {
-                        onCancel();
-                      } else {
-                        setSelectedClientId('');
-                        setClientSearchQuery('');
-                        setCart([]);
-                        setNotas('');
-                        onCancel();
-                      }
-                    }}
-                    className="h-[42px] px-4 bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors flex-1 flex items-center justify-center"
-                  >
-                    <span>Cancelar</span>
-                  </button>
-                  <button
-                    id="btn-submit-order-record"
-                    type="button"
-                    onClick={handleSubmitOrder}
-                    className="h-[42px] px-4 bg-[#4A5D4E] hover:bg-[#3C4D3F] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-colors flex-1 flex items-center justify-center gap-1.5"
-                  >
-                    <CheckCircle className="h-4 w-4 shrink-0" />
-                    <span>{editingPedido ? 'Grabar Cambios' : 'Grabar Pedido'}</span>
-                  </button>
-                </div>
-              </div>
-
             </div>
-          </div>
-        )}
+          )}
         </div>
       )}
 
@@ -1368,7 +1574,7 @@ export default function OrderForm({
                   {(() => {
                     const prenda = listToUse.find(p => p.ref === editingCartItem.prendaRef);
                     const tallas = prenda ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) : ['S', 'M', 'L', 'XL', 'XXL'];
-                    
+
                     return (
                       <>
                         {tallas.map((t) => {
@@ -1389,17 +1595,16 @@ export default function OrderForm({
                                   return copy;
                                 });
                               }}
-                              className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ${
-                                isSelected
+                              className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ${isSelected
                                   ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm animate-scale-up'
                                   : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 hover:opacity-85'
-                              }`}
+                                }`}
                             >
                               {t}
                             </button>
                           );
                         })}
-                        
+
                         {/* Extreme right N/A button */}
                         <button
                           type="button"
@@ -1413,11 +1618,10 @@ export default function OrderForm({
                               }
                             });
                           }}
-                          className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ml-auto ${
-                            !!editTallasCantidades['N/A']
+                          className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ml-auto ${!!editTallasCantidades['N/A']
                               ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm'
                               : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 hover:opacity-85'
-                          }`}
+                            }`}
                         >
                           N/A
                         </button>
@@ -1431,57 +1635,66 @@ export default function OrderForm({
               {(() => {
                 const activeSizes = Object.keys(editTallasCantidades).filter(t => editTallasCantidades[t] > 0);
                 if (activeSizes.length === 0) return null;
-                
+
                 return (
-                  <div className="mt-3.5 p-3.5 bg-indigo-50/55 border border-indigo-100 rounded-xl space-y-2 animate-in fade-in duration-150">
+                  <div className="mt-3.5 p-3.5 bg-indigo-50/55 border border-indigo-100 rounded-xl space-y-2">
                     <span className="block text-[10px] font-black uppercase tracking-wider text-indigo-600">
                       Cantidad por Talla
                     </span>
-                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-0.5">
-                      {activeSizes.map((t) => (
-                        <div key={t} className="flex flex-col items-center gap-1.5 bg-white border border-slate-100 p-2 rounded-xl shadow-2xs min-w-[90px] animate-scale-up">
-                          <span className="text-[10px] font-extrabold text-slate-800 font-mono">Talla {t}</span>
-                          <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditTallasCantidades(prev => {
-                                  const current = prev[t] || 0;
-                                  if (current <= 1) {
-                                    const copy = { ...prev };
-                                    delete copy[t];
-                                    return copy;
-                                  }
-                                  return { ...prev, [t]: current - 1 };
-                                });
-                              }}
-                              className="p-1 hover:bg-slate-50 text-slate-500"
-                            >
-                              <Minus className="h-3 w-3" />
-                            </button>
-                            <input
-                              type="number"
-                              min="1"
-                              value={editTallasCantidades[t] || ''}
-                              onChange={(e) => {
-                                const val = Math.max(1, parseInt(e.target.value) || 1);
-                                setEditTallasCantidades(prev => ({ ...prev, [t]: val }));
-                              }}
-                              onFocus={(e) => e.target.select()}
-                              className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setEditTallasCantidades(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
-                              }}
-                              className="p-1 hover:bg-slate-50 text-slate-500"
-                            >
-                              <Plus className="h-3 w-3" />
-                            </button>
+                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-0.5 animate-in fade-in duration-150">
+                      {activeSizes.map((t) => {
+                        const isNA = t === 'N/A';
+                        return (
+                          <div
+                            key={t}
+                            className={`flex bg-white border border-slate-100 p-2.5 rounded-xl shadow-2xs animate-scale-up ${isNA
+                                ? 'w-full flex-row justify-between items-center px-4 py-3'
+                                : 'flex-col items-center gap-1.5 min-w-[90px]'
+                              }`}
+                          >
+                            <span className="text-[10px] font-extrabold text-slate-800 font-mono">Talla {t}</span>
+                            <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditTallasCantidades(prev => {
+                                    const current = prev[t] || 0;
+                                    if (current <= 1) {
+                                      const copy = { ...prev };
+                                      delete copy[t];
+                                      return copy;
+                                    }
+                                    return { ...prev, [t]: current - 1 };
+                                  });
+                                }}
+                                className="p-1 hover:bg-slate-50 text-slate-500"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={editTallasCantidades[t] || ''}
+                                onChange={(e) => {
+                                  const val = Math.max(1, parseInt(e.target.value) || 1);
+                                  setEditTallasCantidades(prev => ({ ...prev, [t]: val }));
+                                }}
+                                onFocus={(e) => e.target.select()}
+                                className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditTallasCantidades(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
+                                }}
+                                className="p-1 hover:bg-slate-50 text-slate-500"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 );
@@ -1489,20 +1702,428 @@ export default function OrderForm({
             </div>
 
             {/* Modal Footer */}
-            <div className="pt-4 border-t border-slate-100 flex justify-end gap-2.5 mt-4">
+            <div className="pt-4 border-t border-slate-100 flex gap-3 mt-4 w-full">
               <button
                 type="button"
                 onClick={() => setEditingCartItem(null)}
-                className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold rounded-xl text-slate-650 transition-colors cursor-pointer"
+                className="flex-1 py-2.5 border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold rounded-xl text-slate-650 transition-colors cursor-pointer text-center"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleSaveEditCartItem}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer"
+                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-md transition-colors cursor-pointer text-center"
               >
                 Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MASS QUANTITY MODAL */}
+      {showMassQtyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-slate-100 flex flex-col my-8 animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="bg-[#1E293B] text-white p-5 relative">
+              <button
+                type="button"
+                onClick={() => setShowMassQtyModal(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <span className="px-2.5 py-0.5 bg-[#4F46E5] text-[9px] uppercase tracking-wider font-semibold rounded-full text-[#E0E7FF] mb-1 inline-block">
+                Herramienta de Edición
+              </span>
+              <h3 className="text-md font-bold uppercase tracking-wider text-[#F8FAFC]">
+                Asignación Masiva de Cantidades
+              </h3>
+              <p className="text-[11px] text-slate-300 mt-1">
+                Aplica la misma cantidad o distribución de tallas a todas las referencias del pedido de una vez.
+              </p>
+            </div>
+
+            {/* Modal Tabs */}
+            <div className="flex border-b border-slate-100">
+              <button
+                type="button"
+                onClick={() => setMassQtyMode('flat')}
+                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wide transition-all border-b-2 ${massQtyMode === 'flat'
+                    ? 'border-indigo-600 text-indigo-600 bg-indigo-50/20'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 bg-slate-50/40'
+                  }`}
+              >
+                Cantidad Fija General (Talla N/A)
+              </button>
+              <button
+                type="button"
+                onClick={() => setMassQtyMode('sizes')}
+                className={`flex-1 py-3 text-xs font-bold uppercase tracking-wide transition-all border-b-2 ${massQtyMode === 'sizes'
+                    ? 'border-indigo-600 text-indigo-600 bg-indigo-50/20'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 bg-slate-50/40'
+                  }`}
+              >
+                Distribución por Tallas de Categoría
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[380px] space-y-4">
+              {massQtyMode === 'flat' ? (
+                <div className="space-y-3">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-700 uppercase">Cantidad única por prenda</label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="Ej. 12"
+                      value={massFlatQty}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setMassFlatQty(isNaN(val) ? '' : val);
+                      }}
+                      className="w-full border border-slate-300 rounded-xl p-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-indigo-500 bg-slate-50/50"
+                    />
+                  </div>
+                  <div className="bg-amber-50 border border-amber-100 rounded-xl p-3 flex gap-2">
+                    <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-amber-800 leading-relaxed">
+                      <strong>Nota:</strong> Al aplicar, todas las prendas agregadas al carrito se configurarán en la talla <strong>"N/A"</strong> con la cantidad exacta que ingreses. Se ignorarán las tallas previas y se recalcularán los valores económicos.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {Object.keys(massSizesQty).length === 0 ? (
+                    <div className="text-center py-6 text-xs text-slate-400">
+                      No hay categorías disponibles. Agrega prendas al carrito primero.
+                    </div>
+                  ) : (
+                    Object.keys(massSizesQty).map(cat => {
+                      const sizesForCat = massSizesQty[cat] || {};
+
+                      return (
+                        <div key={cat} className="space-y-2 border-b border-slate-100 pb-4 last:border-0 last:pb-0 animate-in fade-in duration-150">
+                          <span className="px-2.5 py-0.5 bg-slate-100 text-[10px] font-extrabold uppercase rounded-md text-slate-600 tracking-wider">
+                            Categoría: {cat}
+                          </span>
+                          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 pt-1">
+                            {Object.keys(sizesForCat).map(talla => (
+                              <div key={talla} className="flex flex-col items-center bg-slate-50 border border-slate-200 rounded-xl p-2 shadow-2xs">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase mb-1 font-mono">{talla}</span>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  value={sizesForCat[talla] || ''}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value);
+                                    const cleanVal = isNaN(val) || val < 0 ? 0 : val;
+                                    setMassSizesQty(prev => ({
+                                      ...prev,
+                                      [cat]: {
+                                        ...prev[cat],
+                                        [talla]: cleanVal
+                                      }
+                                    }));
+                                  }}
+                                  className="w-12 text-center text-xs border border-slate-200 rounded-md p-1 font-bold text-slate-800 focus:outline-none focus:border-indigo-500 bg-white"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+
+                  <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-3 flex gap-2">
+                    <Info className="h-4 w-4 text-indigo-600 shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-indigo-800 leading-relaxed">
+                      <strong>Filtro inteligente:</strong> Las cantidades configuradas por categoría se cruzarán con las tallas reales que soporta cada prenda. Las tallas que una prenda no admita serán omitidas en ese modelo para evitar inconsistencias de despacho. Las categorías en las que no ingreses cantidades permanecerán inalteradas.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 border-t border-slate-100 p-4 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowMassQtyModal(false)}
+                className="flex-1 py-2.5 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-xl transition-all hover:bg-slate-100 cursor-pointer text-center"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleApplyMassQty}
+                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold uppercase rounded-xl shadow-md transition-all cursor-pointer text-center"
+              >
+                Aplicar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ADD EXTRA PRODUCT MODAL */}
+      {showAddExtraModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 overflow-y-auto animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full border border-slate-100 flex flex-col my-8 animate-in zoom-in-95 duration-200 max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="bg-[#059669] text-white p-5 relative rounded-t-2xl">
+              <button
+                type="button"
+                onClick={() => setShowAddExtraModal(false)}
+                className="absolute top-4 right-4 text-emerald-200 hover:text-white transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <span className="px-2.5 py-0.5 bg-[#10B981] text-[9px] uppercase tracking-wider font-semibold rounded-full text-white mb-1 inline-block">
+                Referencia Fuera de Correría
+              </span>
+              <h3 className="text-md font-bold uppercase tracking-wider text-[#F8FAFC]">
+                Agregar Referencia Adicional
+              </h3>
+              <p className="text-[11px] text-emerald-100 mt-1">
+                Ingresa una referencia personalizada que no forma parte del catálogo estándar y define sus cantidades.
+              </p>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-4">
+              {/* Row 1: Reference & Label */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Referencia (Ref) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ej. 10210"
+                    value={extraRef}
+                    onChange={(e) => setExtraRef(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#059669] focus:outline-none uppercase"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Etiqueta (Categoría) *
+                  </label>
+                  <select
+                    value={extraCategory}
+                    onChange={(e) => {
+                      const newCat = e.target.value as any;
+                      setExtraCategory(newCat);
+                      setExtraTallasCantidades({ 'N/A': 1 }); // Por defecto N/A = 1
+                    }}
+                    className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-700 focus:ring-1 focus:ring-[#059669] focus:outline-none"
+                  >
+                    <option value="Dama">Dama</option>
+                    <option value="Plus">Plus</option>
+                    <option value="Niña">Niña</option>
+                    <option value="Niño">Niño</option>
+                    <option value="Colegial">Colegial</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 2: Price & Novelty */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Precio de Venta ($) *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs font-mono">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      required
+                      placeholder="0"
+                      value={extraUnitPrice}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        setExtraUnitPrice(isNaN(val) ? '' : val);
+                      }}
+                      onFocus={(e) => e.target.select()}
+                      className="w-full pl-7 p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#059669] focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                    Requerimiento / Novedad
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej. Ajuste de prenda"
+                    value={extraNovedad}
+                    onChange={(e) => setExtraNovedad(e.target.value)}
+                    onFocus={(e) => e.target.select()}
+                    className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs text-slate-800 focus:ring-1 focus:ring-[#059669] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Sizes Selector */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">
+                  Selecciona las Tallas
+                </label>
+                <div className="flex flex-wrap gap-1.5 items-center w-full">
+                  {(() => {
+                    const tallas = getAvailableSizesForCategory(extraCategory);
+                    return (
+                      <>
+                        {tallas.map((t) => {
+                          const isSelected = extraTallasCantidades[t] !== undefined && extraTallasCantidades[t] > 0;
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              onClick={() => {
+                                setExtraTallasCantidades(prev => {
+                                  const copy = { ...prev };
+                                  delete copy['N/A'];
+                                  if (copy[t]) {
+                                    delete copy[t];
+                                  } else {
+                                    copy[t] = 1;
+                                  }
+                                  return copy;
+                                });
+                              }}
+                              className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ${isSelected
+                                  ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm animate-scale-up'
+                                  : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 hover:opacity-85'
+                                }`}
+                            >
+                              {t}
+                            </button>
+                          );
+                        })}
+
+                        {/* Extreme right N/A button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setExtraTallasCantidades(prev => {
+                              const isSelected = !!prev['N/A'];
+                              if (isSelected) {
+                                return {};
+                              } else {
+                                return { 'N/A': 1 };
+                              }
+                            });
+                          }}
+                          className={`h-8 min-w-[36px] px-2 text-xs font-black rounded-md border transition-all ml-auto ${!!extraTallasCantidades['N/A']
+                              ? 'bg-[#1E293B] border-[#1E293B] text-white shadow-sm animate-scale-up'
+                              : 'bg-slate-100 border-slate-200 text-slate-400 opacity-60 hover:opacity-85'
+                            }`}
+                        >
+                          N/A
+                        </button>
+                      </>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Quantity inputs for active sizes */}
+              {(() => {
+                const activeSizes = Object.keys(extraTallasCantidades).filter(t => extraTallasCantidades[t] > 0);
+                if (activeSizes.length === 0) return null;
+
+                return (
+                  <div className="mt-3.5 p-3.5 bg-indigo-50/55 border border-indigo-100 rounded-xl space-y-2">
+                    <span className="block text-[10px] font-black uppercase tracking-wider text-indigo-600">
+                      Cantidad por Talla
+                    </span>
+                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto pr-0.5 animate-in fade-in duration-150">
+                      {activeSizes.map((t) => {
+                        const isNA = t === 'N/A';
+                        return (
+                          <div
+                            key={t}
+                            className={`flex bg-white border border-slate-100 p-2.5 rounded-xl shadow-2xs animate-scale-up ${isNA
+                                ? 'w-full flex-row justify-between items-center px-4 py-3'
+                                : 'flex-col items-center gap-1.5 min-w-[90px]'
+                              }`}
+                          >
+                            <span className="text-[10px] font-extrabold text-slate-800 font-mono">Talla {t}</span>
+                            <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden h-7">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setExtraTallasCantidades(prev => {
+                                    const current = prev[t] || 0;
+                                    if (current <= 1) {
+                                      const copy = { ...prev };
+                                      delete copy[t];
+                                      return copy;
+                                    }
+                                    return { ...prev, [t]: current - 1 };
+                                  });
+                                }}
+                                className="p-1 hover:bg-slate-50 text-slate-500"
+                              >
+                                <Minus className="h-3 w-3" />
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={extraTallasCantidades[t] || ''}
+                                onChange={(e) => {
+                                  const val = Math.max(1, parseInt(e.target.value) || 1);
+                                  setExtraTallasCantidades(prev => ({ ...prev, [t]: val }));
+                                }}
+                                onFocus={(e) => e.target.select()}
+                                className="w-8 text-center text-xs font-bold text-slate-700 bg-transparent border-none outline-none focus:ring-0 p-0"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setExtraTallasCantidades(prev => ({ ...prev, [t]: (prev[t] || 0) + 1 }));
+                                }}
+                                className="p-1 hover:bg-slate-50 text-slate-500"
+                              >
+                                <Plus className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 border-t border-slate-100 p-4 flex gap-3 rounded-b-2xl">
+              <button
+                type="button"
+                onClick={() => setShowAddExtraModal(false)}
+                className="flex-1 py-2.5 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-xl transition-all hover:bg-slate-100 cursor-pointer text-center bg-white"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveExtraItem}
+                className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl shadow-md transition-all cursor-pointer text-center"
+              >
+                Agregar al Pedido
               </button>
             </div>
           </div>

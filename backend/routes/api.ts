@@ -196,9 +196,9 @@ router.post('/pedidos', authMiddleware, async (req, res) => {
 
     // Clean up cross-references:
     // 1. Remove active orders from the deleted list (restores)
-    const activeIds = new Set(Array.from(existingMap.keys()));
+    const activeIdsSent = new Set(pedidos.map((p: any) => p.id));
     const serverDeletedPedidos = data.deletedPedidos || [];
-    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIds.has(p.id));
+    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIdsSent.has(p.id));
     await saveDeletedPedidos(finalDeleted);
 
     // 2. Remove deleted orders from the active list (deletions)
@@ -241,17 +241,15 @@ router.post('/deleted-pedidos', authMiddleware, async (req, res) => {
     }
 
     // Clean up cross-references:
-    // 1. Remove active orders from the deleted list (restores)
-    const activeIds = new Set((data.pedidos || []).map((p: any) => p.id));
-    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIds.has(p.id));
-    await saveDeletedPedidos(finalDeleted);
+    // 1. Guardar la papelera consolidada
+    await saveDeletedPedidos(serverDeletedPedidos);
 
-    // 2. Remove deleted orders from the active list (deletions)
-    const deletedIds = new Set(finalDeleted.map((p: any) => p.id));
+    // 2. Remover los pedidos eliminados de la lista de activos
+    const deletedIds = new Set(serverDeletedPedidos.map((p: any) => p.id));
     const activePedidos = (data.pedidos as any[]).filter((p: any) => !deletedIds.has(p.id));
     await savePedidos(activePedidos);
 
-    res.json({ success: true, count: finalDeleted.length });
+    res.json({ success: true, count: serverDeletedPedidos.length });
   } catch (err: any) {
     res.status(500).json({ error: 'Error al guardar pedidos eliminados', details: err.message });
   }
@@ -490,8 +488,8 @@ router.post('/pedidos/sync-batch', authMiddleware, async (req, res) => {
     }
 
     // 4. Consolidar Pedidos Activos y Eliminados (Evitar colisiones cruzadas)
-    const activeIds = new Set(Array.from(pedidosMap.keys()));
-    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIds.has(p.id));
+    const activeIdsSent = new Set(pedidos.map((p: any) => p.id));
+    const finalDeleted = serverDeletedPedidos.filter((p: any) => !activeIdsSent.has(p.id));
     await saveDeletedPedidos(finalDeleted);
 
     const deletedIds = new Set(finalDeleted.map((p: any) => p.id));
