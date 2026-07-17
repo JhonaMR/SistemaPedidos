@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { Lock, User, AlertCircle, KeyRound, ShieldAlert } from 'lucide-react';
 import { UsuarioApp } from '../types';
 import { apiLogin } from '../services/apiService';
+import { getBrandLogo, getBrandName } from '../utils/brandHelper';
 
 interface LoginProps {
   usuarios: UsuarioApp[];
@@ -249,9 +250,9 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
 
         <div className="text-center space-y-2">
           <div className="inline-flex p-1 bg-white rounded-2xl mx-auto">
-            <img src="/logos/plow-192x192.png" className="h-14 w-14 object-contain" alt="Plow Logo" />
+            <img src={getBrandLogo()} className="h-14 w-14 object-contain" alt={`${getBrandName()} Logo`} />
           </div>
-          <h2 className="text-2xl font-black text-slate-900 tracking-tight">ARARE S.A.S</h2>
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight">{getBrandName()}</h2>
           <p className="text-xs text-slate-500 font-medium">Ingresa a tu cuenta</p>
         </div>
 
@@ -305,7 +306,7 @@ export default function Login({ usuarios, onLogin, onUpdateUsuarios }: LoginProp
 
         <div className="pt-2 text-center">
           <p className="text-[10px] text-slate-400">
-            ARARE S.A.S. • Toma de pedidos 1.0.2 • Crado por Yersi. 2026.
+            {getBrandName()} • Toma de pedidos 1.0.2 • Creado por Yersi. 2026.
           </p>
         </div>
       </div>

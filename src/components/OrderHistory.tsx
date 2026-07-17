@@ -3,6 +3,7 @@ import { Pedido, ItemPedido, Cliente, Prenda } from '../types';
 import { printOrderReceipt } from '../services/printService';
 import { exportOrderToExcel } from '../services/exportOrderExcelService';
 import { getSortedTallasStr } from '../utils/sizeHelper';
+import { getIsMelas } from '../utils/brandHelper';
 import {
   Search,
   Filter,
@@ -1047,7 +1048,7 @@ export default function OrderHistory({
                   setPrintModalOrder(null);
                   try {
                     const client = clientes.find(c => c.id === order.clienteId);
-                    await exportOrderToExcel(order, client, catalogGarments, false);
+                    await exportOrderToExcel(order, client, catalogGarments, getIsMelas());
                   } catch (error) {
                     console.error("Error al generar el comprobante Excel:", error);
                     alert("Hubo un error al generar el Excel del comprobante.");

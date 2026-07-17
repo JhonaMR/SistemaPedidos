@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { Cliente, Pedido, UsuarioApp, Prenda, Campana } from './types';
+import { getBrandLogo, getBrandName } from './utils/brandHelper';
 import { db, PedidoOffline } from './services/db';
 import {
   fetchServerData,
@@ -69,6 +70,10 @@ export function parseCampana(nombreCompleto: string): Campana {
 }
 
 export default function App() {
+  useEffect(() => {
+    document.title = `${getBrandName()} - Toma de Pedidos`;
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'dashboard' | 'nuevo-pedido' | 'pedidos' | 'clientes' | 'configuracion' | 'referencias'>('dashboard');
 
   // Multi-User States
@@ -1283,11 +1288,11 @@ export default function App() {
               className="flex items-center gap-3 hover:opacity-80 transition-all text-left bg-transparent border-0 p-0 m-0 cursor-pointer"
             >
               <div className="p-1 bg-white border border-indigo-100 rounded-xl overflow-hidden shadow-3xs flex items-center justify-center">
-                <img src="/logos/plow-192x192.png" className="h-10 w-10 object-contain" alt="Plow Logo" />
+                <img src={getBrandLogo()} className="h-10 w-10 object-contain" alt={`${getBrandName()} Logo`} />
               </div>
               <div>
                 <h1 className="text-xl font-extrabold text-slate-950 flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span>Arare S.A.S.</span>
+                  <span>{getBrandName()}</span>
                 </h1>
                 <p className="text-xs text-slate-500 font-medium">Gestión y Toma de Pedidos para Vendedores</p>
               </div>
@@ -1401,10 +1406,10 @@ export default function App() {
             <div className="flex items-center justify-between p-5 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
                 <div className="p-1 bg-white border border-slate-200 rounded-lg overflow-hidden flex items-center justify-center shadow-3xs">
-                  <img src="/logos/plow-192x192.png" className="h-8 w-8 object-contain" alt="Plow Logo" />
+                  <img src={getBrandLogo()} className="h-8 w-8 object-contain" alt={`${getBrandName()} Logo`} />
                 </div>
                 <div>
-                  <h2 className="font-extrabold text-sm text-slate-950">Arare S.A.S.</h2>
+                  <h2 className="font-extrabold text-sm text-slate-950">{getBrandName()}</h2>
                   <p className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{currentUser?.nombre || vendedor.nombre}</p>
                 </div>
               </div>
@@ -2083,7 +2088,7 @@ export default function App() {
 
         {/* Simple Atelier Footer */}
         <footer className="mt-12 pt-6 border-t border-slate-200 text-center text-xs text-slate-500 flex flex-col items-center justify-center gap-1">
-          <p className="font-semibold text-slate-700">Arare S.A.S. - Sistema de toma de pedidos.</p>
+          <p className="font-semibold text-slate-700">{getBrandName()} - Sistema de toma de pedidos.</p>
         </footer>
 
       </div>

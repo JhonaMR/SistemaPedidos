@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Pedido, Cliente, Prenda } from '../types';
 import { getSortedTallasStr } from '../utils/sizeHelper';
+import { getBrandColor, getBrandTextColor, getBrandLogo, getBrandInfo } from '../utils/brandHelper';
 
 const formatDate = (dateStr?: string | null) => {
   if (!dateStr) return '—';
@@ -28,18 +29,12 @@ export const printOrderReceipt = async (
   clientes: Cliente[],
   catalogGarments: Prenda[]
 ) => {
-  const brandColor = '#f2bfbe';
-  const brandTextColor = '#6b2a35';
-  const logoSrc = '/logos/plow-192x192.png';
+  const brandColor = getBrandColor();
+  const brandTextColor = getBrandTextColor();
+  const logoSrc = getBrandLogo();
   const sellerFull = (order.vendedorNombre || '').split(' ')[0].toUpperCase();
 
-  const brandInfo = [
-    'ARARE S.A.S.',
-    'NIT: 901453438',
-    '3146320002',
-    'Itagüí (Ant)',
-    'Dirección: CLL 77 a # 45 a 30 - 301',
-  ];
+  const brandInfo = getBrandInfo();
 
   const client = clientes.find(c => c.id === order.clienteId);
   const clientName = client?.nombre || order.clienteNombre || '—';
