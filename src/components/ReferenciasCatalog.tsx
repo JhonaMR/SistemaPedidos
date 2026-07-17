@@ -247,7 +247,7 @@ export default function ReferenciasCatalog({
   return (
     <div id="referencias-catalog-container" className="space-y-6">
       {/* Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white border border-[#E2E8F0] p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white border border-[#E2E8F0] p-6 rounded-2xl shadow-sm">
         <div>
           <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
             <Package className="h-5 w-5 text-indigo-600" />
@@ -266,14 +266,13 @@ export default function ReferenciasCatalog({
             </div>
           )}
         </div>
-
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 w-full md:w-auto">
           {currentUser?.rol === 'soporte' && (
             <button
               id="btn-create-reference"
               type="button"
               onClick={handleStartAdd}
-              className="flex items-center gap-1.5 px-3 py-2 bg-[#4A5D4E] hover:bg-[#3D4C3F] text-white text-xs font-bold rounded-lg transition-colors shadow-xs"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 bg-[#4A5D4E] hover:bg-[#3D4C3F] text-white text-xs font-bold rounded-lg transition-colors shadow-xs w-full md:w-auto cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               <span>Añadir Referencia</span>
@@ -281,58 +280,61 @@ export default function ReferenciasCatalog({
           )}
 
           {/* Selectores de Campaña Duplicados */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Año:</span>
-            <select
-              value={selectedYearFilter}
-              onChange={(e) => {
-                const val = parseInt(e.target.value, 10);
-                setSelectedYearFilter(val);
+          <div className="flex items-center justify-between md:justify-start gap-2 w-full md:w-auto bg-slate-50 p-2 md:p-0 rounded-lg md:bg-transparent">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Año:</span>
+              <select
+                value={selectedYearFilter}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  setSelectedYearFilter(val);
 
-                // Seleccionar automáticamente la primera campaña de este año
-                const campaignsForYear = (campanasDisponibles || [])
-                  .filter(c => c.anio === val)
-                  .sort((a, b) => a.numero - b.numero);
+                  // Seleccionar automáticamente la primera campaña de este año
+                  const campaignsForYear = (campanasDisponibles || [])
+                    .filter(c => c.anio === val)
+                    .sort((a, b) => a.numero - b.numero);
 
-                if (campaignsForYear.length > 0) {
-                  setSelectedCampanaFilter(`${campaignsForYear[0].nombre} ${campaignsForYear[0].anio}`);
-                } else {
-                  setSelectedCampanaFilter('Todas');
-                }
-              }}
-              className="p-1.5 px-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors"
-            >
-              <option value={2026}>2026</option>
-              <option value={2027}>2027</option>
-              <option value={2028}>2028</option>
-              <option value={2029}>2029</option>
-            </select>
+                  if (campaignsForYear.length > 0) {
+                    setSelectedCampanaFilter(`${campaignsForYear[0].nombre} ${campaignsForYear[0].anio}`);
+                  } else {
+                    setSelectedCampanaFilter('Todas');
+                  }
+                }}
+                className="p-1.5 px-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors"
+              >
+                <option value={2026}>2026</option>
+                <option value={2027}>2027</option>
+                <option value={2028}>2028</option>
+                <option value={2029}>2029</option>
+              </select>
+            </div>
 
-            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 ml-1">Campaña:</span>
-            <select
-              value={selectedCampanaFilter}
-              onChange={(e) => setSelectedCampanaFilter(e.target.value)}
-              className="p-1.5 px-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors max-w-[155px] truncate"
-            >
-              <option value="Todas">Ver todas</option>
-              {(campanasDisponibles || [])
-                .filter(c => c.anio === selectedYearFilter)
-                .sort((a, b) => a.numero - b.numero)
-                .map((c) => (
-                  <option key={`${c.nombre} ${c.anio}`} value={`${c.nombre} ${c.anio}`} title={`${c.nombre} ${c.anio}`}>
-                    {c.nombre} {c.anio}
-                  </option>
-                ))}
-            </select>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 ml-1">Campaña:</span>
+              <select
+                value={selectedCampanaFilter}
+                onChange={(e) => setSelectedCampanaFilter(e.target.value)}
+                className="p-1.5 px-2 bg-white border border-[#E2E8F0] rounded-xl text-xs font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer shadow-3xs hover:border-slate-300 transition-colors max-w-[155px] truncate"
+              >
+                <option value="Todas">Ver todas</option>
+                {(campanasDisponibles || [])
+                  .filter(c => c.anio === selectedYearFilter)
+                  .sort((a, b) => a.numero - b.numero)
+                  .map((c) => (
+                    <option key={`${c.nombre} ${c.anio}`} value={`${c.nombre} ${c.anio}`} title={`${c.nombre} ${c.anio}`}>
+                      {c.nombre} {c.anio}
+                    </option>
+                  ))}
+              </select>
+            </div>
           </div>
 
-          <div className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-800 font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shrink-0">
+          <div className="text-xs bg-indigo-50 border border-indigo-100 text-indigo-800 font-bold px-4 py-2 rounded-xl flex items-center justify-center md:justify-start gap-1.5 w-full md:w-auto shrink-0">
             <Sparkles className="h-4 w-4" />
             <span>{filteredPrendas.length} Referencias Disponibles</span>
           </div>
         </div>
       </div>
-
       {/* Filter and Search Bar */}
       <div className="bg-white border border-[#E2E8F0] rounded-xl p-4 shadow-sm flex flex-col md:flex-row gap-4 items-center">
         {/* Search */}

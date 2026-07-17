@@ -587,8 +587,8 @@ export default function OrderHistory({
                     </div>
 
                     {/* Receipt Itemized Table */}
-                    <div className="border border-slate-100 rounded-xl overflow-hidden bg-white">
-                      <table className="w-full text-left border-collapse text-xs">
+                    <div className="border border-slate-100 rounded-xl overflow-x-auto w-full bg-white">
+                      <table className="w-full text-left border-collapse text-xs min-w-[550px]">
                         <thead>
                           <tr className="bg-slate-50 border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-400 font-bold">
                             <th className="py-1.5 px-3">Referencia</th>

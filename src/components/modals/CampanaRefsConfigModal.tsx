@@ -105,8 +105,8 @@ export default function CampanaRefsConfigModal({
         </div>
 
         {/* References Table Scroll Container */}
-        <div className="overflow-y-auto flex-1 border border-slate-100 rounded-xl divide-y divide-slate-50">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="overflow-y-auto overflow-x-auto flex-1 border border-slate-100 rounded-xl divide-y divide-slate-50 w-full">
+          <table className="w-full text-left border-collapse text-xs min-w-[500px]">
             <thead>
               <tr className="bg-slate-50/70 border-b border-slate-100 text-[9px] uppercase tracking-wider text-slate-400 font-extrabold sticky top-0">
                 <th className="p-3">Referencia y Nombre</th>

@@ -357,7 +357,9 @@ export default function OrderForm({
       const uniqueSizes = Array.from(new Set(
         itemsInCat.flatMap(item => {
           const prenda = catalogGarments.find(p => p.ref === item.prendaRef);
-          return prenda ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) : [];
+          return prenda 
+            ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) 
+            : getAvailableSizesForCategory(item.categoria);
         })
       )) as string[];
 
@@ -411,10 +413,10 @@ export default function OrderForm({
         if (totalConfiguredForCat === 0) {
           return item;
         }
-
         const prenda = catalogGarments.find(p => p.ref === item.prendaRef);
-        const supportedSizes = prenda ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) : [];
-
+        const supportedSizes = prenda 
+          ? (Array.isArray(prenda.tallasDisponibles) ? prenda.tallasDisponibles : []) 
+          : getAvailableSizesForCategory(item.categoria);
         const newTallasDetalle: Record<string, number> = {};
         let newQty = 0;
 
@@ -588,18 +590,18 @@ export default function OrderForm({
 
       {/* Step 1: Client Selection banner */}
       <div id="client-selection-panel" className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 mb-4 gap-3">
           <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] flex items-center gap-1.5">
             <User className="h-4.5 w-4.5" />
             <span>1. Datos del Cliente</span>
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-start sm:justify-end">
             {!isQuickAdding && !selectedClientId && (
               <button
                 id="btn-quick-add-client-toggle"
                 type="button"
                 onClick={() => setIsQuickAdding(true)}
-                className="px-3 py-1.5 bg-[#FAF7F0] border border-[#C4BFA6] hover:bg-[#F3EFE4] text-xs font-bold uppercase rounded-lg text-[#6A5E4E] transition-all shrink-0 animate-fade-in"
+                className="px-3 py-1.5 bg-[#FAF7F0] border border-[#C4BFA6] hover:bg-[#F3EFE4] text-xs font-bold uppercase rounded-lg text-[#6A5E4E] transition-all shrink-0 animate-fade-in cursor-pointer"
               >
                 + Nuevo cliente
               </button>
@@ -636,7 +638,7 @@ export default function OrderForm({
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm"
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-bold uppercase rounded-lg transition-all shrink-0 shadow-sm cursor-pointer"
             >
               Cancelar
             </button>
@@ -732,89 +734,92 @@ export default function OrderForm({
                     : `${prefijoVendedor}-${String(siguienteCorrelativo).padStart(3, '0')}`;
 
                   return (
-                    <div className="bg-slate-50 border border-indigo-100 rounded-lg p-3 shadow-sm relative overflow-hidden text-left">
-                      {/* Decorative corner tag containing the consecutive formatted order number and billing percentages */}
-                      <div className="absolute top-2 right-2 flex items-center gap-1.5 flex-wrap sm:flex-nowrap justify-end">
-                        {/* Porcentaje de Facturación Selector */}
-                        <div className="flex items-center">
-                          {!isDividedInvoicing ? (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setIsDividedInvoicing(true);
-                                setFacturacionFE(50);
-                                setFacturacionRM(50);
-                              }}
-                              className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-350 text-emerald-800 text-xs font-bold rounded-lg shadow-sm flex items-center gap-1.5 uppercase tracking-wide transition-all hover:scale-[1.01] active:scale-95"
-                              title="Facturación: 100% FE. Clic para dividir."
-                            >
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                              <span>100% FE</span>
-                            </button>
-                          ) : (
-                            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-300 px-2 py-1 rounded-lg shadow-xs transition-all max-w-[240px]">
-                              <div className="flex items-center gap-0.5">
-                                <span className="text-[10px] font-bold text-amber-950 font-mono">FE:</span>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  max={100}
-                                  value={facturacionFE}
-                                  onFocus={(e) => e.target.select()}
-                                  onChange={(e) => {
-                                    const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                    setFacturacionFE(val);
-                                  }}
-                                  className="w-10 text-center p-0.5 bg-white border border-amber-300 rounded text-xs font-bold text-slate-800 font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
-                                />
-                                <span className="text-[10px] font-bold text-amber-950">%</span>
-                              </div>
-                              <div className="flex items-center gap-0.5">
-                                <span className="text-[10px] font-bold text-amber-950 font-mono">RM:</span>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  max={100}
-                                  value={facturacionRM}
-                                  onFocus={(e) => e.target.select()}
-                                  onChange={(e) => {
-                                    const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
-                                    setFacturacionRM(val);
-                                  }}
-                                  className="w-10 text-center p-0.5 bg-white border border-amber-300 rounded text-xs font-bold text-slate-800 font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
-                                />
-                                <span className="text-[10px] font-bold text-amber-950">%</span>
-                              </div>
+                    <div className="bg-slate-50 border border-indigo-100 rounded-lg p-3 shadow-sm text-left">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2.5 border-b border-slate-200">
+                        {/* Client details block: takes full width */}
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-indigo-50 rounded text-indigo-600 shrink-0">
+                            <User className="h-4 w-4" />
+                          </div>
+                          <div>
+                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">ID: {selectedClient?.codigoCliente}</span>
+                            <h4 className="text-sm font-extrabold text-slate-900 leading-tight">{selectedClient?.nombre}</h4>
+                          </div>
+                        </div>
 
+                        {/* Consecutive Badge & Billing percentages selector (below on mobile, side-by-side on desktop) */}
+                        <div className="flex flex-wrap items-center gap-1.5 justify-start sm:justify-end w-full sm:w-auto shrink-0">
+                          {/* Porcentaje de Facturación Selector */}
+                          <div className="flex items-center">
+                            {!isDividedInvoicing ? (
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setIsDividedInvoicing(false);
-                                  setFacturacionFE(100);
-                                  setFacturacionRM(0);
+                                  setIsDividedInvoicing(true);
+                                  setFacturacionFE(50);
+                                  setFacturacionRM(50);
                                 }}
-                                className="p-0.5 hover:bg-amber-100 rounded text-amber-900 transition-colors"
-                                title="Volver a 100 FE"
+                                className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-350 text-emerald-800 text-xs font-bold rounded-lg shadow-sm flex items-center gap-1.5 uppercase tracking-wide transition-all hover:scale-[1.01] active:scale-95 cursor-pointer"
+                                title="Facturación: 100% FE. Clic para dividir."
                               >
-                                <X className="h-3.5 w-3.5 stroke-[2.5]" />
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span>100% FE</span>
                               </button>
-                            </div>
-                          )}
-                        </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-300 px-2 py-1 rounded-lg shadow-xs transition-all max-w-[240px]">
+                                <div className="flex items-center gap-0.5">
+                                  <span className="text-[10px] font-bold text-amber-950 font-mono">FE:</span>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    value={facturacionFE}
+                                    onFocus={(e) => e.target.select()}
+                                    onChange={(e) => {
+                                      const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                      setFacturacionFE(val);
+                                    }}
+                                    className="w-10 text-center p-0.5 bg-white border border-amber-300 rounded text-xs font-bold text-slate-800 font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                  />
+                                  <span className="text-[10px] font-bold text-amber-950">%</span>
+                                </div>
+                                <div className="flex items-center gap-0.5">
+                                  <span className="text-[10px] font-bold text-amber-950 font-mono">RM:</span>
+                                  <input
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    value={facturacionRM}
+                                    onFocus={(e) => e.target.select()}
+                                    onChange={(e) => {
+                                      const val = Math.min(100, Math.max(0, parseInt(e.target.value) || 0));
+                                      setFacturacionRM(val);
+                                    }}
+                                    className="w-10 text-center p-0.5 bg-white border border-amber-300 rounded text-xs font-bold text-slate-800 font-mono focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                  />
+                                  <span className="text-[10px] font-bold text-amber-950">%</span>
+                                </div>
 
-                        {/* Consecutive Badge */}
-                        <div className="bg-indigo-600 text-white text-xs font-bold font-mono px-2.5 py-1.5 rounded-lg shadow-xs tracking-wide flex items-center justify-center transition-all hover:scale-[1.01]">
-                          {consecutiveText}
-                        </div>
-                      </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsDividedInvoicing(false);
+                                    setFacturacionFE(100);
+                                    setFacturacionRM(0);
+                                  }}
+                                  className="p-0.5 hover:bg-amber-100 rounded text-amber-900 transition-colors cursor-pointer"
+                                  title="Volver a 100 FE"
+                                >
+                                  <X className="h-3.5 w-3.5 stroke-[2.5]" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
 
-                      <div className="flex items-center gap-2 pb-2.5 border-b border-slate-200 pr-[180px] sm:pr-[280px] md:pr-[360px]">
-                        <div className="p-1.5 bg-indigo-50 rounded text-indigo-600">
-                          <User className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest font-mono">ID: {selectedClient?.codigoCliente}</span>
-                          <h4 className="text-sm font-extrabold text-slate-900 leading-tight">{selectedClient?.nombre}</h4>
+                          {/* Consecutive Badge */}
+                          <div className="bg-indigo-600 text-white text-xs font-bold font-mono px-2.5 py-1.5 rounded-lg shadow-xs tracking-wide flex items-center justify-center transition-all hover:scale-[1.01]">
+                            {consecutiveText}
+                          </div>
                         </div>
                       </div>
 
@@ -1280,9 +1285,9 @@ export default function OrderForm({
         </div>
       ) : (
         <div id="order-cart-panel" className="bg-white border border-[#E2E8F0] rounded-xl p-5 shadow-sm">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] mb-4 flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-[#4A5D4E] mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <span>3. Lista de Prendas en el Pedido Actual</span>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={handleOpenAddExtraProductModal}
@@ -1335,12 +1340,12 @@ export default function OrderForm({
                     {cart.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-50">
                         <td className="py-1.5">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-slate-800 font-mono">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-1.5">
+                            <span className="font-semibold text-slate-800 font-mono leading-tight">
                               {listToUse.find(p => p.ref === item.prendaRef)?.ref || item.prendaRef}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-normal">
-                              - ({item.categoria})
+                            <span className="text-[10px] text-slate-400 font-normal leading-tight">
+                              <span className="hidden sm:inline">- </span>({item.categoria})
                             </span>
                           </div>
                         </td>

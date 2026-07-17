@@ -23,11 +23,11 @@
     "nombre": "John Efrain Bolivar",
     "usuario": "JEB",
     "rol": "general",
-    "esPrimeraVez": false,
+    "esPrimeraVez": true,
     "activo": true,
     "idVendedor": "02",
     "localPinHash": "f513688e4af543f97466c3277fa83b9054b3a75f0841e4c5beed69f04591e9d9",
-    "clave": "$2b$10$Eo.Ppi2DFfz72mQTrCc/1Ofr7IDm4kX1RIq0wJ2XlzHmz.xi9KglW"
+    "clave": "$2b$10$F.Udi0b6y0aG7GE.vqYYL.pp5Q4DAIZKT0FJwskCdC/Lx9tuGXiWi"
   },
   {
     "id": "usr_1783687063997",

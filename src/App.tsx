@@ -50,6 +50,7 @@ import EditUserModal from './components/modals/EditUserModal';
 import CampanaRefsConfigModal from './components/modals/CampanaRefsConfigModal';
 import ExcelTemplatesModal from './components/modals/ExcelTemplatesModal';
 import NewCampanaModal from './components/modals/NewCampanaModal';
+import { DottedBackground } from './components/DottedBackground';
 
 export function parseCampana(nombreCompleto: string): Campana {
   const match = nombreCompleto.match(/\d{4}/);
@@ -1225,7 +1226,8 @@ export default function App() {
   });
 
   return (
-    <div id="app-root-layout" className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans antialiased relative">
+    <div id="app-root-layout" className="min-h-screen bg-transparent text-slate-800 font-sans antialiased relative">
+      <DottedBackground />
       {/* Campaign Selector Modal overlay */}
       <CampanaSelectModal
         isOpen={showCampanaModal}
@@ -1923,8 +1925,8 @@ export default function App() {
                     </div>
                   </form>
 
-                  <div className="border border-slate-100 rounded-xl overflow-hidden bg-white">
-                    <table className="w-full text-left border-collapse text-xs">
+                  <div className="border border-slate-100 rounded-xl overflow-x-auto w-full bg-white">
+                    <table className="w-full text-left border-collapse text-xs min-w-[750px]">
                       <thead>
                         <tr className="bg-slate-50 border-b border-slate-100 text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">
                           <th className="p-3">Nombre Completo</th>

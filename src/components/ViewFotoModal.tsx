@@ -32,7 +32,7 @@ export function ViewFotoModal({ prenda, onClose }: ViewFotoModalProps) {
       onClick={onClose}
     >
       <div 
-        className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-2xl relative overflow-hidden space-y-4 animate-in fade-in zoom-in duration-200 text-left"
+        className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-4 sm:p-6 shadow-2xl relative overflow-hidden space-y-4 animate-in fade-in zoom-in duration-200 text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
@@ -52,7 +52,7 @@ export function ViewFotoModal({ prenda, onClose }: ViewFotoModalProps) {
         </div>
 
         {/* Photo Preview Panel */}
-        <div className="h-[380px] w-full rounded-xl bg-slate-50 border border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 text-slate-400 relative overflow-hidden">
+        <div className="h-[250px] sm:h-[380px] w-full rounded-xl bg-slate-50 border border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 text-slate-400 relative overflow-hidden shrink-0">
           {prenda.imagenUrl ? (
             <img 
               src={prenda.imagenUrl} 
@@ -73,14 +73,14 @@ export function ViewFotoModal({ prenda, onClose }: ViewFotoModalProps) {
         </div>
 
         {/* Specifications row */}
-        <div className="grid grid-cols-2 gap-4 bg-slate-50 rounded-xl p-3 text-xs border border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 bg-slate-50 rounded-xl p-3 text-xs border border-slate-100">
           <div>
             <span className="text-[9px] uppercase font-bold text-slate-400 block">Precio de lista</span>
             <span className="font-extrabold text-indigo-600 font-mono text-sm">{formatCOP(prenda.precioBase)}</span>
           </div>
           <div>
             <span className="text-[9px] uppercase font-bold text-slate-400 block">Tallas</span>
-            <span className="font-bold text-slate-700">{prenda.tallasDisponibles.join(', ')}</span>
+            <span className="font-bold text-slate-700 break-words block">{prenda.tallasDisponibles.join(', ')}</span>
           </div>
         </div>
 

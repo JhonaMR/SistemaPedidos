@@ -486,25 +486,24 @@ export default function ClientSection({
         /* Right side (now replaces left side): Client detailed records */
         selectedCliente && (
           <div id="selected-client-dashboard" className="bg-white border border-[#E2E8F0] rounded-xl p-6 space-y-6 shadow-sm">
-
             {/* Clickable Header: Profile Card */}
             <div
               onClick={() => setSelectedClientId(null)}
-              className="flex items-center justify-between border-b border-[#F1F5F9] pb-4 cursor-pointer hover:bg-slate-50 -mx-4 -mt-4 p-4 rounded-t-xl transition-all group"
+              className="flex flex-col sm:flex-row gap-4 justify-between sm:items-center border-b border-[#F1F5F9] pb-4 cursor-pointer hover:bg-slate-50 -mx-4 -mt-4 p-4 rounded-t-xl transition-all group"
               title="Haz clic para volver a la lista"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-slate-100 rounded-lg text-slate-600 group-hover:bg-[#FAF7F0] group-hover:text-[#4A5D4E] transition-colors">
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className="p-2 bg-slate-100 rounded-lg text-slate-600 group-hover:bg-[#FAF7F0] group-hover:text-[#4A5D4E] transition-colors shrink-0">
                   <ChevronRight className="h-5 w-5 transform rotate-180" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <span className="text-[9px] uppercase font-bold tracking-widest text-[#858074] block">Ficha de Cliente • Clic para volver</span>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-xl font-bold font-serif text-[#1E293B] mt-0.5 group-hover:text-[#4A5D4E] transition-colors">{selectedCliente.nombre}</h3>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-xl font-bold font-serif text-[#1E293B] mt-0.5 group-hover:text-[#4A5D4E] transition-colors break-words whitespace-normal max-w-[85%]" title={selectedCliente.nombre}>{selectedCliente.nombre}</h3>
                     <button
                       type="button"
                       onClick={(e) => handleEditFromDetailedView(selectedCliente, e)}
-                      className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                      className="p-1.5 text-slate-400 hover:text-indigo-650 hover:bg-indigo-50 rounded-lg transition-all shrink-0 cursor-pointer"
                       title="Editar Datos de Cliente"
                     >
                       <Edit2 className="h-4 w-4" />
@@ -515,7 +514,7 @@ export default function ClientSection({
               </div>
 
               <div
-                className="bg-[#FAF7F0] p-3 rounded-lg border border-[#EDECE3] text-center min-w-[120px]"
+                className="bg-[#FAF7F0] p-3 rounded-lg border border-[#EDECE3] text-center w-full sm:w-auto min-w-[120px] shrink-0"
                 onClick={(e) => e.stopPropagation()}
               >
                 <span className="text-[9px] uppercase font-bold tracking-widest text-[#858074] block">Pedidos Realizados</span>
