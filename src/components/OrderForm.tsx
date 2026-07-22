@@ -87,6 +87,7 @@ export default function OrderForm({
   const [extraUnitPrice, setExtraUnitPrice] = useState<number | ''>('');
   const [extraNovedad, setExtraNovedad] = useState('');
   const [extraTallasCantidades, setExtraTallasCantidades] = useState<Record<string, number>>({ 'N/A': 1 });
+  const [foundExtraPrenda, setFoundExtraPrenda] = useState<Prenda | null>(null);
 
   // Client Quick Add states
   const [isQuickAdding, setIsQuickAdding] = useState(false);
@@ -459,8 +460,36 @@ export default function OrderForm({
     setExtraUnitPrice('');
     setExtraNovedad('');
     setExtraTallasCantidades({ 'N/A': 1 });
+    setFoundExtraPrenda(null);
     setShowAddExtraModal(true);
   };
+
+  useEffect(() => {
+    const cleanRef = extraRef.trim().toUpperCase();
+    if (!cleanRef) {
+      setFoundExtraPrenda(null);
+      return;
+    }
+
+    const found = catalogGarments.find(p => p.ref.toUpperCase() === cleanRef);
+    if (found) {
+      setFoundExtraPrenda(found);
+      setExtraUnitPrice(found.precioBase);
+      
+      let matchedCat: 'Dama' | 'Plus' | 'Niña' | 'Niño' | 'Colegial' | null = null;
+      if (Array.isArray(found.categoria) && found.categoria.length > 0) {
+        matchedCat = found.categoria[0];
+      } else if (typeof found.categoria === 'string') {
+        matchedCat = found.categoria;
+      }
+      
+      if (matchedCat) {
+        setExtraCategory(matchedCat);
+      }
+    } else {
+      setFoundExtraPrenda(null);
+    }
+  }, [extraRef, catalogGarments]);
 
   const handleSaveExtraItem = () => {
     const cleanRef = extraRef.trim().toUpperCase();
@@ -481,9 +510,10 @@ export default function OrderForm({
       return;
     }
 
-    // Al imprimir el pedido, el nombre de la referencia debe ser "Prenda " + etiqueta.toLowerCase()
-    const label = extraCategory.toLowerCase();
-    const nombrePrenda = `Prenda ${label}`;
+    // Al imprimir el pedido, el nombre de la referencia debe ser el de la prenda encontrada o "Prenda " + etiqueta.toLowerCase()
+    const nombrePrenda = foundExtraPrenda 
+      ? foundExtraPrenda.nombre 
+      : `Prenda ${extraCategory.toLowerCase()}`;
     const totalQty = activeTallas.reduce((sum, [_, q]) => sum + q, 0);
     const formattedTallaStr = getSortedTallasStr(extraTallasCantidades);
 
@@ -1917,6 +1947,11 @@ export default function OrderForm({
                     onFocus={(e) => e.target.select()}
                     className="w-full p-2.5 bg-[#FAFBFD] border border-[#CBD5E1] rounded-lg text-xs font-bold text-slate-800 focus:ring-1 focus:ring-[#059669] focus:outline-none uppercase"
                   />
+                  {foundExtraPrenda && (
+                    <p className="mt-1 text-[11px] font-bold text-emerald-600">
+                      ✓ Prenda encontrada: {foundExtraPrenda.nombre}
+                    </p>
+                  )}
                 </div>
 
                 <div>

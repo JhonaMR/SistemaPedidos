@@ -1,0 +1,1 @@
+{"name":"Toma Pedido App","short_name":"TomaPedido","description":"Sistema de toma de pedidos offline-first para vendedores","start_url":"/","display":"standalone","background_color":"#ffffff","theme_color":"#4f46e5","lang":"en","scope":"/","icons":[{"src":"pwa-256x256.png","sizes":"256x256","type":"image/png"}]}

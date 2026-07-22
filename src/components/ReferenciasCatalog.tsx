@@ -112,17 +112,6 @@ export default function ReferenciasCatalog({
       isEnabledInCampaign = !campanasReferencias ||
         !campanasReferencias[selectedCampanaFilter] ||
         campanasReferencias[selectedCampanaFilter].includes(p.ref);
-    } else {
-      // Si es Todas, filtramos por todas las campañas del año seleccionado
-      const campanasDelAnio = (campanasDisponibles || [])
-        .filter(c => c.anio === selectedYearFilter)
-        .map(c => `${c.nombre} ${c.anio}`);
-
-      if (campanasDelAnio.length > 0 && campanasReferencias) {
-        isEnabledInCampaign = campanasDelAnio.some(campName =>
-          campanasReferencias[campName] && campanasReferencias[campName].includes(p.ref)
-        );
-      }
     }
 
     const matchesSearch =

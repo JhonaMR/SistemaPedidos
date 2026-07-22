@@ -55,7 +55,9 @@ export function ViewFotoModal({ prenda, onClose }: ViewFotoModalProps) {
         <div className="h-[250px] sm:h-[380px] w-full rounded-xl bg-slate-50 border border-dashed border-slate-300 flex flex-col items-center justify-center gap-2 text-slate-400 relative overflow-hidden shrink-0">
           {prenda.imagenUrl ? (
             <img 
-              src={prenda.imagenUrl} 
+              src={prenda.imagenUrl.startsWith('data:') 
+                ? prenda.imagenUrl 
+                : `${import.meta.env.VITE_API_URL || ''}${prenda.imagenUrl}`} 
               alt={prenda.nombre} 
               className="w-full h-full object-contain"
               referrerPolicy="no-referrer"

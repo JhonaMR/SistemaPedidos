@@ -13,8 +13,17 @@ import { z as z2 } from "zod";
 
 // backend/config.ts
 import path from "path";
+import dotenv from "dotenv";
+dotenv.config();
 var PORT = process.env.PORT || 5050;
 var NODE_ENV = process.env.NODE_ENV || "development";
+var PG_CONFIG = {
+  host: process.env.PGHOST || "localhost",
+  port: parseInt(process.env.PGPORT || "5435", 10),
+  user: process.env.PGUSER || "postgres",
+  password: process.env.PGPASSWORD || "postgres",
+  database: process.env.PGDATABASE || "arare_plow"
+};
 var DB_DIR = path.join(process.cwd(), "db_json");
 var DB_PATHS = {
   clientes: path.join(DB_DIR, "clientes.json"),
@@ -27,7 +36,7 @@ var DB_PATHS = {
   campanas: path.join(DB_DIR, "campanas.json"),
   campanasReferencias: path.join(DB_DIR, "campanas_referencias.json")
 };
-var FOTOS_REFERENCIAS_DIR = path.join(process.cwd(), "public", "fotos_referencias");
+var FOTOS_REFERENCIAS_DIR = process.env.FOTOS_REFERENCIAS_DIR || path.join(process.cwd(), "public", "fotos_referencias");
 var JWT_SECRET = process.env.JWT_SECRET || "arare_secreto_super_seguro_2026";
 
 // backend/middleware/authMiddleware.ts
@@ -119,199 +128,637 @@ var CampanaSchema = z.object({
 });
 
 // backend/services/dbService.ts
-import fs from "fs/promises";
 import bcrypt from "bcryptjs";
 
-// backend/services/lockService.ts
-var Mutex = class {
-  constructor() {
-    this.queue = Promise.resolve();
-  }
-  async acquire() {
-    let release = () => {
-    };
-    const nextPromise = new Promise((resolve) => {
-      release = resolve;
-    });
-    const currentQueue = this.queue;
-    this.queue = this.queue.then(() => nextPromise);
-    await currentQueue;
-    return release;
-  }
-};
-var FileLockManager = class {
-  constructor() {
-    this.locks = /* @__PURE__ */ new Map();
-  }
-  getMutex(filePath) {
-    let mutex = this.locks.get(filePath);
-    if (!mutex) {
-      mutex = new Mutex();
-      this.locks.set(filePath, mutex);
+// backend/services/dbConnection.ts
+import pg from "pg";
+var pool = new pg.Pool(PG_CONFIG);
+async function ensureDatabaseExists() {
+  const { database, ...dbConfigWithoutDb } = PG_CONFIG;
+  const client = new pg.Client({
+    ...dbConfigWithoutDb,
+    database: "postgres"
+  });
+  try {
+    await client.connect();
+    const res = await client.query("SELECT 1 FROM pg_database WHERE datname = $1", [database]);
+    if (res.rowCount === 0) {
+      console.log(`[Database Connection] Database "${database}" does not exist. Creating it...`);
+      await client.query(`CREATE DATABASE "${database}"`);
+      console.log(`[Database Connection] Database "${database}" created successfully.`);
     }
-    return mutex;
-  }
-  /**
-   * Ejecuta una función asíncrona de manera exclusiva para una ruta de archivo.
-   * Garantiza que no haya lecturas/escrituras simultáneas en el mismo archivo.
-   */
-  async runExclusive(filePath, callback) {
-    const mutex = this.getMutex(filePath);
-    const release = await mutex.acquire();
+  } catch (err) {
+    console.error(`[Database Connection] Error ensuring database "${database}" exists:`, err);
+  } finally {
     try {
-      return await callback();
-    } finally {
-      release();
+      await client.end();
+    } catch (e) {
     }
   }
-};
-var lockManager = new FileLockManager();
+}
+async function initDatabaseSchema() {
+  await ensureDatabaseExists();
+  const client = await pool.connect();
+  try {
+    console.log(`[Database Connection] Initializing tables for database: ${PG_CONFIG.database}`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS usuarios (
+        id VARCHAR(50) PRIMARY KEY,
+        nombre VARCHAR(255) NOT NULL,
+        usuario VARCHAR(10) UNIQUE NOT NULL,
+        clave VARCHAR(255) NOT NULL,
+        rol VARCHAR(20) NOT NULL,
+        es_primera_vez BOOLEAN NOT NULL DEFAULT TRUE,
+        activo BOOLEAN DEFAULT TRUE,
+        id_vendedor VARCHAR(20)
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS clientes (
+        id VARCHAR(50) PRIMARY KEY,
+        codigo_cliente VARCHAR(50) NOT NULL,
+        nombre VARCHAR(255) NOT NULL,
+        documento_identidad VARCHAR(50) NOT NULL,
+        telefono VARCHAR(50),
+        correo VARCHAR(100),
+        direccion VARCHAR(255),
+        ciudad VARCHAR(100),
+        notas TEXT,
+        fecha_registro VARCHAR(50) NOT NULL,
+        limite_facturacion VARCHAR(50)
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS prendas (
+        ref VARCHAR(50) PRIMARY KEY,
+        nombre VARCHAR(255) NOT NULL,
+        categoria JSONB NOT NULL,
+        precio_base NUMERIC(12, 2) NOT NULL,
+        tallas_disponibles JSONB NOT NULL,
+        imagen_url VARCHAR(255),
+        stock INTEGER NOT NULL,
+        descripcion TEXT
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS campanas (
+        nombre VARCHAR(100) NOT NULL,
+        anio INTEGER NOT NULL,
+        numero INTEGER NOT NULL,
+        PRIMARY KEY (nombre, anio)
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS campanas_referencias (
+        campana_key VARCHAR(150) PRIMARY KEY,
+        referencias JSONB NOT NULL
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS vendedor (
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(255) NOT NULL,
+        codigo VARCHAR(50) NOT NULL
+      )
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS pedidos (
+        id VARCHAR(50) PRIMARY KEY,
+        numero_pedido VARCHAR(50) NOT NULL,
+        cliente_id VARCHAR(50) NOT NULL,
+        cliente_nombre VARCHAR(255) NOT NULL,
+        cliente_telefono VARCHAR(50),
+        vendedor_nombre VARCHAR(255) NOT NULL,
+        subtotal NUMERIC(12, 2) NOT NULL,
+        porcentaje_descuento NUMERIC(5, 2) NOT NULL,
+        monto_descuento NUMERIC(12, 2) NOT NULL,
+        total NUMERIC(12, 2) NOT NULL,
+        estado VARCHAR(20) NOT NULL,
+        notas TEXT,
+        fecha VARCHAR(50) NOT NULL,
+        fecha_entrega_estimada VARCHAR(50) NOT NULL,
+        fecha_limite_despacho VARCHAR(50),
+        campana VARCHAR(100),
+        facturacion_fe NUMERIC(5, 2),
+        facturacion_rm NUMERIC(5, 2),
+        fecha_cancelado VARCHAR(50),
+        motivo_cancelado TEXT,
+        fecha_eliminacion VARCHAR(50),
+        editado BOOLEAN,
+        backup_of VARCHAR(50),
+        backup_fecha VARCHAR(50),
+        es_backup BOOLEAN DEFAULT FALSE,
+        es_deleted BOOLEAN DEFAULT FALSE
+      )
+    `);
+    await client.query(`
+      DO $$
+      BEGIN
+        IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'pedido_items') THEN
+          IF NOT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'pedido_items' AND column_name = 'db_id') THEN
+            DROP TABLE pedido_items CASCADE;
+          END IF;
+        END IF;
+      END $$;
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS pedido_items (
+        db_id SERIAL PRIMARY KEY,
+        id VARCHAR(50) NOT NULL,
+        pedido_id VARCHAR(50) NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+        prenda_ref VARCHAR(50) NOT NULL,
+        nombre_prenda VARCHAR(255) NOT NULL,
+        categoria VARCHAR(100) NOT NULL,
+        talla VARCHAR(20) NOT NULL,
+        novedad TEXT,
+        cantidad INTEGER NOT NULL,
+        precio_unitario NUMERIC(12, 2) NOT NULL,
+        total NUMERIC(12, 2) NOT NULL,
+        tallas_detalle JSONB
+      )
+    `);
+    console.log("[Database Connection] All database tables checked/created successfully.");
+  } catch (err) {
+    console.error("[Database Connection] Error initializing database schemas:", err);
+    throw err;
+  } finally {
+    client.release();
+  }
+}
 
 // backend/services/dbService.ts
-async function safeReadFile(filePath, defaultContent) {
-  return lockManager.runExclusive(filePath, async () => {
-    try {
-      await fs.access(filePath);
-      const data = await fs.readFile(filePath, "utf-8");
-      return JSON.parse(data);
-    } catch (err) {
-      return JSON.parse(defaultContent);
-    }
+async function queryPedidos(whereClause, params = []) {
+  const query = `
+    SELECT 
+      id,
+      numero_pedido as "numeroPedido",
+      cliente_id as "clienteId",
+      cliente_nombre as "clienteNombre",
+      cliente_telefono as "clienteTelefono",
+      vendedor_nombre as "vendedorNombre",
+      subtotal::float,
+      porcentaje_descuento::float as "porcentajeDescuento",
+      monto_descuento::float as "montoDescuento",
+      total::float,
+      estado,
+      notas,
+      fecha,
+      fecha_entrega_estimada as "fechaEntregaEstimada",
+      fecha_limite_despacho as "fechaLimiteDespacho",
+      campana,
+      facturacion_fe::float as "facturacionFE",
+      facturacion_rm::float as "facturacionRM",
+      fecha_cancelado as "fechaCancelado",
+      motivo_cancelado as "motivoCancelado",
+      fecha_eliminacion as "fechaEliminacion",
+      editado,
+      backup_of as "backupOf",
+      backup_fecha as "backupFecha",
+      es_backup as "esBackup"
+    FROM pedidos
+    WHERE ${whereClause}
+  `;
+  const res = await pool.query(query, params);
+  if (res.rows.length === 0) return [];
+  const ids = res.rows.map((p) => p.id);
+  const itemsRes = await pool.query(`
+    SELECT 
+      id,
+      pedido_id as "pedidoId",
+      prenda_ref as "prendaRef",
+      nombre_prenda as "nombrePrenda",
+      categoria,
+      talla,
+      novedad,
+      cantidad::int,
+      precio_unitario::float as "precioUnitario",
+      total::float,
+      tallas_detalle as "tallasDetalle"
+    FROM pedido_items
+    WHERE pedido_id = ANY($1)
+  `, [ids]);
+  const itemsByPedido = /* @__PURE__ */ new Map();
+  itemsRes.rows.forEach((item) => {
+    const list = itemsByPedido.get(item.pedidoId) || [];
+    const { pedidoId, ...cleanItem } = item;
+    list.push(cleanItem);
+    itemsByPedido.set(item.pedidoId, list);
   });
+  return res.rows.map((p) => ({
+    ...p,
+    items: itemsByPedido.get(p.id) || []
+  }));
 }
-async function safeWriteFile(filePath, data) {
-  return lockManager.runExclusive(filePath, async () => {
-    try {
-      await fs.writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
-      return true;
-    } catch (err) {
-      console.error(`Error writing to ${filePath}:`, err);
-      throw err;
-    }
-  });
-}
-async function getAllData() {
-  const clientes = await safeReadFile(DB_PATHS.clientes, "[]");
-  let pedidos = await safeReadFile(DB_PATHS.pedidos, "[]");
-  const deletedPedidos = await safeReadFile(DB_PATHS.deletedPedidos, "[]");
-  let shouldSavePedidos = false;
-  if (Array.isArray(pedidos)) {
-    pedidos = pedidos.map((p) => {
-      if (p.idLocal !== void 0) {
-        delete p.idLocal;
-        shouldSavePedidos = true;
-      }
-      return p;
-    });
-  }
-  let hasAsyncOrders = false;
-  if (Array.isArray(pedidos)) {
-    hasAsyncOrders = pedidos.some((p) => p.numeroPedido && p.numeroPedido.startsWith("ASYNC-"));
-  }
-  if (hasAsyncOrders) {
-    shouldSavePedidos = true;
-    const maxCorrelativos = /* @__PURE__ */ new Map();
-    pedidos.forEach((p) => {
-      if (p.numeroPedido && !p.numeroPedido.startsWith("ASYNC-")) {
-        const parts = p.numeroPedido.split("-");
-        const prefijo = parts[0] || "01";
-        const corr = parseInt(parts[1], 10);
-        if (!isNaN(corr)) {
-          const maxVal = maxCorrelativos.get(prefijo) || 0;
-          if (corr > maxVal) {
-            maxCorrelativos.set(prefijo, corr);
+async function saveOrdersSlice(orders, isDeleted, isBackup) {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    if (orders.length > 0) {
+      for (const o of orders) {
+        await client.query(`
+          INSERT INTO pedidos (
+            id, numero_pedido, cliente_id, cliente_nombre, cliente_telefono, vendedor_nombre,
+            subtotal, porcentaje_descuento, monto_descuento, total, estado, notas, fecha,
+            fecha_entrega_estimada, fecha_limite_despacho, campana, facturacion_fe, facturacion_rm,
+            fecha_cancelado, motivo_cancelado, fecha_eliminacion, editado, backup_of, backup_fecha,
+            es_backup, es_deleted
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
+          ON CONFLICT (id) DO UPDATE SET
+            numero_pedido = EXCLUDED.numero_pedido,
+            cliente_id = EXCLUDED.cliente_id,
+            cliente_nombre = EXCLUDED.cliente_nombre,
+            cliente_telefono = EXCLUDED.cliente_telefono,
+            vendedor_nombre = EXCLUDED.vendedor_nombre,
+            subtotal = EXCLUDED.subtotal,
+            porcentaje_descuento = EXCLUDED.porcentaje_descuento,
+            monto_descuento = EXCLUDED.monto_descuento,
+            total = EXCLUDED.total,
+            estado = EXCLUDED.estado,
+            notas = EXCLUDED.notas,
+            fecha = EXCLUDED.fecha,
+            fecha_entrega_estimada = EXCLUDED.fecha_entrega_estimada,
+            fecha_limite_despacho = EXCLUDED.fecha_limite_despacho,
+            campana = EXCLUDED.campana,
+            facturacion_fe = EXCLUDED.facturacion_fe,
+            facturacion_rm = EXCLUDED.facturacion_rm,
+            fecha_cancelado = EXCLUDED.fecha_cancelado,
+            motivo_cancelado = EXCLUDED.motivo_cancelado,
+            fecha_eliminacion = EXCLUDED.fecha_eliminacion,
+            editado = EXCLUDED.editado,
+            backup_of = EXCLUDED.backup_of,
+            backup_fecha = EXCLUDED.backup_fecha,
+            es_backup = EXCLUDED.es_backup,
+            es_deleted = EXCLUDED.es_deleted
+        `, [
+          o.id,
+          o.numeroPedido,
+          o.clienteId,
+          o.clienteNombre,
+          o.clienteTelefono || "",
+          o.vendedorNombre,
+          o.subtotal,
+          o.porcentajeDescuento,
+          o.montoDescuento,
+          o.total,
+          o.estado,
+          o.notas || null,
+          o.fecha,
+          o.fechaEntregaEstimada,
+          o.fechaLimiteDespacho || null,
+          o.campana || null,
+          o.facturacionFE || null,
+          o.facturacionRM || null,
+          o.fechaCancelado || null,
+          o.motivoCancelado || null,
+          o.fechaEliminacion || null,
+          o.editado || false,
+          o.backupOf || null,
+          o.backupFecha || null,
+          isBackup,
+          isDeleted
+        ]);
+        await client.query("DELETE FROM pedido_items WHERE pedido_id = $1", [o.id]);
+        if (Array.isArray(o.items) && o.items.length > 0) {
+          for (const item of o.items) {
+            await client.query(`
+              INSERT INTO pedido_items (
+                id, pedido_id, prenda_ref, nombre_prenda, categoria, talla, novedad, cantidad, precio_unitario, total, tallas_detalle
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            `, [
+              item.id,
+              o.id,
+              item.prendaRef,
+              item.nombrePrenda,
+              item.categoria,
+              item.talla,
+              item.novedad || null,
+              item.cantidad,
+              item.precioUnitario,
+              item.total,
+              item.tallasDetalle ? JSON.stringify(item.tallasDetalle) : null
+            ]);
           }
         }
       }
-    });
-    pedidos = pedidos.map((p) => {
-      if (p.numeroPedido && p.numeroPedido.startsWith("ASYNC-")) {
-        const parts = p.numeroPedido.split("-");
-        const prefijoVendedor = parts[1] || "01";
-        const nextCorr = (maxCorrelativos.get(prefijoVendedor) || 0) + 1;
-        maxCorrelativos.set(prefijoVendedor, nextCorr);
-        const paddedNum = String(nextCorr).padStart(3, "0");
-        return {
-          ...p,
-          numeroPedido: `${prefijoVendedor}-${paddedNum}`
-        };
-      }
-      return p;
-    });
-  }
-  if (shouldSavePedidos) {
-    await safeWriteFile(DB_PATHS.pedidos, pedidos);
-  }
-  const backups = await safeReadFile(DB_PATHS.backups, "[]");
-  const vendedor = await safeReadFile(DB_PATHS.vendedor, '{"nombre": "Lina Pulgarin", "codigo": "V-102"}');
-  const prendas = await safeReadFile(DB_PATHS.prendas, "[]");
-  const defaultUsuarios = '[{"id":"usr_sop","nombre":"Usuario Soporte","usuario":"SOP","clave":"9999","rol":"soporte","esPrimeraVez":false,"activo":true},{"id":"usr_gen","nombre":"Usuario General","usuario":"GEN","clave":"1234","rol":"general","esPrimeraVez":true,"activo":true}]';
-  let usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
-  let hasPlaintextPINs = false;
-  if (Array.isArray(usuarios)) {
-    usuarios = await Promise.all(
-      usuarios.map(async (u) => {
-        if (u.clave && /^\d{4}$/.test(u.clave)) {
-          const hash = await bcrypt.hash(u.clave, 10);
-          hasPlaintextPINs = true;
-          return { ...u, clave: hash };
-        }
-        return u;
-      })
-    );
-    if (hasPlaintextPINs) {
-      console.log("[Security Auto-Heal] Plaintext PINs detected in database. Encrypting with bcrypt...");
-      await safeWriteFile(DB_PATHS.usuarios, usuarios);
+      const ids = orders.map((o) => o.id);
+      await client.query(`
+        DELETE FROM pedidos 
+        WHERE es_deleted = $1 AND es_backup = $2 AND NOT (id = ANY($3))
+      `, [isDeleted, isBackup, ids]);
+    } else {
+      await client.query("DELETE FROM pedidos WHERE es_deleted = $1 AND es_backup = $2", [isDeleted, isBackup]);
     }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
   }
-  const defaultCampanas = '[{"nombre":"Inicio de a\xF1o","anio":2026,"numero":1},{"nombre":"Madres","anio":2026,"numero":2},{"nombre":"Vacaciones","anio":2026,"numero":3},{"nombre":"Temporada","anio":2026,"numero":4}]';
-  const defaultCampanasRefs = '{"Inicio de a\xF1o 2026":["p1","p2","p3","p4","p5","p6","p7"],"Madres 2026":["p1","p2","p3","p4","p5","p6","p7"],"Vacaciones 2026":["p1","p2","p3","p4","p5","p6","p7"],"Temporada 2026":["p1","p2","p3","p4","p5","p6","p7"]}';
-  let campanas = await safeReadFile(DB_PATHS.campanas, defaultCampanas);
-  const campanasReferencias = await safeReadFile(DB_PATHS.campanasReferencias, defaultCampanasRefs);
-  if (Array.isArray(campanas) && campanas.length > 0 && typeof campanas[0] === "string") {
-    campanas = campanas.map((c) => {
-      const match = c.match(/\d{4}/);
-      const anio = match ? parseInt(match[0], 10) : 2026;
-      const cleanName = c.replace(new RegExp(`\\s*${anio}\\s*`, "g"), "").trim();
-      const norm = cleanName.toLowerCase();
-      let numero = 1;
-      if (norm.includes("inicio")) numero = 1;
-      else if (norm.includes("madre")) numero = 2;
-      else if (norm.includes("vacacio") || norm.includes("vacac")) numero = 3;
-      else if (norm.includes("temporad")) numero = 4;
-      else numero = 5;
-      return { nombre: cleanName, anio, numero };
-    });
-    await safeWriteFile(DB_PATHS.campanas, campanas);
+}
+async function getAllData() {
+  const clientRes = await pool.query(`
+    SELECT 
+      id,
+      codigo_cliente as "codigoCliente",
+      nombre,
+      documento_identidad as "documentoIdentidad",
+      telefono,
+      correo,
+      direccion,
+      ciudad,
+      notas,
+      fecha_registro as "fechaRegistro",
+      limite_facturacion as "limiteFacturacion"
+    FROM clientes
+  `);
+  const clientes = clientRes.rows;
+  const prendasRes = await pool.query(`
+    SELECT 
+      ref,
+      nombre,
+      categoria,
+      precio_base::float as "precioBase",
+      tallas_disponibles as "tallasDisponibles",
+      imagen_url as "imagenUrl",
+      stock::int,
+      descripcion
+    FROM prendas
+  `);
+  const prendas = prendasRes.rows.map((p) => ({
+    ...p,
+    categoria: p.categoria,
+    tallasDisponibles: p.tallasDisponibles
+  }));
+  const userRes = await pool.query(`
+    SELECT 
+      id,
+      nombre,
+      usuario,
+      clave,
+      rol,
+      es_primera_vez as "esPrimeraVez",
+      activo,
+      id_vendedor as "idVendedor"
+    FROM usuarios
+  `);
+  let usuarios = userRes.rows;
+  let hasPlaintextPINs = false;
+  usuarios = await Promise.all(
+    usuarios.map(async (u) => {
+      if (u.clave && /^\d{4}$/.test(u.clave)) {
+        const hash = await bcrypt.hash(u.clave, 10);
+        hasPlaintextPINs = true;
+        await pool.query("UPDATE usuarios SET clave = $1 WHERE id = $2", [hash, u.id]);
+        return { ...u, clave: hash };
+      }
+      return u;
+    })
+  );
+  if (usuarios.length === 0) {
+    const defaultUsuarios = [
+      { id: "usr_sop", nombre: "Usuario Soporte", usuario: "SOP", clave: "9999", rol: "soporte", esPrimeraVez: false, activo: true },
+      { id: "usr_gen", nombre: "Usuario General", usuario: "GEN", clave: "1234", rol: "general", esPrimeraVez: true, activo: true }
+    ];
+    for (const u of defaultUsuarios) {
+      const hash = await bcrypt.hash(u.clave, 10);
+      await pool.query(`
+        INSERT INTO usuarios (id, nombre, usuario, clave, rol, es_primera_vez, activo, id_vendedor)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [u.id, u.nombre, u.usuario, hash, u.rol, u.esPrimeraVez, u.activo, null]);
+    }
+    const freshUsers = await pool.query('SELECT id, nombre, usuario, clave, rol, es_primera_vez as "esPrimeraVez", activo, id_vendedor as "idVendedor" FROM usuarios');
+    usuarios = freshUsers.rows;
   }
-  return { clientes, pedidos, deletedPedidos, backups, vendedor, prendas, usuarios, campanas, campanasReferencias };
+  const campRes = await pool.query("SELECT nombre, anio::int, numero::int FROM campanas ORDER BY anio DESC, numero ASC");
+  let campanas = campRes.rows;
+  if (campanas.length === 0) {
+    const defaultCampanas = [
+      { nombre: "Inicio de a\xF1o", anio: 2026, numero: 1 },
+      { nombre: "Madres", anio: 2026, numero: 2 },
+      { nombre: "Vacaciones", anio: 2026, numero: 3 },
+      { nombre: "Temporada", anio: 2026, numero: 4 }
+    ];
+    for (const c of defaultCampanas) {
+      await pool.query("INSERT INTO campanas (nombre, anio, numero) VALUES ($1, $2, $3)", [c.nombre, c.anio, c.numero]);
+    }
+    const freshCamps = await pool.query("SELECT nombre, anio::int, numero::int FROM campanas ORDER BY anio DESC, numero ASC");
+    campanas = freshCamps.rows;
+  }
+  const refsRes = await pool.query("SELECT * FROM campanas_referencias");
+  const campanasReferencias = {};
+  refsRes.rows.forEach((row) => {
+    campanasReferencias[row.campana_key] = row.referencias;
+  });
+  const vendedorRes = await pool.query("SELECT nombre, codigo FROM vendedor ORDER BY id DESC LIMIT 1");
+  const vendedor = vendedorRes.rows[0] || { nombre: "Lina Pulgarin", codigo: "V-102" };
+  const pedidos = await queryPedidos("NOT es_deleted AND NOT es_backup");
+  const deletedPedidos = await queryPedidos("es_deleted AND NOT es_backup");
+  const backups = await queryPedidos("es_backup");
+  return {
+    clientes,
+    pedidos,
+    deletedPedidos,
+    backups,
+    vendedor,
+    prendas,
+    usuarios,
+    campanas,
+    campanasReferencias
+  };
 }
 async function saveClientes(clientes) {
-  return safeWriteFile(DB_PATHS.clientes, clientes);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    if (clientes.length > 0) {
+      for (const c of clientes) {
+        await client.query(`
+          INSERT INTO clientes (
+            id, codigo_cliente, nombre, documento_identidad, telefono, correo, direccion, ciudad, notas, fecha_registro, limite_facturacion
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          ON CONFLICT (id) DO UPDATE SET
+            codigo_cliente = EXCLUDED.codigo_cliente,
+            nombre = EXCLUDED.nombre,
+            documento_identidad = EXCLUDED.documento_identidad,
+            telefono = EXCLUDED.telefono,
+            correo = EXCLUDED.correo,
+            direccion = EXCLUDED.direccion,
+            ciudad = EXCLUDED.ciudad,
+            notas = EXCLUDED.notas,
+            fecha_registro = EXCLUDED.fecha_registro,
+            limite_facturacion = EXCLUDED.limite_facturacion
+        `, [
+          c.id,
+          c.codigoCliente,
+          c.nombre,
+          c.documentoIdentidad,
+          c.telefono || "",
+          c.correo || "",
+          c.direccion || "",
+          c.ciudad || "",
+          c.notas || null,
+          c.fechaRegistro,
+          c.limiteFacturacion || null
+        ]);
+      }
+      const ids = clientes.map((c) => c.id);
+      await client.query("DELETE FROM clientes WHERE NOT (id = ANY($1))", [ids]);
+    } else {
+      await client.query("DELETE FROM clientes");
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 async function savePedidos(pedidos) {
-  return safeWriteFile(DB_PATHS.pedidos, pedidos);
+  return saveOrdersSlice(pedidos, false, false);
 }
 async function saveDeletedPedidos(deletedPedidos) {
-  return safeWriteFile(DB_PATHS.deletedPedidos, deletedPedidos);
+  return saveOrdersSlice(deletedPedidos, true, false);
 }
 async function saveBackups(backups) {
-  return safeWriteFile(DB_PATHS.backups, backups);
+  return saveOrdersSlice(backups, false, true);
 }
 async function saveVendedor(vendedor) {
-  return safeWriteFile(DB_PATHS.vendedor, vendedor);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("DELETE FROM vendedor");
+    await client.query("INSERT INTO vendedor (nombre, codigo) VALUES ($1, $2)", [vendedor.nombre, vendedor.codigo]);
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 async function savePrendas(prendas) {
-  return safeWriteFile(DB_PATHS.prendas, prendas);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    if (prendas.length > 0) {
+      for (const p of prendas) {
+        await client.query(`
+          INSERT INTO prendas (
+            ref, nombre, categoria, precio_base, tallas_disponibles, imagen_url, stock, descripcion
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ON CONFLICT (ref) DO UPDATE SET
+            nombre = EXCLUDED.nombre,
+            categoria = EXCLUDED.categoria,
+            precio_base = EXCLUDED.precio_base,
+            tallas_disponibles = EXCLUDED.tallas_disponibles,
+            imagen_url = EXCLUDED.imagen_url,
+            stock = EXCLUDED.stock,
+            descripcion = EXCLUDED.descripcion
+        `, [
+          p.ref,
+          p.nombre,
+          JSON.stringify(p.categoria),
+          p.precioBase,
+          JSON.stringify(p.tallasDisponibles),
+          p.imagenUrl || null,
+          p.stock,
+          p.descripcion || null
+        ]);
+      }
+      const refs = prendas.map((p) => p.ref);
+      await client.query("DELETE FROM prendas WHERE NOT (ref = ANY($1))", [refs]);
+    } else {
+      await client.query("DELETE FROM prendas");
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 async function saveUsuarios(usuarios) {
-  return safeWriteFile(DB_PATHS.usuarios, usuarios);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    if (usuarios.length > 0) {
+      for (const u of usuarios) {
+        await client.query(`
+          INSERT INTO usuarios (
+            id, nombre, usuario, clave, rol, es_primera_vez, activo, id_vendedor
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ON CONFLICT (id) DO UPDATE SET
+            nombre = EXCLUDED.nombre,
+            usuario = EXCLUDED.usuario,
+            clave = EXCLUDED.clave,
+            rol = EXCLUDED.rol,
+            es_primera_vez = EXCLUDED.es_primera_vez,
+            activo = EXCLUDED.activo,
+            id_vendedor = EXCLUDED.id_vendedor
+        `, [
+          u.id,
+          u.nombre,
+          u.usuario,
+          u.clave,
+          u.rol,
+          u.esPrimeraVez,
+          u.activo !== false,
+          u.idVendedor || null
+        ]);
+      }
+      const ids = usuarios.map((u) => u.id);
+      await client.query("DELETE FROM usuarios WHERE NOT (id = ANY($1))", [ids]);
+    } else {
+      await client.query("DELETE FROM usuarios");
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 async function saveCampanas(campanas) {
-  return safeWriteFile(DB_PATHS.campanas, campanas);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("DELETE FROM campanas");
+    if (campanas.length > 0) {
+      for (const c of campanas) {
+        await client.query(`
+          INSERT INTO campanas (nombre, anio, numero) VALUES ($1, $2, $3)
+        `, [c.nombre, c.anio, c.numero]);
+      }
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 async function saveCampanasReferencias(campanasReferencias) {
-  return safeWriteFile(DB_PATHS.campanasReferencias, campanasReferencias);
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    await client.query("DELETE FROM campanas_referencias");
+    for (const [key, refs] of Object.entries(campanasReferencias)) {
+      await client.query(`
+        INSERT INTO campanas_referencias (campana_key, referencias) VALUES ($1, $2)
+      `, [key, JSON.stringify(refs)]);
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 // backend/routes/api.ts
@@ -757,6 +1204,7 @@ var api_default = router;
 // backend/server.ts
 var isProd = NODE_ENV === "production";
 async function startServer() {
+  await initDatabaseSchema();
   const app = express();
   app.use(cors());
   app.use(express.json({ limit: "50mb" }));

@@ -1,0 +1,79 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: toma-pedidos-db
+    restart: always
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: arare_psql_secreto_2026
+    volumes:
+      # Persistent PostgreSQL database storage
+      - postgres_data:/var/lib/postgresql/data
+
+  backend-plow:
+    build:
+      context: /share/CACHEDEV1_DATA/docker/toma-pedidos
+      dockerfile: Dockerfile
+    container_name: toma-pedidos-plow
+    restart: always
+    ports:
+      - "5050:5050"
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+      VITE_BRAND: plow
+      PGHOST: postgres-db
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: arare_psql_secreto_2026
+      PGDATABASE: arare_plow
+      JWT_SECRET: arare_jwt_secret_plow_2026
+      FOTOS_REFERENCIAS_DIR: /app/fotos_referencias
+    volumes:
+      # Persistent storage folder for Plow catalog images
+      - /share/CACHEDEV1_DATA/docker/toma-pedidos/plow_fotos:/app/fotos_referencias
+    depends_on:
+      - postgres-db
+
+  backend-melas:
+    build:
+      context: /share/CACHEDEV1_DATA/docker/toma-pedidos
+      dockerfile: Dockerfile
+    container_name: toma-pedidos-melas
+    restart: always
+    ports:
+      - "5051:5050" # Map NAS port 5051 to internal port 5050
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+      VITE_BRAND: melas
+      PGHOST: postgres-db
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: arare_psql_secreto_2026
+      PGDATABASE: arare_melas
+      JWT_SECRET: arare_jwt_secret_melas_2026
+      FOTOS_REFERENCIAS_DIR: /app/fotos_referencias
+    volumes:
+      # Persistent storage folder for Melas catalog images
+      - /share/CACHEDEV1_DATA/docker/toma-pedidos/melas_fotos:/app/fotos_referencias
+    depends_on:
+      - postgres-db
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: toma-pedidos-tunnel
+    restart: always
+    command: tunnel --no-autoupdate run
+    environment:
+      # Paste your Cloudflare Tunnel Token here
+      TUNNEL_TOKEN: eyJhIjoiMzI5YTA4NGU2NzlkYTFiMTdjNDZlNDMzMTIxN2IwMWIiLCJ0IjoiZWI4MDFjMmQtNzA5NS00YTJmLWE4OWEtY2NlMTczZDMzOGZjIiwicyI6IlpEZ3paR1ZtTVdFdFlUUm1ZeTAwTUdZNUxUazFPVFV0Wm1SbU5HSmlNR0ptWmpJMiJ9
+    depends_on:
+      - backend-plow
+      - backend-melas
+
+volumes:
+  postgres_data:

@@ -1,183 +1,466 @@
-import fs from 'fs/promises';
 import bcrypt from 'bcryptjs';
-import { DB_PATHS } from '../config';
-import { lockManager } from './lockService';
+import { pool } from './dbConnection';
 
-// Helper to safely read file or return default
-async function safeReadFile(filePath: string, defaultContent: string) {
-  return lockManager.runExclusive(filePath, async () => {
-    try {
-      await fs.access(filePath);
-      const data = await fs.readFile(filePath, 'utf-8');
-      return JSON.parse(data);
-    } catch (err) {
-      // If file does not exist, return default parsed
-      return JSON.parse(defaultContent);
-    }
+// Helper to query orders and their items
+async function queryPedidos(whereClause: string, params: any[] = []) {
+  const query = `
+    SELECT 
+      id,
+      numero_pedido as "numeroPedido",
+      cliente_id as "clienteId",
+      cliente_nombre as "clienteNombre",
+      cliente_telefono as "clienteTelefono",
+      vendedor_nombre as "vendedorNombre",
+      subtotal::float,
+      porcentaje_descuento::float as "porcentajeDescuento",
+      monto_descuento::float as "montoDescuento",
+      total::float,
+      estado,
+      notas,
+      fecha,
+      fecha_entrega_estimada as "fechaEntregaEstimada",
+      fecha_limite_despacho as "fechaLimiteDespacho",
+      campana,
+      facturacion_fe::float as "facturacionFE",
+      facturacion_rm::float as "facturacionRM",
+      fecha_cancelado as "fechaCancelado",
+      motivo_cancelado as "motivoCancelado",
+      fecha_eliminacion as "fechaEliminacion",
+      editado,
+      backup_of as "backupOf",
+      backup_fecha as "backupFecha",
+      es_backup as "esBackup"
+    FROM pedidos
+    WHERE ${whereClause}
+  `;
+  const res = await pool.query(query, params);
+  
+  if (res.rows.length === 0) return [];
+  
+  const ids = res.rows.map(p => p.id);
+  const itemsRes = await pool.query(`
+    SELECT 
+      id,
+      pedido_id as "pedidoId",
+      prenda_ref as "prendaRef",
+      nombre_prenda as "nombrePrenda",
+      categoria,
+      talla,
+      novedad,
+      cantidad::int,
+      precio_unitario::float as "precioUnitario",
+      total::float,
+      tallas_detalle as "tallasDetalle"
+    FROM pedido_items
+    WHERE pedido_id = ANY($1)
+  `, [ids]);
+  
+  const itemsByPedido = new Map<string, any[]>();
+  itemsRes.rows.forEach(item => {
+    const list = itemsByPedido.get(item.pedidoId) || [];
+    const { pedidoId, ...cleanItem } = item;
+    list.push(cleanItem);
+    itemsByPedido.set(item.pedidoId, list);
   });
+  
+  return res.rows.map(p => ({
+    ...p,
+    items: itemsByPedido.get(p.id) || []
+  }));
 }
 
-// Helper to safely write file
-async function safeWriteFile(filePath: string, data: any) {
-  return lockManager.runExclusive(filePath, async () => {
-    try {
-      await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf-8');
-      return true;
-    } catch (err) {
-      console.error(`Error writing to ${filePath}:`, err);
-      throw err;
-    }
-  });
-}
-
-export async function getAllData() {
-  const clientes = await safeReadFile(DB_PATHS.clientes, '[]');
-  let pedidos = await safeReadFile(DB_PATHS.pedidos, '[]');
-  const deletedPedidos = await safeReadFile(DB_PATHS.deletedPedidos, '[]');
-
-  // Clean up legacy idLocal from active database
-  let shouldSavePedidos = false;
-  if (Array.isArray(pedidos)) {
-    pedidos = pedidos.map((p: any) => {
-      if (p.idLocal !== undefined) {
-        delete p.idLocal;
-        shouldSavePedidos = true;
-      }
-      return p;
-    });
-  }
-
-  // Auto-heal legacy ASYNC- orders in the active database
-  let hasAsyncOrders = false;
-  if (Array.isArray(pedidos)) {
-    hasAsyncOrders = pedidos.some((p: any) => p.numeroPedido && p.numeroPedido.startsWith('ASYNC-'));
-  }
-
-  if (hasAsyncOrders) {
-    shouldSavePedidos = true;
-    const maxCorrelativos = new Map<string, number>();
+// Helper to save a slice of orders (active, deleted, or backups)
+async function saveOrdersSlice(orders: any[], isDeleted: boolean, isBackup: boolean) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
     
-    // 1. Scan for existing max sequential numbers
-    pedidos.forEach((p: any) => {
-      if (p.numeroPedido && !p.numeroPedido.startsWith('ASYNC-')) {
-        const parts = p.numeroPedido.split('-');
-        const prefijo = parts[0] || '01';
-        const corr = parseInt(parts[1], 10);
-        if (!isNaN(corr)) {
-          const maxVal = maxCorrelativos.get(prefijo) || 0;
-          if (corr > maxVal) {
-            maxCorrelativos.set(prefijo, corr);
+    if (orders.length > 0) {
+      for (const o of orders) {
+        // Upsert order
+        await client.query(`
+          INSERT INTO pedidos (
+            id, numero_pedido, cliente_id, cliente_nombre, cliente_telefono, vendedor_nombre,
+            subtotal, porcentaje_descuento, monto_descuento, total, estado, notas, fecha,
+            fecha_entrega_estimada, fecha_limite_despacho, campana, facturacion_fe, facturacion_rm,
+            fecha_cancelado, motivo_cancelado, fecha_eliminacion, editado, backup_of, backup_fecha,
+            es_backup, es_deleted
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26)
+          ON CONFLICT (id) DO UPDATE SET
+            numero_pedido = EXCLUDED.numero_pedido,
+            cliente_id = EXCLUDED.cliente_id,
+            cliente_nombre = EXCLUDED.cliente_nombre,
+            cliente_telefono = EXCLUDED.cliente_telefono,
+            vendedor_nombre = EXCLUDED.vendedor_nombre,
+            subtotal = EXCLUDED.subtotal,
+            porcentaje_descuento = EXCLUDED.porcentaje_descuento,
+            monto_descuento = EXCLUDED.monto_descuento,
+            total = EXCLUDED.total,
+            estado = EXCLUDED.estado,
+            notas = EXCLUDED.notas,
+            fecha = EXCLUDED.fecha,
+            fecha_entrega_estimada = EXCLUDED.fecha_entrega_estimada,
+            fecha_limite_despacho = EXCLUDED.fecha_limite_despacho,
+            campana = EXCLUDED.campana,
+            facturacion_fe = EXCLUDED.facturacion_fe,
+            facturacion_rm = EXCLUDED.facturacion_rm,
+            fecha_cancelado = EXCLUDED.fecha_cancelado,
+            motivo_cancelado = EXCLUDED.motivo_cancelado,
+            fecha_eliminacion = EXCLUDED.fecha_eliminacion,
+            editado = EXCLUDED.editado,
+            backup_of = EXCLUDED.backup_of,
+            backup_fecha = EXCLUDED.backup_fecha,
+            es_backup = EXCLUDED.es_backup,
+            es_deleted = EXCLUDED.es_deleted
+        `, [
+          o.id, o.numeroPedido, o.clienteId, o.clienteNombre, o.clienteTelefono || '', o.vendedorNombre,
+          o.subtotal, o.porcentajeDescuento, o.montoDescuento, o.total, o.estado, o.notas || null, o.fecha,
+          o.fechaEntregaEstimada, o.fechaLimiteDespacho || null, o.campana || null, o.facturacionFE || null, o.facturacionRM || null,
+          o.fechaCancelado || null, o.motivoCancelado || null, o.fechaEliminacion || null, o.editado || false, o.backupOf || null, o.backupFecha || null,
+          isBackup, isDeleted
+        ]);
+        
+        // Delete and recreate items for this order to be consistent
+        await client.query('DELETE FROM pedido_items WHERE pedido_id = $1', [o.id]);
+        
+        if (Array.isArray(o.items) && o.items.length > 0) {
+          for (const item of o.items) {
+            await client.query(`
+              INSERT INTO pedido_items (
+                id, pedido_id, prenda_ref, nombre_prenda, categoria, talla, novedad, cantidad, precio_unitario, total, tallas_detalle
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+            `, [
+              item.id, o.id, item.prendaRef, item.nombrePrenda, item.categoria, item.talla, item.novedad || null,
+              item.cantidad, item.precioUnitario, item.total, item.tallasDetalle ? JSON.stringify(item.tallasDetalle) : null
+            ]);
           }
         }
       }
-    });
-
-    // 2. Assign numbers to ASYNC orders sequentially
-    pedidos = pedidos.map((p: any) => {
-      if (p.numeroPedido && p.numeroPedido.startsWith('ASYNC-')) {
-        const parts = p.numeroPedido.split('-');
-        const prefijoVendedor = parts[1] || '01';
-        const nextCorr = (maxCorrelativos.get(prefijoVendedor) || 0) + 1;
-        maxCorrelativos.set(prefijoVendedor, nextCorr);
-        const paddedNum = String(nextCorr).padStart(3, '0');
-        return {
-          ...p,
-          numeroPedido: `${prefijoVendedor}-${paddedNum}`
-        };
-      }
-      return p;
-    });
-  }
-
-  if (shouldSavePedidos) {
-    await safeWriteFile(DB_PATHS.pedidos, pedidos);
-  }
-  const backups = await safeReadFile(DB_PATHS.backups, '[]');
-  const vendedor = await safeReadFile(DB_PATHS.vendedor, '{"nombre": "Lina Pulgarin", "codigo": "V-102"}');
-  const prendas = await safeReadFile(DB_PATHS.prendas, '[]');
-  const defaultUsuarios = '[{"id":"usr_sop","nombre":"Usuario Soporte","usuario":"SOP","clave":"9999","rol":"soporte","esPrimeraVez":false,"activo":true},{"id":"usr_gen","nombre":"Usuario General","usuario":"GEN","clave":"1234","rol":"general","esPrimeraVez":true,"activo":true}]';
-  let usuarios = await safeReadFile(DB_PATHS.usuarios, defaultUsuarios);
-
-  // Auto-encrypt plaintext passwords
-  let hasPlaintextPINs = false;
-  if (Array.isArray(usuarios)) {
-    usuarios = await Promise.all(
-      usuarios.map(async (u: any) => {
-        if (u.clave && /^\d{4}$/.test(u.clave)) {
-          const hash = await bcrypt.hash(u.clave, 10);
-          hasPlaintextPINs = true;
-          return { ...u, clave: hash };
-        }
-        return u;
-      })
-    );
-    if (hasPlaintextPINs) {
-      console.log('[Security Auto-Heal] Plaintext PINs detected in database. Encrypting with bcrypt...');
-      await safeWriteFile(DB_PATHS.usuarios, usuarios);
-    }
-  }
-
-  const defaultCampanas = '[{"nombre":"Inicio de año","anio":2026,"numero":1},{"nombre":"Madres","anio":2026,"numero":2},{"nombre":"Vacaciones","anio":2026,"numero":3},{"nombre":"Temporada","anio":2026,"numero":4}]';
-  const defaultCampanasRefs = '{"Inicio de año 2026":["p1","p2","p3","p4","p5","p6","p7"],"Madres 2026":["p1","p2","p3","p4","p5","p6","p7"],"Vacaciones 2026":["p1","p2","p3","p4","p5","p6","p7"],"Temporada 2026":["p1","p2","p3","p4","p5","p6","p7"]}';
-  let campanas = await safeReadFile(DB_PATHS.campanas, defaultCampanas);
-  const campanasReferencias = await safeReadFile(DB_PATHS.campanasReferencias, defaultCampanasRefs);
-
-  // Migrate if it's an array of strings (old database schema)
-  if (Array.isArray(campanas) && campanas.length > 0 && typeof campanas[0] === 'string') {
-    campanas = campanas.map((c: string) => {
-      const match = c.match(/\d{4}/);
-      const anio = match ? parseInt(match[0], 10) : 2026;
-      const cleanName = c.replace(new RegExp(`\\s*${anio}\\s*`, 'g'), '').trim();
-      const norm = cleanName.toLowerCase();
       
-      let numero = 1;
-      if (norm.includes('inicio')) numero = 1;
-      else if (norm.includes('madre')) numero = 2;
-      else if (norm.includes('vacacio') || norm.includes('vacac')) numero = 3;
-      else if (norm.includes('temporad')) numero = 4;
-      else numero = 5;
+      // Delete orders that are not in the new lists
+      const ids = orders.map(o => o.id);
+      await client.query(`
+        DELETE FROM pedidos 
+        WHERE es_deleted = $1 AND es_backup = $2 AND NOT (id = ANY($3))
+      `, [isDeleted, isBackup, ids]);
+    } else {
+      await client.query('DELETE FROM pedidos WHERE es_deleted = $1 AND es_backup = $2', [isDeleted, isBackup]);
+    }
+    
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
 
-      return { nombre: cleanName, anio, numero };
-    });
-    // Write back the migrated version to keep it persistent
-    await safeWriteFile(DB_PATHS.campanas, campanas);
+export async function getAllData() {
+  // Query clients
+  const clientRes = await pool.query(`
+    SELECT 
+      id,
+      codigo_cliente as "codigoCliente",
+      nombre,
+      documento_identidad as "documentoIdentidad",
+      telefono,
+      correo,
+      direccion,
+      ciudad,
+      notas,
+      fecha_registro as "fechaRegistro",
+      limite_facturacion as "limiteFacturacion"
+    FROM clientes
+  `);
+  const clientes = clientRes.rows;
+
+  // Query garments (catalog)
+  const prendasRes = await pool.query(`
+    SELECT 
+      ref,
+      nombre,
+      categoria,
+      precio_base::float as "precioBase",
+      tallas_disponibles as "tallasDisponibles",
+      imagen_url as "imagenUrl",
+      stock::int,
+      descripcion
+    FROM prendas
+  `);
+  const prendas = prendasRes.rows.map(p => ({
+    ...p,
+    categoria: p.categoria,
+    tallasDisponibles: p.tallasDisponibles
+  }));
+
+  // Query users
+  const userRes = await pool.query(`
+    SELECT 
+      id,
+      nombre,
+      usuario,
+      clave,
+      rol,
+      es_primera_vez as "esPrimeraVez",
+      activo,
+      id_vendedor as "idVendedor"
+    FROM usuarios
+  `);
+  let usuarios = userRes.rows;
+
+  // Auto-encrypt plaintext passwords if any are found (legacy support)
+  let hasPlaintextPINs = false;
+  usuarios = await Promise.all(
+    usuarios.map(async (u: any) => {
+      if (u.clave && /^\d{4}$/.test(u.clave)) {
+        const hash = await bcrypt.hash(u.clave, 10);
+        hasPlaintextPINs = true;
+        await pool.query('UPDATE usuarios SET clave = $1 WHERE id = $2', [hash, u.id]);
+        return { ...u, clave: hash };
+      }
+      return u;
+    })
+  );
+
+  // Fallback for default users if none exist
+  if (usuarios.length === 0) {
+    const defaultUsuarios = [
+      { id: 'usr_sop', nombre: 'Usuario Soporte', usuario: 'SOP', clave: '9999', rol: 'soporte', esPrimeraVez: false, activo: true },
+      { id: 'usr_gen', nombre: 'Usuario General', usuario: 'GEN', clave: '1234', rol: 'general', esPrimeraVez: true, activo: true }
+    ];
+    for (const u of defaultUsuarios) {
+      const hash = await bcrypt.hash(u.clave, 10);
+      await pool.query(`
+        INSERT INTO usuarios (id, nombre, usuario, clave, rol, es_primera_vez, activo, id_vendedor)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `, [u.id, u.nombre, u.usuario, hash, u.rol, u.esPrimeraVez, u.activo, null]);
+    }
+    const freshUsers = await pool.query('SELECT id, nombre, usuario, clave, rol, es_primera_vez as "esPrimeraVez", activo, id_vendedor as "idVendedor" FROM usuarios');
+    usuarios = freshUsers.rows;
   }
 
-  return { clientes, pedidos, deletedPedidos, backups, vendedor, prendas, usuarios, campanas, campanasReferencias };
+  // Query campaigns
+  const campRes = await pool.query('SELECT nombre, anio::int, numero::int FROM campanas ORDER BY anio DESC, numero ASC');
+  let campanas = campRes.rows;
+  
+  if (campanas.length === 0) {
+    const defaultCampanas = [
+      { nombre: 'Inicio de año', anio: 2026, numero: 1 },
+      { nombre: 'Madres', anio: 2026, numero: 2 },
+      { nombre: 'Vacaciones', anio: 2026, numero: 3 },
+      { nombre: 'Temporada', anio: 2026, numero: 4 }
+    ];
+    for (const c of defaultCampanas) {
+      await pool.query('INSERT INTO campanas (nombre, anio, numero) VALUES ($1, $2, $3)', [c.nombre, c.anio, c.numero]);
+    }
+    const freshCamps = await pool.query('SELECT nombre, anio::int, numero::int FROM campanas ORDER BY anio DESC, numero ASC');
+    campanas = freshCamps.rows;
+  }
+
+  // Query campaign references mapping
+  const refsRes = await pool.query('SELECT * FROM campanas_referencias');
+  const campanasReferencias: Record<string, string[]> = {};
+  refsRes.rows.forEach(row => {
+    campanasReferencias[row.campana_key] = row.referencias;
+  });
+
+  // Query active vendor configuration
+  const vendedorRes = await pool.query('SELECT nombre, codigo FROM vendedor ORDER BY id DESC LIMIT 1');
+  const vendedor = vendedorRes.rows[0] || { nombre: 'Lina Pulgarin', codigo: 'V-102' };
+
+  // Query active, deleted, and backup orders
+  const pedidos = await queryPedidos('NOT es_deleted AND NOT es_backup');
+  const deletedPedidos = await queryPedidos('es_deleted AND NOT es_backup');
+  const backups = await queryPedidos('es_backup');
+
+  return {
+    clientes,
+    pedidos,
+    deletedPedidos,
+    backups,
+    vendedor,
+    prendas,
+    usuarios,
+    campanas,
+    campanasReferencias
+  };
 }
 
 export async function saveClientes(clientes: any[]) {
-  return safeWriteFile(DB_PATHS.clientes, clientes);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (clientes.length > 0) {
+      for (const c of clientes) {
+        await client.query(`
+          INSERT INTO clientes (
+            id, codigo_cliente, nombre, documento_identidad, telefono, correo, direccion, ciudad, notas, fecha_registro, limite_facturacion
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+          ON CONFLICT (id) DO UPDATE SET
+            codigo_cliente = EXCLUDED.codigo_cliente,
+            nombre = EXCLUDED.nombre,
+            documento_identidad = EXCLUDED.documento_identidad,
+            telefono = EXCLUDED.telefono,
+            correo = EXCLUDED.correo,
+            direccion = EXCLUDED.direccion,
+            ciudad = EXCLUDED.ciudad,
+            notas = EXCLUDED.notas,
+            fecha_registro = EXCLUDED.fecha_registro,
+            limite_facturacion = EXCLUDED.limite_facturacion
+        `, [
+          c.id, c.codigoCliente, c.nombre, c.documentoIdentidad, c.telefono || '', c.correo || '', c.direccion || '', c.ciudad || '', c.notas || null, c.fechaRegistro, c.limiteFacturacion || null
+        ]);
+      }
+      const ids = clientes.map(c => c.id);
+      await client.query('DELETE FROM clientes WHERE NOT (id = ANY($1))', [ids]);
+    } else {
+      await client.query('DELETE FROM clientes');
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function savePedidos(pedidos: any[]) {
-  return safeWriteFile(DB_PATHS.pedidos, pedidos);
+  return saveOrdersSlice(pedidos, false, false);
 }
 
 export async function saveDeletedPedidos(deletedPedidos: any[]) {
-  return safeWriteFile(DB_PATHS.deletedPedidos, deletedPedidos);
+  return saveOrdersSlice(deletedPedidos, true, false);
 }
 
 export async function saveBackups(backups: any[]) {
-  return safeWriteFile(DB_PATHS.backups, backups);
+  return saveOrdersSlice(backups, false, true);
 }
 
 export async function saveVendedor(vendedor: any) {
-  return safeWriteFile(DB_PATHS.vendedor, vendedor);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('DELETE FROM vendedor');
+    await client.query('INSERT INTO vendedor (nombre, codigo) VALUES ($1, $2)', [vendedor.nombre, vendedor.codigo]);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function savePrendas(prendas: any[]) {
-  return safeWriteFile(DB_PATHS.prendas, prendas);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (prendas.length > 0) {
+      for (const p of prendas) {
+        await client.query(`
+          INSERT INTO prendas (
+            ref, nombre, categoria, precio_base, tallas_disponibles, imagen_url, stock, descripcion
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ON CONFLICT (ref) DO UPDATE SET
+            nombre = EXCLUDED.nombre,
+            categoria = EXCLUDED.categoria,
+            precio_base = EXCLUDED.precio_base,
+            tallas_disponibles = EXCLUDED.tallas_disponibles,
+            imagen_url = EXCLUDED.imagen_url,
+            stock = EXCLUDED.stock,
+            descripcion = EXCLUDED.descripcion
+        `, [
+          p.ref, p.nombre, JSON.stringify(p.categoria), p.precioBase, JSON.stringify(p.tallasDisponibles), p.imagenUrl || null, p.stock, p.descripcion || null
+        ]);
+      }
+      const refs = prendas.map(p => p.ref);
+      await client.query('DELETE FROM prendas WHERE NOT (ref = ANY($1))', [refs]);
+    } else {
+      await client.query('DELETE FROM prendas');
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function saveUsuarios(usuarios: any[]) {
-  return safeWriteFile(DB_PATHS.usuarios, usuarios);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    if (usuarios.length > 0) {
+      for (const u of usuarios) {
+        await client.query(`
+          INSERT INTO usuarios (
+            id, nombre, usuario, clave, rol, es_primera_vez, activo, id_vendedor
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          ON CONFLICT (id) DO UPDATE SET
+            nombre = EXCLUDED.nombre,
+            usuario = EXCLUDED.usuario,
+            clave = EXCLUDED.clave,
+            rol = EXCLUDED.rol,
+            es_primera_vez = EXCLUDED.es_primera_vez,
+            activo = EXCLUDED.activo,
+            id_vendedor = EXCLUDED.id_vendedor
+        `, [
+          u.id, u.nombre, u.usuario, u.clave, u.rol, u.esPrimeraVez, u.activo !== false, u.idVendedor || null
+        ]);
+      }
+      const ids = usuarios.map(u => u.id);
+      await client.query('DELETE FROM usuarios WHERE NOT (id = ANY($1))', [ids]);
+    } else {
+      await client.query('DELETE FROM usuarios');
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function saveCampanas(campanas: any[]) {
-  return safeWriteFile(DB_PATHS.campanas, campanas);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('DELETE FROM campanas');
+    if (campanas.length > 0) {
+      for (const c of campanas) {
+        await client.query(`
+          INSERT INTO campanas (nombre, anio, numero) VALUES ($1, $2, $3)
+        `, [c.nombre, c.anio, c.numero]);
+      }
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 export async function saveCampanasReferencias(campanasReferencias: Record<string, string[]>) {
-  return safeWriteFile(DB_PATHS.campanasReferencias, campanasReferencias);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('DELETE FROM campanas_referencias');
+    for (const [key, refs] of Object.entries(campanasReferencias)) {
+      await client.query(`
+        INSERT INTO campanas_referencias (campana_key, referencias) VALUES ($1, $2)
+      `, [key, JSON.stringify(refs)]);
+    }
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }

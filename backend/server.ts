@@ -4,10 +4,14 @@ import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import apiRouter from './routes/api';
 import { PORT, NODE_ENV, FOTOS_REFERENCIAS_DIR } from './config';
+import { initDatabaseSchema } from './services/dbConnection';
 
 const isProd = NODE_ENV === 'production';
 
 async function startServer() {
+  // Initialize PostgreSQL database schemas if they do not exist
+  await initDatabaseSchema();
+
   const app = express();
   app.use(cors()); // Permitir peticiones desde Netlify u otros orígenes
   app.use(express.json({ limit: '50mb' })); // Support larger payloads for Base64 images if needed
